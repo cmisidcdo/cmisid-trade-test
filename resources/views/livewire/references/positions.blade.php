@@ -1,278 +1,511 @@
 <div>
     <section class="section dashboard">
-          <div class="card">
-              <div class="card-body">
-                <h5 class="card-title">Positions</h5>
-                <div class="col-4 text-start">
-                  <input type="text" class="form-control" placeholder="search" wire:model.live="search">
-                </div>
-                <div class="text-end">
-                  {{-- <button class="btn btn-primary">Add</button> --}}
-                  <button type="button" class="btn {{ $archive ? 'btn-success' : 'btn-warning' }}" wire:click="toggleArchive">
-                    {{ $archive ? 'General' : 'Archive' }}
-                </button>                
-                  <button type="button" class="btn btn-primary" wire:click='clear' data-bs-toggle="modal" data-bs-target="#positionModal" >
-                    Add
-                  </button>
-                  
-                </div>
-  
-  
-                <!-- Table with stripped rows -->
-                <table class="table table-hover">
-                  <thead>
-                    <tr>
-                      <th scope="col">#</th>
-                      <th scope="col">Title</th>
-                      <th scope="col">Salary Grade</th>
-                      <th scope="col">Competency Level</th>
-                      <th scope="col">Status</th>
-                      <th scope="col">Priority</th>
-                      <th scope="col">Actions</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    @forelse($positions as $item)
-                    <tr>
-                      <td scope="row">{{$item->id}}</td>
-                      <td>{{$item->title}}</td>
-                      <td>{{$item->salary_grade}}</td>
-                      <td>{{$item->competency_level}}</td>
-                      <td>
-                        <span class="badge rounded-pill {{$item->deleted_at == Null ? 'bg-success': 'bg-danger'}}">
-                          {{$item->deleted_at == Null ? 'active': 'inactive'}}
-                        </span>
-                        
-                      </td>
-                      <td>
-                        <span class="badge rounded-pill {{$item->interview_priority == True ? 'bg-success': 'bg-danger'}}">
-                          {{$item->interview_priority == True ? 'Yes': 'No'}}
-                        </span>
-                        
-                      </td>
-                      <td>
-                        <button class="btn btn-secondary" wire:click='readPosition({{$item->id}})'>
-                          Edit
-                        </button>
-  
-                        <button class="{{$item->deleted_at == Null ? 'btn btn-danger': 'btn btn-success'}}" wire:click='{{$item->deleted_at == Null ? 'deletePosition('.$item->id.')': 'restorePosition('.$item->id.')'}}'>
-                          {{$item->deleted_at == Null ? 'Delete': 'Restore'}}
-                        </button>
-                      </td>
-                    </tr>
-                    @empty
-                      <tr>
-                        <th colspan="7">No Record</th>
-                      </tr>
-                      
-                    @endforelse
-                  </tbody>
-                </table>
-                <!-- End Table with stripped rows -->
-                <div>
-                  {{$positions->links()}}
-                </div>
-              </div>
-            </div>
-  
-          
-            <div class="modal fade" id="positionModal" tabindex="-1" aria-labelledby="positionModalLabel" aria-hidden="true" wire:ignore.self>
-                <div class="modal-dialog">
-                    <div class="modal-content">
-                        <div class="modal-header">
-                            <h5 class="modal-title" id="positionModalLabel">{{$editMode ? 'Update Position' : 'Add Position'}}</h5>
-                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" wire:click='clear'></button>
+        <div class="card shadow-sm">
+            <div class="card-body p-4">
+                <h5 class="card-title fw-bold mb-4">Positions</h5>
+                
+                <!-- Search and Action Buttons Row -->
+                <div class="row mb-4 align-items-center">
+                    <div class="col-md-6">
+                        <div class="input-group">
+                            <span class="input-group-text bg-light border">
+                                <i class="bi bi-search"></i>
+                            </span>
+                            <input 
+                                type="text" 
+                                class="form-control border" 
+                                placeholder="Search positions..." 
+                                wire:model.live="search"
+                                aria-label="Search positions"
+                            >
+                            <span wire:loading wire:target="search" class="input-group-text bg-light border">
+                                <div class="spinner-border spinner-border-sm text-primary" role="status">
+                                    <span class="visually-hidden">Searching...</span>
+                                </div>
+                            </span>
                         </div>
-                        <div class="modal-body">
-                            <form class="row g-3" wire:submit.prevent="{{$editMode ? 'updatePosition' : 'createPosition'}}">
-                                
-                                {{-- Title --}}
-                                <div class="col-12">
-                                    <label for="title" class="form-label">Title</label>
-                                    <input type="text" class="form-control" wire:model="title">
-                                    @error('title')
-                                    <div class="custom-invalid-feedback">{{$message}}</div>
+                    </div>
+                    <div class="col-md-6 d-flex justify-content-end gap-2 mt-3 mt-md-0">
+                        <button 
+                            type="button" 
+                            class="btn {{ $archive ? 'btn-outline-primary' : 'btn-outline-secondary' }} d-flex align-items-center"
+                            wire:click="toggleArchive"
+                            title="{{ $archive ? 'Switch to Added positions' : 'Switch to archived positions' }}"
+                        >
+                            <i class="bi {{ $archive ? 'bi-archive-fill' : 'bi-archive' }} me-1"></i>
+                            {{ $archive ? 'View Added Positions' : 'View Archived Positions' }}
+                        </button>                
+                        <button 
+                            type="button" 
+                            class="btn btn-primary d-flex align-items-center" 
+                            wire:click='clear' 
+                            data-bs-toggle="modal" 
+                            data-bs-target="#positionModal"
+                            title="Add new position"
+                        >
+                            <i class="bi bi-plus-circle me-1"></i> Add Position
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Table with improved styling -->
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle">
+                        <thead class="table-light">
+                            <tr>
+                                <th scope="col" class="fw-semibold">#</th>
+                                <th scope="col" class="fw-semibold">Title</th>
+                                <th scope="col" class="fw-semibold">Salary Grade</th>
+                                <th scope="col" class="fw-semibold">Competency Level</th>
+                                <th scope="col" class="fw-semibold">Status</th>
+                                <th scope="col" class="fw-semibold">Priority</th>
+                                <th scope="col" class="fw-semibold text-center">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @forelse($positions as $item)
+                            <tr class="position-row">
+                                <td scope="row">{{$item->id}}</td>
+                                <td class="fw-medium">{{$item->title}}</td>
+                                <td>{{$item->salary_grade}}</td>
+                                <td>
+                                    <span class="badge rounded-pill 
+                                        {{ $item->competency_level == 'basic' ? 'bg-info' : 
+                                          ($item->competency_level == 'intermediate' ? 'bg-primary' : 'bg-dark') }}">
+                                        {{ucfirst($item->competency_level)}}
+                                    </span>
+                                </td>
+                                <td>
+                                    <span class="badge rounded-pill {{$item->deleted_at == Null ? 'bg-success': 'bg-danger'}}">
+                                        {{$item->deleted_at == Null ? 'Active': 'Inactive'}}
+                                    </span>
+                                </td>
+                                <td>
+                                    <span class="badge rounded-pill {{$item->interview_priority == True ? 'bg-success': 'bg-secondary'}}">
+                                        {{$item->interview_priority == True ? 'Priority': 'Standard'}}
+                                    </span>
+                                </td>
+                                <td>
+                                    <div class="d-flex justify-content-center gap-2">
+                                        <button 
+                                            class="btn btn-sm btn-outline-primary" 
+                                            wire:click='readPosition({{$item->id}})'
+                                            title="Edit position"
+                                        >
+                                            <i class="bi bi-pencil-square me-1"></i> Edit
+                                        </button>
+            
+                                        <button 
+                                            class="btn btn-sm {{$item->deleted_at == Null ? 'btn-outline-danger': 'btn-outline-success'}}" 
+                                            wire:click='{{$item->deleted_at == Null ? 'deletePosition('.$item->id.')': 'restorePosition('.$item->id.')'}}'
+                                            title="{{$item->deleted_at == Null ? 'Move to archive' : 'Restore position'}}"
+                                        >
+                                            <i class="bi {{$item->deleted_at == Null ? 'bi-archive' : 'bi-arrow-counterclockwise'}} me-1"></i>
+                                            {{$item->deleted_at == Null ? 'Archive': 'Restore'}}
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                            @empty
+                                <tr>
+                                    <td colspan="7" class="text-center py-4">
+                                        <div class="empty-state">
+                                            <i class="bi bi-folder2-open text-muted" style="font-size: 2rem;"></i>
+                                            <p class="mt-2 mb-0">No positions found</p>
+                                            @if(!empty($search))
+                                                <p class="text-muted small">Try adjusting your search criteria</p>
+                                            @endif
+                                        </div>
+                                    </td>
+                                </tr>
+                            @endforelse
+                        </tbody>
+                    </table>
+                </div>
+                
+                <!-- Pagination with improved styling -->
+                <div class="mt-4">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div class="pagination-info text-muted small">
+                            Showing {{ $positions->firstItem() ?? 0 }} to {{ $positions->lastItem() ?? 0 }} of {{ $positions->total() ?? 0 }} entries
+                        </div>
+                        {{$positions->links()}}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Position Modal with improved layout -->
+        <div class="modal fade" id="positionModal" tabindex="-1" aria-labelledby="positionModalLabel" aria-hidden="true" wire:ignore.self>
+            <div class="modal-dialog modal-lg">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="positionModalLabel">
+                            <i class="bi {{ $editMode ? 'bi-pencil-square' : 'bi-plus-circle' }} me-1"></i>
+                            {{$editMode ? 'Update Position' : 'Add Position'}}
+                        </h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" wire:click='clear'></button>
+                    </div>
+                    <div class="modal-body">
+                        <form class="row g-4" wire:submit.prevent="{{$editMode ? 'updatePosition' : 'createPosition'}}">
+                            
+                            <!-- Title Field -->
+                            <div class="col-12">
+                                <label for="title" class="form-label fw-semibold">Title <span class="text-danger">*</span></label>
+                                <input 
+                                    type="text" 
+                                    id="title"
+                                    class="form-control @error('title') is-invalid @enderror" 
+                                    wire:model="title"
+                                    placeholder="Enter position title"
+                                >
+                                @error('title')
+                                <div class="invalid-feedback">{{$message}}</div>
+                                @enderror
+                            </div>
+        
+                            <!-- Salary Grade & Interview Priority -->
+                            <div class="row g-3">
+                                <div class="col-md-6">
+                                    <label for="salary_grade" class="form-label fw-semibold">Salary Grade <span class="text-danger">*</span></label>
+                                    <input 
+                                        type="number" 
+                                        id="salary_grade"
+                                        class="form-control @error('salary_grade') is-invalid @enderror" 
+                                        wire:model="salary_grade"
+                                        placeholder="Enter grade (1-30)"
+                                    >
+                                    @error('salary_grade')
+                                    <div class="invalid-feedback">{{$message}}</div>
                                     @enderror
                                 </div>
-            
-                                {{-- Salary Grade & Interview Priority in One Row --}}
-                                <div class="row">
-                                    <div class="col-6">
-                                        <label for="salary_grade" class="form-label">Salary Grade</label>
-                                        <input type="number" class="form-control" wire:model="salary_grade">
-                                        @error('salary_grade')
-                                        <div class="custom-invalid-feedback">{{$message}}</div>
-                                        @enderror
+        
+                                <div class="col-md-6">
+                                    <label class="form-label fw-semibold d-block">Interview Priority <span class="text-danger">*</span></label>
+                                    <div class="form-check form-check-inline">
+                                        <input 
+                                            class="form-check-input @error('interview_priority') is-invalid @enderror" 
+                                            type="radio" 
+                                            id="priorityYes"
+                                            wire:model="interview_priority" 
+                                            value="1"
+                                        >
+                                        <label class="form-check-label" for="priorityYes">Priority</label>
                                     </div>
-            
-                                    <div class="col-6">
-                                        <label class="form-label">Interview Priority</label>
-                                        <div class="form-check">
-                                            <input class="form-check-input" type="radio" wire:model="interview_priority" value="1">
-                                            <label class="form-check-label">Yes</label>
-                                        </div>
-                                        <div class="form-check">
-                                            <input class="form-check-input" type="radio" wire:model="interview_priority" value="0">
-                                            <label class="form-check-label">No</label>
-                                        </div>
-                                        @error('interview_priority')
-                                        <div class="custom-invalid-feedback">{{$message}}</div>
-                                        @enderror
+                                    <div class="form-check form-check-inline">
+                                        <input 
+                                            class="form-check-input @error('interview_priority') is-invalid @enderror" 
+                                            type="radio" 
+                                            id="priorityNo"
+                                            wire:model="interview_priority" 
+                                            value="0"
+                                        >
+                                        <label class="form-check-label" for="priorityNo">Standard</label>
                                     </div>
-                                </div>
-            
-                                {{-- Competency Level --}}
-                                <div class="col-12">
-                                    <label for="competency_level" class="form-label">Competency Level</label>
-                                    <select class="form-control" wire:model="competency_level">
-                                        <option value="">Select Level</option>
-                                        <option value="basic">Basic</option>
-                                        <option value="intermediate">Intermediate</option>
-                                        <option value="advanced">Advanced</option>
-                                    </select>
-                                    @error('competency_level')
-                                    <div class="custom-invalid-feedback">{{$message}}</div>
+                                    @error('interview_priority')
+                                    <div class="d-block invalid-feedback">{{$message}}</div>
                                     @enderror
                                 </div>
-            
-                                {{-- Add Skills Button --}}
-                                <div class="col-12 text-end">
-                                    <button type="button" class="btn btn-success" wire:click="selectSkills">
-                                        Add Skill
+                            </div>
+        
+                            <!-- Competency Level -->
+                            <div class="col-12">
+                                <label for="competency_level" class="form-label fw-semibold">Competency Level <span class="text-danger">*</span></label>
+                                <select 
+                                    class="form-select @error('competency_level') is-invalid @enderror" 
+                                    id="competency_level"
+                                    wire:model="competency_level"
+                                >
+                                    <option value="">Select Level</option>
+                                    <option value="basic">Basic</option>
+                                    <option value="intermediate">Intermediate</option>
+                                    <option value="advanced">Advanced</option>
+                                </select>
+                                @error('competency_level')
+                                <div class="invalid-feedback">{{$message}}</div>
+                                @enderror
+                            </div>
+        
+                            <!-- Skills Section -->
+                            <div class="col-12">
+                                <div class="d-flex justify-content-between align-items-center mb-3">
+                                    <h5 class="fw-semibold mb-0">Required Skills</h5>
+                                    <button 
+                                        type="button" 
+                                        class="btn btn-success btn-sm d-flex align-items-center" 
+                                        wire:click="selectSkills"
+                                    >
+                                        <i class="bi bi-plus-circle me-1"></i> Add Skill
                                     </button>
                                 </div>
-            
-                                {{-- Skills Table --}}
-                                <div class="col-12">
-                                    <h5>Skills</h5>
+                                
+                                <!-- Skills Table -->
+                                <div class="table-responsive">
                                     <table class="table table-hover">
-                                        <thead>
+                                        <thead class="table-light">
                                             <tr>
-                                                <th>#</th>
-                                                <th>Skill Title</th>
-                                                <th>Competency Level</th>
-                                                <th>Actions</th>
+                                                <th class="fw-semibold">#</th>
+                                                <th class="fw-semibold">Skill Title</th>
+                                                <th class="fw-semibold">Competency Level</th>
+                                                <th class="fw-semibold text-center">Actions</th>
                                             </tr>
                                         </thead>
                                         <tbody>
                                             @forelse($selectedskills as $index => $selectedskill)
                                             <tr>
                                                 <td>{{ $index + 1 }}</td>
-                                                <td>{{ $selectedskill['title'] }}</td>
+                                                <td class="fw-medium">{{ $selectedskill['title'] }}</td>
                                                 <td>
-                                                    <select class="form-control" 
-                                                            wire:change="updateCompetencyLevel({{ $index }}, $event.target.value)">
+                                                    <select 
+                                                        class="form-select form-select-sm" 
+                                                        wire:change="updateCompetencyLevel({{ $index }}, $event.target.value)"
+                                                        aria-label="Select competency level"
+                                                    >
                                                         <option value="basic" {{ $selectedskill['competency_level'] == 'basic' ? 'selected' : '' }}>Basic</option>
                                                         <option value="intermediate" {{ $selectedskill['competency_level'] == 'intermediate' ? 'selected' : '' }}>Intermediate</option>
                                                         <option value="advanced" {{ $selectedskill['competency_level'] == 'advanced' ? 'selected' : '' }}>Advanced</option>
                                                     </select>
                                                 </td>
-                                                <td>
-                                                    <button class="btn btn-danger" wire:click.prevent="removeSkill({{ $index }})">
-                                                        Remove
+                                                <td class="text-center">
+                                                    <button 
+                                                        class="btn btn-danger btn-sm" 
+                                                        wire:click.prevent="removeSkill({{ $index }})"
+                                                        title="Remove this skill"
+                                                    >
+                                                        <i class="bi bi-trash me-1"></i> Remove
                                                     </button>    
                                                 </td>
                                             </tr>
                                             @empty
                                             <tr>
-                                                <td colspan="4">No skills added yet.</td>
+                                                <td colspan="4" class="text-center py-3 text-muted">
+                                                    <i class="bi bi-info-circle me-1"></i> No skills added yet.
+                                                </td>
                                             </tr>
                                             @endforelse
                                         </tbody>                                        
-                                        
                                     </table>
                                 </div>
-            
-                                {{-- Submit and Close Buttons --}}
-                                <div class="text-center">
-                                    <button type="submit" class="btn btn-primary">Submit</button>
-                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" wire:click='clear'>Close</button>
-                                </div>
-                            </form>
+                            </div>
+        
+                            <!-- Modal Footer Buttons -->
+                            <div class="col-12 d-flex justify-content-end gap-2 mt-4">
+                                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal" wire:click='clear'>
+                                    <i class="bi bi-x-circle me-1"></i> Cancel
+                                </button>
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="bi {{ $editMode ? 'bi-check2-circle' : 'bi-plus-circle' }} me-1"></i>
+                                    {{ $editMode ? 'Update' : 'Save' }} Position
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Skills Selection Modal with improved styling -->
+        <div class="modal fade" id="skillsModal" tabindex="-1" aria-labelledby="skillsModalLabel" aria-hidden="true" wire:ignore.self>
+            <div class="modal-dialog modal-lg">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="skillsModalLabel">
+                            <i class="bi bi-list-check me-1"></i> Select Skills
+                        </h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" wire:click='clear'></button>
+                    </div>
+                    <div class="modal-body">
+                        <!-- Search Skills Input -->
+                        <div class="mb-3">
+                            <div class="input-group">
+                                <span class="input-group-text bg-light border">
+                                    <i class="bi bi-search"></i>
+                                </span>
+                                <input 
+                                    type="text" 
+                                    class="form-control" 
+                                    placeholder="Search skills..." 
+                                    wire:model.live="skillSearch"
+                                    aria-label="Search skills"
+                                >
+                                <span wire:loading wire:target="skillSearch" class="input-group-text bg-light border">
+                                    <div class="spinner-border spinner-border-sm text-primary" role="status">
+                                        <span class="visually-hidden">Searching...</span>
+                                    </div>
+                                </span>
+                            </div>
+                        </div>
+                        
+                        <!-- Skills Table -->
+                        <div class="table-responsive">
+                            <table class="table table-hover align-middle">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th class="fw-semibold">#</th>
+                                        <th class="fw-semibold">Skill Title</th>
+                                        <th class="fw-semibold text-center">Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @forelse($skills as $item)
+                                    <tr>
+                                        <td scope="row">{{$item->id}}</td>
+                                        <td class="fw-medium">{{$item->title}}</td>
+                                        <td class="text-center">
+                                            <button 
+                                                class="btn btn-success btn-sm" 
+                                                wire:click="addSkill({{$item->id}})"
+                                                wire:loading.attr="disabled"
+                                                wire:target="addSkill({{$item->id}})"
+                                            >
+                                                <i class="bi bi-plus-circle me-1"></i> Add
+                                                <span wire:loading wire:target="addSkill({{$item->id}})">
+                                                    <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+                                                </span>
+                                            </button>
+                                        </td>
+                                    </tr>
+                                    @empty
+                                    <tr>
+                                        <td colspan="3" class="text-center py-4 text-muted">
+                                            <i class="bi bi-info-circle me-1"></i> No skills available.
+                                        </td>
+                                    </tr>
+                                    @endforelse
+                                </tbody>
+                            </table>
+                            
+                            <!-- Skills Pagination -->
+                            <div class="mt-3">
+                                {{ $skills->links() }}
+                            </div>
+                        </div>
+        
+                        <!-- Skills Modal Footer -->
+                        <div class="d-flex justify-content-end gap-2 mt-4">
+                            <button 
+                                type="button" 
+                                class="btn btn-primary" 
+                                wire:click="backToPosition"
+                            >
+                                <i class="bi bi-arrow-left me-1"></i> Back to Position
+                            </button>
                         </div>
                     </div>
                 </div>
             </div>
-            
-            {{-- Skills Selection Modal --}}
-            <div class="modal fade" id="skillsModal" tabindex="-1" aria-labelledby="skillsModalLabel" aria-hidden="true" wire:ignore.self>
-                <div class="modal-dialog">
-                    <div class="modal-content">
-                        <div class="modal-header">
-                            <h5 class="modal-title" id="skillsModalLabel">Select Skills</h5>
-                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" wire:click='clear'></button>
-                        </div>
-                        <div class="modal-body">
-                            {{-- Skills Table --}}
-                            <div class="col-12">
-                                <h5>Available Skills</h5>
-                                <table class="table table-hover">
-                                    <thead>
-                                        <tr>
-                                            <th>#</th>
-                                            <th>Skill Title</th>
-                                            <th>Actions</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        @forelse($skills as $item)
-                                        <tr>
-                                          <td scope="row">{{$item->id}}</td>
-                                          <td>{{$item->title}}</td>
-                                            <td>
-                                                <button class="btn btn-success" wire:click="addSkill({{$item->id}})">
-                                                    Add
-                                                </button>
-                                            </td>
-                                        </tr>
-                                        @empty
-                                        <tr>
-                                            <td colspan="3">No skills available.</td>
-                                        </tr>
-                                        @endforelse
-                                    </tbody>
-                                </table>
-                                    {{ $skills->links() }}
-
-                            </div>
-            
-                            {{-- Submit and Close Buttons --}}
-                            <div class="text-center">
-                                <button type="button" class="btn btn-secondary" wire:click="backToPosition">Back</button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            
-            
+        </div>
     </section>
-  </div>
-  
-  @script
-  <script>
-    $wire.on('hide-positionModal', () => {
-        console.log('Hiding position modal');
-        $('#positionModal').modal('hide');
-    });
-  
-    $wire.on('show-positionModal', () => {
-        console.log('Showing position modal');
-        $('#positionModal').modal('show');
-    });
 
-    $wire.on('show-skillsModal', () => {
-        console.log('Showing skills modal');
-        $('#positionModal').modal('hide');
-        $('#skillsModal').modal('show');
-    });
+    @script
+    <script>
+        // Initialize tooltips
+        document.addEventListener('DOMContentLoaded', function() {
+            var tooltipTriggerList = [].slice.call(document.querySelectorAll('[title]'));
+            var tooltipList = tooltipTriggerList.map(function(tooltipTriggerEl) {
+                return new bootstrap.Tooltip(tooltipTriggerEl, {
+                    trigger: 'hover'
+                });
+            });
+            
+            // Reinitialize tooltips when Livewire updates the DOM
+            document.addEventListener('livewire:load', function() {
+                initTooltips();
+            });
+            
+            document.addEventListener('livewire:update', function() {
+                initTooltips();
+            });
+            
+            function initTooltips() {
+                var tooltipTriggerList = [].slice.call(document.querySelectorAll('[title]'));
+                var tooltipList = tooltipTriggerList.map(function(tooltipTriggerEl) {
+                    return new bootstrap.Tooltip(tooltipTriggerEl, {
+                        trigger: 'hover'
+                    });
+                });
+            }
+        });
+    
+        // Modal control
+        $wire.on('hide-positionModal', () => {
+            console.log('Hiding position modal');
+            bootstrap.Modal.getInstance(document.getElementById('positionModal')).hide();
+        });
+    
+        $wire.on('show-positionModal', () => {
+            console.log('Showing position modal');
+            new bootstrap.Modal(document.getElementById('positionModal')).show();
+        });
 
-    $wire.on('hide-skillsModal', () => {
-        console.log('Showing skills modal');
-        $('#positionModal').modal('show');
-        $('#skillsModal').modal('hide');
-    });
+        $wire.on('show-skillsModal', () => {
+            console.log('Showing skills modal');
+            bootstrap.Modal.getInstance(document.getElementById('positionModal')).hide();
+            new bootstrap.Modal(document.getElementById('skillsModal')).show();
+        });
 
-  </script>
-  @endscript
-  
+        $wire.on('hide-skillsModal', () => {
+            console.log('Hiding skills modal');
+            new bootstrap.Modal(document.getElementById('positionModal')).show();
+            bootstrap.Modal.getInstance(document.getElementById('skillsModal')).hide();
+        });
+    </script>
+    @endscript
+    
+    <style>
+        /* Improve table row hover effect */
+        .table tbody tr:hover {
+            background-color: rgba(0, 123, 255, 0.05);
+            transition: background-color 0.2s ease;
+        }
+        
+        /* Improve button hover effects */
+        .btn {
+            transition: all 0.2s ease-in-out;
+        }
+        
+        .btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        
+        /* Improve modal transitions */
+        .modal.fade .modal-dialog {
+            transition: transform 0.3s ease-out;
+        }
+        
+        /* Empty state styling */
+        .empty-state {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 1.5rem;
+            color: #6c757d;
+        }
+        
+        /* Improve form validation styling */
+        .was-validated .form-control:invalid, .form-control.is-invalid {
+            border-color: #dc3545;
+            padding-right: calc(1.5em + 0.75rem);
+            background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='none' stroke='%23dc3545' viewBox='0 0 12 12'%3e%3ccircle cx='6' cy='6' r='4.5'/%3e%3cpath stroke-linejoin='round' d='M5.8 3.6h.4L6 6.5z'/%3e%3ccircle cx='6' cy='8.2' r='.6' fill='%23dc3545' stroke='none'/%3e%3c/svg%3e");
+            background-repeat: no-repeat;
+            background-position: right calc(0.375em + 0.1875rem) center;
+            background-size: calc(0.75em + 0.375rem) calc(0.75em + 0.375rem);
+        }
+        
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            .table-responsive {
+                border: 0;
+            }
+            
+            .btn {
+                padding: 0.375rem 0.75rem;
+            }
+            
+            .input-group {
+                width: 100%;
+            }
+        }
+    </style>
+</div>

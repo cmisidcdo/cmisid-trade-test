@@ -1,112 +1,282 @@
 <div>
-    <section class="section dashboard">
-          <div class="card">
-              <div class="card-body">
-                <h5 class="card-title">Skills</h5>
-                <div class="col-4 text-start">
-                  <input type="text" class="form-control" placeholder="search" wire:model.live="search">
-                </div>
-                <div class="text-end">
-                  {{-- <button class="btn btn-primary">Add</button> --}}
-                  <button type="button" class="btn {{ $archive ? 'btn-success' : 'btn-warning' }}" wire:click="toggleArchive">
-                    {{ $archive ? 'General' : 'Archive' }}
-                </button>                
-                  <button type="button" class="btn btn-primary" wire:click='clear' data-bs-toggle="modal" data-bs-target="#skillModal" >
-                    Add
-                  </button>
-                  
-                </div>
-  
-  
-                <!-- Table with stripped rows -->
-                <table class="table table-hover">
-                  <thead>
-                    <tr>
-                      <th scope="col">#</th>
-                      <th scope="col">Title</th>
-                      <th scope="col">Status</th>
-                      <th scope="col">Actions</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    @forelse($skills as $item)
-                    <tr>
-                      <td scope="row">{{$item->id}}</td>
-                      <td>{{$item->title}}</td>
-                      <td>
-                        <span class="badge rounded-pill {{$item->deleted_at == Null ? 'bg-success': 'bg-danger'}}">
-                          {{$item->deleted_at == Null ? 'active': 'inactive'}}
-                        </span>
-                        
-                      </td>
-                      <td>
-                        <button class="btn btn-secondary" wire:click='readSkill({{$item->id}})'>
-                          Edit
-                        </button>
-  
-                        <button class="{{$item->deleted_at == Null ? 'btn btn-danger': 'btn btn-success'}}" wire:click='{{$item->deleted_at == Null ? 'deleteSkill('.$item->id.')': 'restoreSkill('.$item->id.')'}}'>
-                          {{$item->deleted_at == Null ? 'Delete': 'Restore'}}
-                        </button>
-                      </td>
-                    </tr>
-                    @empty
-                      <tr>
-                        <th colspan="4">No Record</th>
-                      </tr>
-                      
-                    @endforelse
-                  </tbody>
-                </table>
-                <!-- End Table with stripped rows -->
-                <div>
-                  {{$skills->links()}}
-                </div>
-              </div>
-            </div>
-  
-          
-            <div class="modal fade" id="skillModal" tabindex="-1" aria-labelledby="skillModalLabel" aria-hidden="true" wire:ignore.self>
-              <div class="modal-dialog">
-                <div class="modal-content">
-                  <div class="modal-header">
-                    <h5 class="modal-title" id="skillModalLabel">{{$editMode ? 'Update' : 'Add'}}</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" wire:click='clear'></button>
+  <section class="section dashboard">
+      <div class="card shadow-sm border-0 rounded-3">
+          <div class="card-body p-4">
+              <h5 class="card-title mb-4 fw-bold">Skills Management</h5>
+              
+              <!-- Search and Action Buttons Row -->
+              <div class="row mb-4 align-items-center">
+                  <div class="col-md-6">
+                      <div class="input-group">
+                          <span class="input-group-text bg-light border-end-0">
+                              <i class="bi bi-search"></i>
+                          </span>
+                          <input type="text" class="form-control border-start-0 ps-0" 
+                              placeholder="Search skills..." 
+                              wire:model.live.debounce.300ms="search"
+                              aria-label="Search skills">
+                          <button class="btn btn-outline-secondary border-start-0 bg-light" type="button" 
+                              wire:loading.class="d-none" wire:target="search"
+                              wire:click="$set('search', '')">
+                              <i class="bi bi-x"></i>
+                          </button>
+                          <span wire:loading wire:target="search" class="input-group-text bg-light border-start-0">
+                              <div class="spinner-border spinner-border-sm text-primary" role="status">
+                                  <span class="visually-hidden">Searching...</span>
+                              </div>
+                          </span>
+                      </div>
+                      <div id="searchSuggestions" class="position-absolute bg-white shadow-sm rounded p-2 d-none">
+                          <!-- Dynamic search suggestions would appear here -->
+                      </div>
                   </div>
-                  <div class="modal-body">
-                    <form class="row g-3" wire:submit="{{$editMode ? 'updateSkill' : 'createSkill'}}">
-                      <div class="col-12">
-                        <label for="inputNanme4" class="form-label">Title</label>
-                        <input type="text" class="form-control" wire:model="title">
-                        @error('title')
-                          <div class="custom-invalid-feedback">
-                            {{$message}}
+                  <div class="col-md-6 text-md-end mt-3 mt-md-0">
+                      <button type="button" class="btn btn-outline-secondary me-2" 
+                          wire:click="toggleArchive"
+                          aria-label="{{ $archive ? 'View general skills' : 'View archived skills' }}">
+                          <i class="bi {{ $archive ? 'bi-box-arrow-in-up' : 'bi-archive' }} me-1"></i>
+                          {{ $archive ? 'View Active' : 'View Archive' }}
+                          <span class="badge bg-secondary ms-1 rounded-pill" wire:loading wire:target="toggleArchive">
+                              <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+                          </span>
+                      </button>
+                      <button type="button" class="btn btn-primary" 
+                          wire:click='clear' 
+                          data-bs-toggle="modal" 
+                          data-bs-target="#skillModal">
+                          <i class="bi bi-plus-lg me-1"></i> Add Skill
+                      </button>
+                  </div>
+              </div>
+
+              <!-- Table with enhanced styling -->
+              <div class="table-responsive">
+                  <table class="table table-hover table-striped align-middle border-bottom">
+                      <thead class="table-light">
+                          <tr>
+                              <th scope="col" class="text-center">#</th>
+                              <th scope="col" class="sortable" wire:click="sortBy('title')">
+                                  Title
+                                  <i class="bi bi-arrow-down-up text-muted ms-1"></i>
+                              </th>
+                              <th scope="col" class="text-center">Status</th>
+                              <th scope="col" class="text-center">Actions</th>
+                          </tr>
+                      </thead>
+                      <tbody>
+                          @forelse($skills as $item)
+                          <tr>
+                              <td scope="row" class="text-center">{{$item->id}}</td>
+                              <td>{{$item->title}}</td>
+                              <td class="text-center">
+                                  <span class="badge rounded-pill {{$item->deleted_at == Null ? 'bg-success': 'bg-danger'}}">
+                                      {{$item->deleted_at == Null ? 'Active': 'Inactive'}}
+                                  </span>
+                              </td>
+                              <td class="text-center">
+                                  <div class="btn-group" role="group" aria-label="Skill actions">
+                                      <button class="btn btn-sm btn-outline-primary" 
+                                          wire:click='readSkill({{$item->id}})'
+                                          data-bs-toggle="tooltip" 
+                                          data-bs-title="Edit skill">
+                                          <i class="bi bi-pencil"></i>
+                                          <span class="d-none d-md-inline ms-1">Edit</span>
+                                      </button>
+
+                                      <button class="btn btn-sm {{$item->deleted_at == Null ? 'btn-outline-danger': 'btn-outline-success'}}" 
+                                          wire:click='{{$item->deleted_at == Null ? 'deleteSkill('.$item->id.')': 'restoreSkill('.$item->id.')'}}'
+                                          data-bs-toggle="tooltip" 
+                                          data-bs-title="{{$item->deleted_at == Null ? 'Delete skill': 'Restore skill'}}">
+                                          <i class="bi {{$item->deleted_at == Null ? 'bi-trash': 'bi-arrow-counterclockwise'}}"></i>
+                                          <span class="d-none d-md-inline ms-1">{{$item->deleted_at == Null ? 'Delete': 'Restore'}}</span>
+                                      </button>
+                                  </div>
+                              </td>
+                          </tr>
+                          @empty
+                          <tr>
+                              <td colspan="4" class="text-center py-4 text-muted">
+                                  <i class="bi bi-inbox fs-3 d-block mb-2"></i>
+                                  No skills found
+                              </td>
+                          </tr>
+                          @endforelse
+                      </tbody>
+                  </table>
+              </div>
+              
+              <!-- Pagination with enhanced styling -->
+              <div class="d-flex justify-content-center mt-4">
+                  {{$skills->links('pagination::bootstrap-5')}}
+              </div>
+              
+              <!-- Success/Error feedback toast -->
+              <div class="position-fixed bottom-0 end-0 p-3" style="z-index: 11">
+                  <div id="successToast" class="toast align-items-center text-white bg-success border-0" role="alert" aria-live="assertive" aria-atomic="true">
+                      <div class="d-flex">
+                          <div class="toast-body">
+                              <i class="bi bi-check-circle me-2"></i> 
+                              <span id="successMessage">Operation completed successfully!</span>
                           </div>
-                        @enderror
+                          <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
                       </div>
-                      <div class="text-center">
-                        <button type="submit" class="btn btn-primary">Submit</button>
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" wire:click='clear'>Close</button>
-                      </div>
-                    </form>
                   </div>
-                </div>
               </div>
-            </div>
-    </section>
-  </div>
+          </div>
+      </div>
+
+      <!-- Enhanced Modal -->
+      <div class="modal fade" id="skillModal" tabindex="-1" aria-labelledby="skillModalLabel" aria-hidden="true" wire:ignore.self>
+          <div class="modal-dialog modal-dialog-centered">
+              <div class="modal-content border-0 shadow">
+                  <div class="modal-header bg-light">
+                      <h5 class="modal-title" id="skillModalLabel">
+                          <i class="bi {{ $editMode ? 'bi-pencil-square' : 'bi-plus-circle' }} me-2"></i>
+                          {{$editMode ? 'Update Skill' : 'Add New Skill'}}
+                      </h5>
+                      <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" wire:click='clear'></button>
+                  </div>
+                  <div class="modal-body p-4">
+                      <form class="needs-validation" wire:submit="{{$editMode ? 'updateSkill' : 'createSkill'}}">
+                          <div class="mb-4">
+                              <label for="skillTitle" class="form-label fw-medium">Skill Title</label>
+                              <input type="text" class="form-control form-control-lg {{$errors->has('title') ? 'is-invalid' : ''}}" 
+                                  id="skillTitle" 
+                                  wire:model="title" 
+                                  placeholder="Enter skill title"
+                                  autocomplete="off">
+                              @error('title')
+                              <div class="invalid-feedback">
+                                  <i class="bi bi-exclamation-circle me-1"></i>
+                                  {{$message}}
+                              </div>
+                              @enderror
+                          </div>
+                          <div class="d-grid gap-2 d-md-flex justify-content-md-end mt-4">
+                              <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal" wire:click='clear'>
+                                  Cancel
+                              </button>
+                              <button type="submit" class="btn btn-primary px-4">
+                                  <span wire:loading.remove wire:target="{{$editMode ? 'updateSkill' : 'createSkill'}}">
+                                      {{$editMode ? 'Update' : 'Save'}}
+                                  </span>
+                                  <span wire:loading wire:target="{{$editMode ? 'updateSkill' : 'createSkill'}}">
+                                      <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+                                      Processing...
+                                  </span>
+                              </button>
+                          </div>
+                      </form>
+                  </div>
+              </div>
+          </div>
+      </div>
+  </section>
+</div>
+
+@push('styles')
+<style>
+  .custom-invalid-feedback {
+      display: block;
+      width: 100%;
+      margin-top: 0.25rem;
+      font-size: 0.875em;
+      color: #dc3545;
+  }
   
-  @script
-  <script>
-    $wire.on('hide-skillModal', () => {
-        console.log('Hiding skill modal');
-        $('#skillModal').modal('hide');
-    });
+  .sortable {
+      cursor: pointer;
+  }
   
-    $wire.on('show-skillModal', () => {
-        console.log('Showing skill modal');
-        $('#skillModal').modal('show');
-    });
+  .sortable:hover {
+      background-color: rgba(0, 0, 0, 0.05);
+  }
   
-  </script>
-  @endscript
+  /* Responsive adjustments */
+  @media (max-width: 768px) {
+      .card-title {
+          font-size: 1.25rem;
+      }
+      
+      .table th, .table td {
+          padding: 0.5rem;
+      }
+  }
+</style>
+@endpush
+
+@script
+<script>
+  // Initialize tooltips
+  document.addEventListener('DOMContentLoaded', function() {
+      const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+      const tooltipList = tooltipTriggerList.map(function(tooltipTriggerEl) {
+          return new bootstrap.Tooltip(tooltipTriggerEl);
+      });
+      
+      // Reinitialize tooltips when Livewire updates the DOM
+      window.addEventListener('livewire:update', function() {
+          const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+          const tooltipList = tooltipTriggerList.map(function(tooltipTriggerEl) {
+              return new bootstrap.Tooltip(tooltipTriggerEl);
+          });
+      });
+  });
+
+  // Modal handling
+  $wire.on('hide-skillModal', () => {
+      console.log('Hiding skill modal');
+      $('#skillModal').modal('hide');
+      
+      // Show success toast
+      const toast = new bootstrap.Toast(document.getElementById('successToast'));
+      document.getElementById('successMessage').textContent = 'Skill saved successfully!';
+      toast.show();
+  });
+
+  $wire.on('show-skillModal', () => {
+      console.log('Showing skill modal');
+      $('#skillModal').modal('show');
+  });
   
+  // Skill operations feedback
+  $wire.on('skill-deleted', () => {
+      const toast = new bootstrap.Toast(document.getElementById('successToast'));
+      document.getElementById('successMessage').textContent = 'Skill deleted successfully!';
+      toast.show();
+  });
+  
+  $wire.on('skill-restored', () => {
+      const toast = new bootstrap.Toast(document.getElementById('successToast'));
+      document.getElementById('successMessage').textContent = 'Skill restored successfully!';
+      toast.show();
+  });
+  
+  // Search suggestions handling
+  const searchInput = document.querySelector('[wire:model\\.live\\.debounce\\.300ms="search"]');
+  const suggestionsDiv = document.getElementById('searchSuggestions');
+  
+  if (searchInput && suggestionsDiv) {
+      searchInput.addEventListener('focus', function() {
+          if (this.value.length > 1) {
+              suggestionsDiv.classList.remove('d-none');
+          }
+      });
+      
+      searchInput.addEventListener('blur', function() {
+          setTimeout(() => {
+              suggestionsDiv.classList.add('d-none');
+          }, 200);
+      });
+      
+      searchInput.addEventListener('input', function() {
+          if (this.value.length > 1) {
+              suggestionsDiv.classList.remove('d-none');
+              // In a real implementation, you would fetch suggestions from the server here
+          } else {
+              suggestionsDiv.classList.add('d-none');
+          }
+      });
+  }
+</script>
+@endscript

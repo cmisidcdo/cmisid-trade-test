@@ -293,12 +293,12 @@
                 </a>
                 <ul id="forms-nav" class="nav-content collapse " data-bs-parent="#sidebar-nav">
                   <li>
-                    <a href="forms-elements.html">
+                    <a href="{{ route('candidate.list') }}">
                       <i class="bi bi-circle"></i><span>Candidate List</span>
                     </a>
                   </li>
                   <li>
-                    <a href="forms-layouts.html">
+                    <a href="{{ route('candidate.add') }}">
                       <i class="bi bi-circle"></i><span>Add New Candidate</span>
                     </a>
                   </li>
@@ -326,22 +326,22 @@
                     </a>
                   </li>
                   <li>
-                    <a href="tables-data.html">
+                    <a href="{{ route('references.offices') }}">
                       <i class="bi bi-circle"></i><span>Offices</span>
                     </a>
                   </li>
                   <li>
-                    <a href="tables-data.html">
+                    <a href="{{ route('references.prioritygroups') }}">
                       <i class="bi bi-circle"></i><span>Priority Groups</span>
                     </a>
                   </li>
                   <li>
-                    <a href="tables-data.html">
+                    <a href="{{ route('references.venues') }}">
                       <i class="bi bi-circle"></i><span>Venues</span>
                     </a>
                   </li>
                   <li>
-                    <a href="tables-data.html">
+                    <a href="{{ route('references.criterias') }}">
                       <i class="bi bi-circle"></i><span>Evaluation Criteria</span>
                     </a>
                   </li>

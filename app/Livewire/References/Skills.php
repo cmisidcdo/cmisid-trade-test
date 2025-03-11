@@ -61,8 +61,6 @@ class Skills extends Component
             ->paginate(10);
     }
 
-    
-
     public function createSkill()
     {
         $this->validate();
@@ -84,24 +82,12 @@ class Skills extends Component
         $this->resetValidation();
     }
 
-    // public function readSkill(Skill $skill)
-    // {
-    //     $this->fill(
-    //         $skill->only('title')
-    //     );
-
-    //     $this->skill_id = $skill->id;
-    //     $this->editMode = true;
-    //     $this->dispatch('show-skillModal');
-
-    // }
-
     public function readSkill($skillId)
     {
         $skill = Skill::withTrashed()->findOrFail($skillId);
 
         $this->fill(
-            $skill->only('title')
+            $skill->only(['title']) 
         );
 
         $this->skill_id = $skill->id;
@@ -109,22 +95,6 @@ class Skills extends Component
         $this->dispatch('show-skillModal');
     }
 
-
-    // public function updateSkill()
-    // {
-    //     $this->validate();
-
-    //     DB::transaction(function () {  
-        
-    //         $skill = Skill::findOrFail($this->skill_id);
-    //         $skill->title = $this->title;
-    //         $skill->save();
-    //     });
-
-    //     $this->clear();
-    //     $this->dispatch('hide-skillModal');
-    //     $this->dispatch('success', 'Skill updated successfully.');
-    // } 
 
     public function updateSkill()
     {

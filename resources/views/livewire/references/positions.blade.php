@@ -88,6 +88,14 @@
                                 <td>
                                     <div class="d-flex justify-content-center gap-2">
                                         <button 
+                                            class="btn btn-sm btn-outline-info" 
+                                            data-bs-toggle="modal"
+                                            data-bs-target="#viewSkillsModal"
+                                            title="View position skills"
+                                        >
+                                            <i class="bi bi-eye me-1"></i> View
+                                        </button>
+                                        <button 
                                             class="btn btn-sm btn-outline-primary" 
                                             wire:click='readPosition({{$item->id}})'
                                             title="Edit position"
@@ -395,6 +403,116 @@
                 </div>
             </div>
         </div>
+        <!-- View Position Skills Modal -->
+        <div class="modal fade" id="viewSkillsModal" tabindex="-1" aria-labelledby="viewSkillsModalLabel" aria-hidden="true" wire:ignore.self>
+            <div class="modal-dialog modal-lg">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="viewSkillsModalLabel">
+                            <i class="bi bi-eye me-1"></i> Position: HR Manager
+                        </h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <!-- Position Details Section -->
+                        <div class="mb-4">
+                            <h6 class="fw-bold mb-3">Position Details</h6>
+                            <div class="row g-3">
+                                <div class="col-md-6">
+                                    <p class="mb-1"><span class="fw-medium">Title:</span> HR Manager</p>
+                                    <p class="mb-1"><span class="fw-medium">Salary Grade:</span> 18</p>
+                                </div>
+                                <div class="col-md-6">
+                                    <p class="mb-1">
+                                        <span class="fw-medium">Competency Level:</span> 
+                                        <span class="badge rounded-pill bg-primary">
+                                            Intermediate
+                                        </span>
+                                    </p>
+                                    <p class="mb-1">
+                                        <span class="fw-medium">Priority:</span>
+                                        <span class="badge rounded-pill bg-success">
+                                            Priority
+                                        </span>
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="border-top pt-3">
+                            <h6 class="fw-bold mb-3">Required Skills</h6>
+                            
+                            <!-- Skills Table -->
+                            <div class="table-responsive">
+                                <table class="table table-hover">
+                                    <thead class="table-light">
+                                        <tr>
+                                            <th class="fw-semibold">#</th>
+                                            <th class="fw-semibold">Skill Title</th>
+                                            <th class="fw-semibold">Competency Level</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td>1</td>
+                                            <td class="fw-medium">Human Resource Management</td>
+                                            <td>
+                                                <span class="badge rounded-pill bg-dark">
+                                                    Advanced
+                                                </span>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>2</td>
+                                            <td class="fw-medium">Performance Evaluation</td>
+                                            <td>
+                                                <span class="badge rounded-pill bg-primary">
+                                                    Intermediate
+                                                </span>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>3</td>
+                                            <td class="fw-medium">Conflict Resolution</td>
+                                            <td>
+                                                <span class="badge rounded-pill bg-primary">
+                                                    Intermediate
+                                                </span>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>4</td>
+                                            <td class="fw-medium">Communication Skills</td>
+                                            <td>
+                                                <span class="badge rounded-pill bg-dark">
+                                                    Advanced
+                                                </span>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>5</td>
+                                            <td class="fw-medium">Microsoft Office</td>
+                                            <td>
+                                                <span class="badge rounded-pill bg-info">
+                                                    Basic
+                                                </span>
+                                            </td>
+                                        </tr>
+                                    </tbody>                                        
+                                </table>
+                            </div>
+                        </div>
+                
+                        <!-- Modal Footer Buttons -->
+                        <div class="d-flex justify-content-end gap-2 mt-4">
+                            <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
+                                <i class="bi bi-x-circle me-1"></i> Close
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
     </section>
 
     @script
@@ -448,6 +566,14 @@
             console.log('Hiding skills modal');
             new bootstrap.Modal(document.getElementById('positionModal')).show();
             bootstrap.Modal.getInstance(document.getElementById('skillsModal')).hide();
+        });
+        $wire.on('show-viewSkillsModal', () => {
+            console.log('Showing view skills modal');
+            new bootstrap.Modal(document.getElementById('viewSkillsModal')).show();
+        });
+        $wire.on('hide-viewskillsModal', () => {
+            consols.log('Hiding view skills modal');
+            bootstrap.Modal.getInstance(document.getElementById('viewSkillsModal')).hide();
         });
     </script>
     @endscript

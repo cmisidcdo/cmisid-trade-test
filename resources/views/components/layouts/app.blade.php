@@ -326,22 +326,22 @@
                     </a>
                   </li>
                   <li>
-                    <a href="tables-data.html">
+                    <a href="{{ route('references.offices') }}">
                       <i class="bi bi-circle"></i><span>Offices</span>
                     </a>
                   </li>
                   <li>
-                    <a href="tables-data.html">
+                    <a href="{{ route('references.prioritygroups') }}">
                       <i class="bi bi-circle"></i><span>Priority Groups</span>
                     </a>
                   </li>
                   <li>
-                    <a href="tables-data.html">
+                    <a href="{{ route('references.venues') }}">
                       <i class="bi bi-circle"></i><span>Venues</span>
                     </a>
                   </li>
                   <li>
-                    <a href="tables-data.html">
+                    <a href="{{ route('references.criterias') }}">
                       <i class="bi bi-circle"></i><span>Evaluation Criteria</span>
                     </a>
                   </li>

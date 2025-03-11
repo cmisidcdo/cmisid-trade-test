@@ -106,7 +106,7 @@ class Users extends Component
         $user = User::withTrashed()->findOrFail($userId);
 
         $this->fill(
-            $user->only('name','email')
+            $user->only(['name', 'email'])
         );
 
         $this->user_id = $user->id;

@@ -293,12 +293,12 @@
                 </a>
                 <ul id="forms-nav" class="nav-content collapse " data-bs-parent="#sidebar-nav">
                   <li>
-                    <a href="forms-elements.html">
+                    <a href="{{ route('candidate.list') }}">
                       <i class="bi bi-circle"></i><span>Candidate List</span>
                     </a>
                   </li>
                   <li>
-                    <a href="forms-layouts.html">
+                    <a href="{{ route('candidate.add') }}">
                       <i class="bi bi-circle"></i><span>Add New Candidate</span>
                     </a>
                   </li>

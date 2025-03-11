@@ -21,6 +21,7 @@ return new class extends Migration
             $table->foreignId('office_id')->constrained('offices')->onDelete('cascade');
             $table->foreignId('priority_group_id')->constrained('priority_groups')->onDelete('cascade');
             $table->softDeletes();
+            $table->date('endorsement_date')->nullable();
             $table->timestamps();
         });
     }

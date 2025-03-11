@@ -1,5 +1,7 @@
 <?php
 
+use App\Livewire\Candidate\AddCandidate;
+use App\Livewire\Candidate\CandidateList;
 use App\Livewire\References\Offices;
 use App\Livewire\References\Positions;
 use App\Livewire\References\Skills;
@@ -30,4 +32,6 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/references/offices', Offices::class)->name('references.offices');
     Route::get('/references/criterias', EvaluationCriterias::class)->name('references.criterias');
     Route::get('/references/prioritygroups', PriorityGroups::class)->name('references.prioritygroups');
+    Route::get('/candidate/list', CandidateList::class)->name('candidate.list');
+    Route::get('/candidate/add', AddCandidate::class)->name('candidate.add');
 });

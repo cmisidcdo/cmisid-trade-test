@@ -496,7 +496,6 @@
 
     @script
     <script>
-        // Initialize tooltips
         document.addEventListener('DOMContentLoaded', function() {
             var tooltipTriggerList = [].slice.call(document.querySelectorAll('[title]'));
             var tooltipList = tooltipTriggerList.map(function(tooltipTriggerEl) {
@@ -505,7 +504,6 @@
                 });
             });
             
-            // Reinitialize tooltips when Livewire updates the DOM
             document.addEventListener('livewire:load', function() {
                 initTooltips();
             });
@@ -524,7 +522,6 @@
             }
         });
     
-        // Modal control
         $wire.on('hide-positionModal', () => {
             console.log('Hiding position modal');
             bootstrap.Modal.getInstance(document.getElementById('positionModal')).hide();
@@ -558,13 +555,16 @@
     @endscript
     
     <style>
-        /* Improve table row hover effect */
+
+        body {
+            background-color: #b6b6b6;
+        }
+        
         .table tbody tr:hover {
             background-color: rgba(0, 123, 255, 0.05);
             transition: background-color 0.2s ease;
         }
         
-        /* Improve button hover effects */
         .btn {
             transition: all 0.2s ease-in-out;
         }
@@ -574,12 +574,10 @@
             box-shadow: 0 2px 5px rgba(0,0,0,0.1);
         }
         
-        /* Improve modal transitions */
         .modal.fade .modal-dialog {
             transition: transform 0.3s ease-out;
         }
         
-        /* Empty state styling */
         .empty-state {
             display: flex;
             flex-direction: column;
@@ -588,7 +586,6 @@
             color: #6c757d;
         }
         
-        /* Improve form validation styling */
         .was-validated .form-control:invalid, .form-control.is-invalid {
             border-color: #dc3545;
             padding-right: calc(1.5em + 0.75rem);
@@ -598,7 +595,11 @@
             background-size: calc(0.75em + 0.375rem) calc(0.75em + 0.375rem);
         }
         
-        /* Responsive adjustments */
+        .section.dashboard {
+            background-color: #b6b6b6;
+            padding: 20px;
+        }
+        
         @media (max-width: 768px) {
             .table-responsive {
                 border: 0;

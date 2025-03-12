@@ -178,7 +178,7 @@
 
 @push('styles')
 <style>
-  .custom-invalid-feedback {
+    .custom-invalid-feedback {
       display: block;
       width: 100%;
       margin-top: 0.25rem;
@@ -186,11 +186,11 @@
       color: #dc3545;
   }
   
-  .sortable {
+    .sortable {
       cursor: pointer;
   }
   
-  .sortable:hover {
+    .sortable:hover {
       background-color: rgba(0, 0, 0, 0.05);
   }
   

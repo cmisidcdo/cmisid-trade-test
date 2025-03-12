@@ -8,13 +8,9 @@ use App\Livewire\References\Skills;
 use App\Livewire\References\Venues;
 use Illuminate\Support\Facades\Route;
 use App\Livewire\Dashboard;
-use App\Livewire\Exam\AssignExam;
 use App\Livewire\References\EvaluationCriterias;
 use App\Livewire\References\PriorityGroups;
 use App\Livewire\Settings\Users;
-use App\Livewire\Test\AssessmentTest;
-use App\Livewire\Test\OralInterview;
-use App\Livewire\Test\PracticalExam;
 use Illuminate\Support\Facades\Auth;
 
 
@@ -38,8 +34,4 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/references/prioritygroups', PriorityGroups::class)->name('references.prioritygroups');
     Route::get('/candidate/list', CandidateList::class)->name('candidate.list');
     Route::get('/candidate/add', AddCandidate::class)->name('candidate.add');
-    Route::get('/test/assessmenttests', AssessmentTest::class)->name('test.assessmenttest');
-    Route::get('/test/practicalexams', PracticalExam::class)->name('test.practicalexam');
-    Route::get('/test/oralinterveiws', OralInterview::class)->name('test.oralinterviews');
-    Route::get('/exam/assign', AssignExam::class)->name('exam.assign');
 });

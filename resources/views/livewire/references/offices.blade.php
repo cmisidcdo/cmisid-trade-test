@@ -106,8 +106,8 @@
                 </div>
                 
                 <!-- Pagination with enhanced styling -->
-                <div>
-                    {{$offices->links()}}
+                <div class="d-flex justify-content-center mt-4">
+                    {{$offices->links('pagination::bootstrap-5')}}
                 </div>
                 
                 <!-- Success/Error feedback toast -->

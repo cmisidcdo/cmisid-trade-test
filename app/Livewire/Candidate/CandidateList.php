@@ -57,7 +57,7 @@ class CandidateList extends Component
             ->when($this->search, function ($query) {
                 $query->where('fullname', 'like', '%' . $this->search . '%');
             })
-            ->paginate(3);
+            ->paginate(10);
     }
 
 

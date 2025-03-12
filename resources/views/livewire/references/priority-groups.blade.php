@@ -106,8 +106,8 @@
                 </div>
                 
                 <!-- Pagination with enhanced styling -->
-                <div>
-                    {{$prioritygroups->links()}}
+                <div class="d-flex justify-content-center mt-4">
+                    {{$prioritygroups->links('pagination::bootstrap-5')}}
                 </div>
                 
                 <!-- Success/Error feedback toast -->

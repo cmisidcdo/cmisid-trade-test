@@ -89,9 +89,8 @@
                                     <div class="d-flex justify-content-center gap-2">
                                         <button 
                                             class="btn btn-sm btn-outline-info" 
-                                            {{-- data-bs-toggle="modal"
-                                            data-bs-target="#viewSkillsModal" --}}
-                                            wire:click='viewPosition({{$item->id}})'
+                                            data-bs-toggle="modal"
+                                            data-bs-target="#viewSkillsModal"
                                             title="View position skills"
                                         >
                                             <i class="bi bi-eye me-1"></i> View
@@ -420,14 +419,14 @@
                             <h6 class="fw-bold mb-3">Position Details</h6>
                             <div class="row g-3">
                                 <div class="col-md-6">
-                                    <p class="mb-1"><span class="fw-medium">Title:</span> {{$this->title}}</p>
-                                    <p class="mb-1"><span class="fw-medium">Salary Grade:</span> {{$this->salary_grade}}</p>
+                                    <p class="mb-1"><span class="fw-medium">Title:</span> HR Manager</p>
+                                    <p class="mb-1"><span class="fw-medium">Salary Grade:</span> 18</p>
                                 </div>
                                 <div class="col-md-6">
                                     <p class="mb-1">
                                         <span class="fw-medium">Competency Level:</span> 
                                         <span class="badge rounded-pill bg-primary">
-                                            {{$this->competency_level}}
+                                            Intermediate
                                         </span>
                                     </p>
                                     <p class="mb-1">
@@ -454,26 +453,52 @@
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        @forelse($selectedskills as $index => $selectedskill)
                                         <tr>
-                                            <td>{{ $index + 1 }}</td>
-                                            <td class="fw-medium">{{ $selectedskill['title'] }}</td>
-                                            <td class="fw-medium">
-                                                <span class="badge rounded-pill 
-                                                    {{ $selectedskill['competency_level'] == 'basic' ? 'bg-info' : 
-                                                    ($selectedskill['competency_level'] == 'intermediate' ? 'bg-primary' : 'bg-dark') }}">
-                                                    {{ $selectedskill['competency_level'] }}
+                                            <td>1</td>
+                                            <td class="fw-medium">Human Resource Management</td>
+                                            <td>
+                                                <span class="badge rounded-pill bg-dark">
+                                                    Advanced
                                                 </span>
                                             </td>
                                         </tr>
-                                        @empty
                                         <tr>
-                                            <td colspan="4" class="text-center py-3 text-muted">
-                                                <i class="bi bi-info-circle me-1"></i> No skills added yet.
+                                            <td>2</td>
+                                            <td class="fw-medium">Performance Evaluation</td>
+                                            <td>
+                                                <span class="badge rounded-pill bg-primary">
+                                                    Intermediate
+                                                </span>
                                             </td>
                                         </tr>
-                                        @endforelse
-                                    </tbody>                                          
+                                        <tr>
+                                            <td>3</td>
+                                            <td class="fw-medium">Conflict Resolution</td>
+                                            <td>
+                                                <span class="badge rounded-pill bg-primary">
+                                                    Intermediate
+                                                </span>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>4</td>
+                                            <td class="fw-medium">Communication Skills</td>
+                                            <td>
+                                                <span class="badge rounded-pill bg-dark">
+                                                    Advanced
+                                                </span>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>5</td>
+                                            <td class="fw-medium">Microsoft Office</td>
+                                            <td>
+                                                <span class="badge rounded-pill bg-info">
+                                                    Basic
+                                                </span>
+                                            </td>
+                                        </tr>
+                                    </tbody>                                        
                                 </table>
                             </div>
                         </div>

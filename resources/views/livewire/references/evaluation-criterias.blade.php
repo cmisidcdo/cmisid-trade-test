@@ -1,8 +1,10 @@
 <div>
+    <div style="background-color: #1a1851; color: white; padding: 15px 0; text-align: center; width: 100%; margin-bottom: 20px;">
+        <h3 style="font-weight: bold; margin: 0;">Evaluation Criteria</h3>
+    </div>
     <section class="section dashboard">
         <div class="card shadow-sm border-0 rounded-3">
             <div class="card-body p-4">
-                <h5 class="card-title mb-4 fw-bold">Evaluation Criteria Management</h5>
                 
                 <!-- Search and Action Buttons Row -->
                 <div class="row mb-4 align-items-center">

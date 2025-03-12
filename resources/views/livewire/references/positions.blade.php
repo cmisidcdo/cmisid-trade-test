@@ -1,8 +1,11 @@
 <div>
+    <div style="background-color: #1a1851; color: white; padding: 15px 0; text-align: center; width: 100%; margin-bottom: 20px;">
+        <h3 style="font-weight: bold; margin: 0;">Positions</h3>
+    </div>
+
     <section class="section dashboard">
         <div class="card shadow-sm">
             <div class="card-body p-4">
-                <h5 class="card-title fw-bold mb-4">Positions</h5>
                 
                 <!-- Search and Action Buttons Row -->
                 <div class="row mb-4 align-items-center">
@@ -579,6 +582,11 @@
     @endscript
     
     <style>
+        /* Set body background to match the gray from screenshot */
+        body {
+            background-color: #DDDDDD;
+        }
+        
         /* Improve table row hover effect */
         .table tbody tr:hover {
             background-color: rgba(0, 123, 255, 0.05);
@@ -617,6 +625,12 @@
             background-repeat: no-repeat;
             background-position: right calc(0.375em + 0.1875rem) center;
             background-size: calc(0.75em + 0.375rem) calc(0.75em + 0.375rem);
+        }
+        
+        /* Add a light gray background to the dashboard section */
+        .section.dashboard {
+            background-color: #DDDDDD;
+            padding: 20px;
         }
         
         /* Responsive adjustments */

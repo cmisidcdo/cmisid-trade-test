@@ -1,0 +1,242 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500&display=swap');
+
+body {
+    font-family: 'Poppins', sans-serif;
+    background: #ececec;
+}
+
+/*------------ Login container ------------*/
+
+.box-area {
+    max-width: 930px; /* Use max-width for better responsiveness */
+    width: 100%; /* Full width on small screens */
+    margin: 0 auto; /* Center align the box */
+}
+
+/*------------ Right box ------------*/
+
+.right-box {
+    padding: 40px 30px; /* Adjusted padding */
+}
+
+/*------------ Custom Placeholder ------------*/
+
+::placeholder {
+    font-size: 16px;
+}
+
+.rounded-4 {
+    border-radius: 20px;
+}
+
+.rounded-5 {
+    border-radius: 30px;
+}
+
+/*------------ Header Text ------------*/
+
+.header-text {
+    text-align: center; /* Center the text */
+}
+
+.header-text h2 {
+    margin: 0; /* Remove default margin for better centering */
+    font-size: 26px; /* Default header size */
+}
+
+.header-text p {
+    margin-top: 10px; /* Optional: Add some space above the paragraph */
+}
+
+/*------------ Input Field Styles ------------*/
+
+.input-group .form-control {
+    font-size: 16px; /* Increase font size for better readability */
+    padding: 12px 15px; /* Increase padding for more height */
+    width: 100%; /* Keep it full width */
+    max-width: 400px; /* Increase max width to prevent it from being too narrow */
+    margin: 0 auto; /* Center it within the input group */
+    transition: border-color 0.3s ease, box-shadow 0.3s ease; /* Transition for focus */
+}
+
+
+
+
+
+
+
+.fas
+.input-group .form-control:focus {
+    border-color: #81C8E4; /* Example color */
+    box-shadow: 0 0 5px rgba(81, 166, 219, 0.5); /* Focus effect */
+}
+
+/* Responsive Styles */
+@media only screen and (max-width: 768px) {
+    .input-group .form-control {
+        font-size: 14px; /* Smaller font size for mobile */
+        padding: 12px 15px; /* Maintain increased padding */
+    }
+
+    .left-box {
+        height: auto; /* Adjust height to auto for better fit */
+        overflow: hidden; /* Keeps the image from overflowing */
+        padding: 20px; /* Added padding */
+    }
+
+    .right-box {
+        padding: 20px; /* Adjust padding for small screens */
+        overflow-y: auto; /* Add scroll if content exceeds */
+        max-height: calc(100vh - 100px); /* Adjust based on the viewport */
+    }
+
+    .header-text h2 {
+        font-size: 24px; /* Adjust header font size */
+    }
+
+    .header-text p {
+        font-size: 14px; /* Smaller paragraph size */
+    }
+
+    .featured-image img {
+        width: 150px; /* Smaller image for mobile view */
+    }
+}
+
+/* Extra small devices (phones, less than 576px) */
+@media (max-width: 575.98px) {
+    .input-group .form-control {
+        font-size: 12px; /* Small font size for mobile */
+        padding: 6px 10px; /* Further reduce padding */
+        max-width: 100%; /* Allow full width on smaller screens */
+    }
+
+    .header-text p {
+        font-size: 12px; /* Further reduce paragraph size */
+    }
+
+    .left-box {
+        padding: 10px; /* Less padding on mobile */
+    }
+
+    .right-box {
+        padding: 15px; /* Less padding on mobile */
+    }
+
+    .featured-image img {
+        width: 120px; /* Further reduce image size */
+    }
+}
+
+/*------------ Button Styles ------------*/
+
+.input-group button {
+    font-size: 14px; /* Base button size */
+    padding: 8px 15px; /* Button padding */
+}
+
+/* Optional: Adjust for mobile screens */
+@media (max-width: 575.98px) {
+    .input-group button {
+        font-size: 12px; /* Smaller font size for mobile */
+        padding: 8px 15px; /* Further reduce padding */
+        width: 70%; /* Wider for small screens if needed */
+    }
+}
+
+/* Login container adjustments */
+.container.min-vh-100 {
+    min-height: calc(100vh - 50px); /* Adjust this based on your footer's height */
+    padding-bottom: 20px; /* Adds space below the content */
+    display: flex; /* Maintain flexbox properties */
+    flex-direction: column; /* Arrange items in a column */
+    justify-content: center; /* Center the content vertically */
+}
+
+* {
+    padding: 0;
+    margin: 0;
+}
+
+/* Ensure the login background occupies the full viewport without overlapping */
+.loginbackground {
+    min-height: 100vh; /* Adjusts to viewport height */
+    overflow-y: auto;  /* Adds scroll if content exceeds viewport */
+    width: 100%;
+    background: linear-gradient(180deg, rgb(81, 166, 219) 0%, rgba(0, 51, 102, 1) 100%);
+    padding-bottom: 20px; /* Space at the bottom for separation */
+}
+
+/* Animation Boxes */
+.boxes div {
+    position: absolute;
+    width: 5vw; /* Responsive width */
+    height: 5vw; /* Responsive height */
+    background-color: transparent;
+    border: 2px solid #FFFFFF;
+}
+
+.boxes div:nth-child(1) {
+    top: 70%;
+    left: 10%;
+    animation: box-animate 10s infinite;
+}
+
+.boxes div:nth-child(2) {
+    top: 20%;
+    left: 80%;
+    animation: box-animate 9s infinite;
+}
+
+.boxes div:nth-child(3) {
+    top: 50%;
+    left: 50%;
+    animation: box-animate 6s infinite;
+}
+
+.boxes div:nth-child(4) {
+    top: 80%;
+    left: 60%;
+    animation: box-animate 15s infinite;
+}
+
+.boxes div:nth-child(5) {
+    top: 30%;
+    left: 30%;
+    animation: box-animate 9s infinite;
+}
+
+.boxes div:nth-child(6) {
+    top: 90%;
+    left: 90%;
+    animation: box-animate 12s infinite;
+}
+
+.boxes div:nth-child(7) {
+    top: 80%;
+    left: 30%;
+    animation: box-animate 2s infinite;
+}
+
+.boxes div:nth-child(8) {
+    top: 40%;
+    left: 20%;
+    animation: box-animate 2s infinite;
+}
+
+.boxes div:nth-child(9) {
+    top: 50%;
+    left: 80%;
+    animation: box-animate 2s infinite;
+}
+
+@keyframes box-animate {
+    0% {
+        transform: scale(0) translateY(0) rotate(0);
+        opacity: 1;
+    }
+    100% {
+        transform: scale(1.3) translateY(-90px) rotate(360deg);
+        opacity: 0;
+    }
+}

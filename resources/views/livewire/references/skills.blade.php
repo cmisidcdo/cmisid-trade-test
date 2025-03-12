@@ -1,5 +1,5 @@
 <div>
-    <div style="background-color: #1a1851; color: white; padding: 15px 0; text-align: center; width: 100%; margin-bottom: 20px;">
+    <div class="globalheader">
         <h3 style="font-weight: bold; margin: 0;">Skills</h3>
     </div>
   <section class="section dashboard">
@@ -178,7 +178,7 @@
 
 @push('styles')
 <style>
-  .custom-invalid-feedback {
+    .custom-invalid-feedback {
       display: block;
       width: 100%;
       margin-top: 0.25rem;
@@ -186,11 +186,11 @@
       color: #dc3545;
   }
   
-  .sortable {
+    .sortable {
       cursor: pointer;
   }
   
-  .sortable:hover {
+    .sortable:hover {
       background-color: rgba(0, 0, 0, 0.05);
   }
   

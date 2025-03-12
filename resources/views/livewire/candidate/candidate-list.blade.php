@@ -1,8 +1,11 @@
 <div>
+    <div class="globalheader">
+        <h3 style="font-weight: bold; margin: 0;">Candidates List</h3>
+    </div>
+
     <section class="section dashboard">
         <div class="card shadow-sm border-0 rounded-3">
             <div class="card-body p-4">
-                <h5 class="card-title mb-4 fw-bold">Candidates Management</h5>
                 
                 <!-- Search and Action Buttons Row -->
                 <div class="row mb-4 align-items-center">

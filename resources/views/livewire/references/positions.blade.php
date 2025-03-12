@@ -1,5 +1,5 @@
 <div>
-    <div style="background-color: #1a1851; color: white; padding: 15px 0; text-align: center; width: 100%; margin-bottom: 20px;">
+    <div class="globalheader">
         <h3 style="font-weight: bold; margin: 0;">Positions</h3>
     </div>
 
@@ -92,8 +92,9 @@
                                     <div class="d-flex justify-content-center gap-2">
                                         <button 
                                             class="btn btn-sm btn-outline-info" 
-                                            data-bs-toggle="modal"
-                                            data-bs-target="#viewSkillsModal"
+                                            {{-- data-bs-toggle="modal"
+                                            data-bs-target="#viewSkillsModal" --}}
+                                            wire:click='viewPosition({{$item->id}})'
                                             title="View position skills"
                                         >
                                             <i class="bi bi-eye me-1"></i> View
@@ -422,14 +423,14 @@
                             <h6 class="fw-bold mb-3">Position Details</h6>
                             <div class="row g-3">
                                 <div class="col-md-6">
-                                    <p class="mb-1"><span class="fw-medium">Title:</span> HR Manager</p>
-                                    <p class="mb-1"><span class="fw-medium">Salary Grade:</span> 18</p>
+                                    <p class="mb-1"><span class="fw-medium">Title:</span> {{$this->title}}</p>
+                                    <p class="mb-1"><span class="fw-medium">Salary Grade:</span> {{$this->salary_grade}}</p>
                                 </div>
                                 <div class="col-md-6">
                                     <p class="mb-1">
                                         <span class="fw-medium">Competency Level:</span> 
                                         <span class="badge rounded-pill bg-primary">
-                                            Intermediate
+                                            {{$this->competency_level}}
                                         </span>
                                     </p>
                                     <p class="mb-1">
@@ -455,53 +456,28 @@
                                             <th class="fw-semibold">Competency Level</th>
                                         </tr>
                                     </thead>
+
                                     <tbody>
+                                        @forelse($selectedskills as $index => $selectedskill)
                                         <tr>
-                                            <td>1</td>
-                                            <td class="fw-medium">Human Resource Management</td>
-                                            <td>
-                                                <span class="badge rounded-pill bg-dark">
-                                                    Advanced
+                                            <td>{{ $index + 1 }}</td>
+                                            <td class="fw-medium">{{ $selectedskill['title'] }}</td>
+                                            <td class="fw-medium">
+                                                <span class="badge rounded-pill 
+                                                    {{ $selectedskill['competency_level'] == 'basic' ? 'bg-info' : 
+                                                    ($selectedskill['competency_level'] == 'intermediate' ? 'bg-primary' : 'bg-dark') }}">
+                                                    {{ $selectedskill['competency_level'] }}
                                                 </span>
                                             </td>
                                         </tr>
+                                        @empty
                                         <tr>
-                                            <td>2</td>
-                                            <td class="fw-medium">Performance Evaluation</td>
-                                            <td>
-                                                <span class="badge rounded-pill bg-primary">
-                                                    Intermediate
-                                                </span>
+                                            <td colspan="4" class="text-center py-3 text-muted">
+                                                <i class="bi bi-info-circle me-1"></i> No skills added yet.
                                             </td>
                                         </tr>
-                                        <tr>
-                                            <td>3</td>
-                                            <td class="fw-medium">Conflict Resolution</td>
-                                            <td>
-                                                <span class="badge rounded-pill bg-primary">
-                                                    Intermediate
-                                                </span>
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td>4</td>
-                                            <td class="fw-medium">Communication Skills</td>
-                                            <td>
-                                                <span class="badge rounded-pill bg-dark">
-                                                    Advanced
-                                                </span>
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td>5</td>
-                                            <td class="fw-medium">Microsoft Office</td>
-                                            <td>
-                                                <span class="badge rounded-pill bg-info">
-                                                    Basic
-                                                </span>
-                                            </td>
-                                        </tr>
-                                    </tbody>                                        
+                                        @endforelse
+                                    </tbody>                                          
                                 </table>
                             </div>
                         </div>
@@ -582,11 +558,6 @@
     @endscript
     
     <style>
-        /* Set body background to match the gray from screenshot */
-        body {
-            background-color: #DDDDDD;
-        }
-        
         /* Improve table row hover effect */
         .table tbody tr:hover {
             background-color: rgba(0, 123, 255, 0.05);
@@ -625,12 +596,6 @@
             background-repeat: no-repeat;
             background-position: right calc(0.375em + 0.1875rem) center;
             background-size: calc(0.75em + 0.375rem) calc(0.75em + 0.375rem);
-        }
-        
-        /* Add a light gray background to the dashboard section */
-        .section.dashboard {
-            background-color: #DDDDDD;
-            padding: 20px;
         }
         
         /* Responsive adjustments */

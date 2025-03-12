@@ -30,6 +30,7 @@
   <link href="{{asset('sweetalert2/sweetalert2.min.css')}}" rel="stylesheet">
   <!-- Template Main CSS File -->
   <link href="{{asset('css/style.css')}}" rel="stylesheet">
+  <link href="{{asset('css/global.css')}}" rel="stylesheet">
   <!-- jQuery -->
 
 
@@ -41,26 +42,17 @@
   <header id="header" class="header fixed-top d-flex align-items-center">
 
   <div class="d-flex align-items-center justify-content-between">
-  <a href="index.html" class="logo d-flex align-items-center">
+  <a href="{{ route('dashboard') }}" class="logo d-flex align-items-center">
     <img src="{{ asset('img/logo.png') }}" alt="Logo" class="img-fluid" style="height: 80px;">
   </a>
   <i class="bi bi-list toggle-sidebar-btn"></i>
 </div><!-- End Logo -->
 
 
-
-
-    <div class="search-bar">
-      <form class="search-form d-flex align-items-center" method="POST" action="#">
-        <input type="text" name="query" placeholder="Search" title="Enter search keyword">
-        <button type="submit" title="Search"><i class="bi bi-search"></i></button>
-      </form>
-    </div><!-- End Search Bar -->
-
     <nav class="header-nav ms-auto">
       <ul class="d-flex align-items-center">
 
-        <li class="nav-item d-block d-lg-none">
+        {{-- <li class="nav-item d-block d-lg-none">
           <a class="nav-link nav-icon search-bar-toggle " href="#">
             <i class="bi bi-search"></i>
           </a>
@@ -205,12 +197,11 @@
 
           </ul><!-- End Messages Dropdown Items -->
 
-        </li><!-- End Messages Nav -->
+        </li><!-- End Messages Nav --> --}}
 
         <li class="nav-item dropdown pe-3">
 
           <a class="nav-link nav-profile d-flex align-items-center pe-0" href="#" data-bs-toggle="dropdown">
-            <img src="assets/img/profile-img.jpg" alt="Profile" class="rounded-circle">
             <span class="d-none d-md-block dropdown-toggle ps-2">{{Auth::user()->name}}</span>
           </a><!-- End Profile Iamge Icon -->
 
@@ -278,74 +269,77 @@
     <ul class="sidebar-nav" id="sidebar-nav">
 
       <li class="nav-item">
-        <a class="nav-link " href="{{ route('dashboard') }}">
+        <a class="nav-link {{ Request::routeIs('dashboard') ? '' : 'collapsed' }}" href="{{ route('dashboard') }}">
           <i class="bi bi-grid-fill fs-5"></i>
           <span>Dashboard</span>
         </a>
       </li><!-- End Dashboard Nav -->
 
       <li class="nav-item">
-        <a class="nav-link collapsed" href="{{ route('settings.users') }}">
-          <i class="bi bi-people-fill fs-5"></i><span>Users</span>
+        <a class="nav-link {{ Request::routeIs('settings.users') ? '' : 'collapsed' }}" href="{{ route('settings.users') }}">
+            <i class="bi bi-people-fill fs-5"></i>
+            <span>Users</span>
         </a>
+    </li>
 
-      </li><!-- End Components Nav -->
-
-      <li class="nav-item">
-        <a class="nav-link collapsed" data-bs-target="#forms-nav" data-bs-toggle="collapse" href="#">
-          <i class="bi bi-file-person fs-5"></i><span>Candidates</span><i class="bi bi-chevron-down ms-auto"></i>
+    <li class="nav-item">
+        <a class="nav-link {{ Request::routeIs('candidate.*') ? '' : 'collapsed' }}" data-bs-target="#forms-nav" data-bs-toggle="collapse" href="#">
+            <i class="bi bi-file-person fs-5"></i>
+            <span>Candidates</span>
+            <i class="bi bi-chevron-down ms-auto"></i>
         </a>
-        <ul id="forms-nav" class="nav-content collapse " data-bs-parent="#sidebar-nav">
-          <li>
-            <a href="{{ route('candidate.list') }}">
-              <i class="bi bi-person-lines-fill fs-5"></i><span>Candidate List</span>
-            </a>
-          </li>
-          <li>
-            <a href="{{ route('candidate.add') }}">
-              <i class="bi bi-person-fill-add fs-5"></i><span>Add New Candidate</span>
-            </a>
-          </li>
-          <li>
-            <a href="forms-editors.html">
-              <i class="bi bi-person-fill-up fs-5"></i><span>Update Candidate</span>
-            </a>
-          </li>
+        <ul id="forms-nav" class="nav-content collapse {{ Request::routeIs('candidate.*') ? 'show' : '' }}" data-bs-parent="#sidebar-nav">
+            <li>
+                <a class="{{ Request::routeIs('candidate.list') ? 'active' : '' }}" href="{{ route('candidate.list') }}">
+                    <i class="bi bi-person-lines-fill fs-5"></i><span>Candidate List</span>
+                </a>
+            </li>
+            <li>
+                <a class="{{ Request::routeIs('candidate.add') ? 'active' : '' }}" href="{{ route('candidate.add') }}">
+                    <i class="bi bi-person-fill-add fs-5"></i><span>Add New Candidate</span>
+                </a>
+            </li>
+            <li>
+                <a class="{{ Request::routeIs('candidate.update') ? 'active' : '' }}" href="{{ route('candidate.update') }}">
+                    <i class="bi bi-person-fill-up fs-5"></i><span>Update Candidate</span>
+                </a>
+            </li>
         </ul>
-      </li><!-- End Forms Nav -->
+    </li>
+  
 
       <li class="nav-item">
-        <a class="nav-link collapsed" data-bs-target="#tables-nav" data-bs-toggle="collapse" href="#">
+        <a class="nav-link {{ Request::routeIs('references.*') ? '' : 'collapsed' }}" data-bs-target="#tables-nav" data-bs-toggle="collapse" href="#">
           <i class="bi bi-layout-text-window-reverse fs-5"></i><span>References</span><i class="bi bi-chevron-down ms-auto"></i>
         </a>
-        <ul id="tables-nav" class="nav-content collapse " data-bs-parent="#sidebar-nav">
+        <ul id="tables-nav" class="nav-content collapse {{ Request::routeIs('references.*') ? 'show' : '' }}" data-bs-parent="#sidebar-nav">
           <li>
-            <a href="{{ route('references.skills') }}">
+            <a class="{{ Request::routeIs('references.skills') ? 'active' : '' }}" href="{{ route('references.skills') }}">
               <i class="bi bi-lightbulb-fill fs-5"></i><span>Skills</span>
             </a>
           </li>
           <li>
-            <a href="{{ route('references.positions') }}">
+            <a class="{{ Request::routeIs('references.positions') ? 'active' : '' }}" href="{{ route('references.positions') }}">
               <i class="bi bi-arrows-move fs-5"></i><span>Positions</span>
             </a>
           </li>
           <li>
-            <a href="{{ route('references.offices') }}">
+            <a class="{{ Request::routeIs('references.offices') ? 'active' : '' }}" href="{{ route('references.offices') }}">
               <i class="bi bi-building-fill fs-5"></i><span>Offices</span>
             </a>
           </li>
           <li>
-            <a href="{{ route('references.prioritygroups') }}">
+            <a class="{{ Request::routeIs('references.prioritygroups') ? 'active' : '' }}" href="{{ route('references.prioritygroups') }}">
               <i class="bi bi-people-fill fs-5"></i><span>Priority Groups</span>
             </a>
           </li>
           <li>
-            <a href="{{ route('references.venues') }}">
+            <a class="{{ Request::routeIs('references.venues') ? 'active' : '' }}" href="{{ route('references.venues') }}">
               <i class="bi bi-geo-alt-fill fs-5"></i><span>Venues</span>
             </a>
           </li>
           <li>
-            <a href="{{ route('references.criterias') }}">
+            <a class="{{ Request::routeIs('references.criterias') ? 'active' : '' }}" href="{{ route('references.criterias') }}">
               <i class="bi bi-card-checklist fs-5"></i><span>Evaluation Criteria</span>
             </a>
           </li>
@@ -353,22 +347,22 @@
       </li><!-- End Tables Nav -->
 
       <li class="nav-item">
-        <a class="nav-link collapsed" data-bs-target="#charts-nav" data-bs-toggle="collapse" href="#">
+        <a class="nav-link {{ Request::routeIs('test.*') ? '' : 'collapsed' }}" data-bs-target="#charts-nav" data-bs-toggle="collapse" href="#">
           <i class="bi bi-clipboard-check-fill fs-5"></i><span>Tests</span><i class="bi bi-chevron-down ms-auto"></i>
         </a>
-        <ul id="charts-nav" class="nav-content collapse " data-bs-parent="#sidebar-nav">
+        <ul id="charts-nav" class="nav-content collapse {{ Request::routeIs('test.*') ? 'show' : '' }}" data-bs-parent="#sidebar-nav">
           <li>
-            <a href="charts-chartjs.html">
+            <a class="{{ Request::routeIs('test.assessment') ? 'active' : '' }}" href="{{ route('test.assessment') }}">
               <i class="bi bi-clipboard-data-fill fs-5"></i><span>Assessment Tests</span>
             </a>
           </li>
           <li>
-            <a href="charts-apexcharts.html">
+            <a class="{{ Request::routeIs('test.practical') ? 'active' : '' }}" href="{{ route('test.practical') }}">
               <i class="bi bi-person-fill-gear fs-5"></i><span>Practical Exams</span>
             </a>
           </li>
           <li>
-            <a href="charts-echarts.html">
+            <a class="{{ Request::routeIs('test.interview') ? 'active' : '' }}" href="{{ route('test.interview') }}">
               <i class="bi bi-wechat fs-5"></i><span>Oral Interviews</span>
             </a>
           </li>
@@ -377,29 +371,29 @@
 
 
       <li class="nav-item">
-        <a class="nav-link collapsed" href="users-profile.html">
+        <a class="nav-link {{ Request::routeIs('assign.exam') ? '' : 'collapsed' }}" href="{{ route('assign.exam') }}">
           <i class="bi bi-person-check-fill fs-5"></i>
           <span>Assign Exam</span>
         </a>
       </li>
 
       <li class="nav-item">
-        <a class="nav-link collapsed" data-bs-target="#icons-nav" data-bs-toggle="collapse" href="#">
+        <a class="nav-link {{ Request::routeIs('exam.*') ? '' : 'collapsed' }}" data-bs-target="#icons-nav" data-bs-toggle="collapse" href="#">
           <i class="bi bi-arrow-clockwise fs-5"></i><span>Ongoing Exams</span><i class="bi bi-chevron-down ms-auto"></i>
         </a>
-        <ul id="icons-nav" class="nav-content collapse " data-bs-parent="#sidebar-nav">
+        <ul id="icons-nav" class="nav-content collapse {{ Request::routeIs('exam.*') ? 'show' : '' }}" data-bs-parent="#sidebar-nav">
           <li>
-            <a href="icons-bootstrap.html">
+            <a class="{{ Request::routeIs('exam.assessmentnotes') ? 'active' : '' }}" href="{{ route('exam.assessmentnotes') }}">
               <i class="bi bi-card-text fs-5"></i><span>Assessment Notes Form</span>
             </a>
           </li>
           <li>
-            <a href="icons-remix.html">
+            <a class="{{ Request::routeIs('exam.ptestevaluations') ? 'active' : '' }}" href="{{ route('exam.ptestevaluations') }}">
               <i class="bi bi-journal-medical fs-5"></i><span>Practical Test Evaluation Form</span>
             </a>
           </li>
           <li>
-            <a href="icons-boxicons.html">
+            <a class="{{ Request::routeIs('exam.otestevaluations') ? 'active' : '' }}" href="{{ route('exam.otestevaluations') }}">
               <i class="bi bi-chat-text-fill fs-5"></i><span>Oral Test Evaluation Form</span>
             </a>
           </li>
@@ -409,14 +403,14 @@
       {{-- <li class="nav-heading">Pages</li> --}}
 
       <li class="nav-item">
-        <a class="nav-link collapsed" href="users-profile.html">
+        <a class="nav-link {{ Request::routeIs('reports') ? '' : 'collapsed' }}" href="{{ route('reports') }}">
           <i class="bi bi-file-bar-graph-fill fs-5"></i>
           <span>Reports</span>
         </a>
       </li><!-- End Reports Page Nav -->
 
       <li class="nav-item">
-        <a class="nav-link collapsed" href="pages-faq.html">
+        <a class="nav-link {{ Request::routeIs('logs') ? '' : 'collapsed' }}" href="{{ route('logs') }}">
           <i class="bi bi-file-earmark-text-fill fs-5"></i>
           <span>Logs</span>
         </a>
@@ -478,25 +472,6 @@
         });
       });
     });
-    // document.addEventListener('livewire:init', () => {
-    //   Livewire.on('success', (message)) =>{
-    //     const Toast = Swal.mixin({
-    //       toast: true,
-    //       position: "top-end",
-    //       showConfirmButton: false,
-    //       timer: 3000,
-    //       timerProgressBar: true,
-    //       didOpen: (toast) => {
-    //         toast.onmouseenter = Swal.stopTimer;
-    //         toast.onmouseleave = Swal.resumeTimer;
-    //       }
-    //     });
-    //     Toast.fire({
-    //       icon: "success",
-    //       title: "Signed in successfully"
-    //     });
-    //   }
-    // });
   </script>
 </body>
 

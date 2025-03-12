@@ -106,8 +106,8 @@
                 </div>
                 
                 <!-- Pagination with enhanced styling -->
-                <div class="d-flex justify-content-center mt-4">
-                    {{$criterias->links('pagination::bootstrap-5')}}
+                <div>
+                    {{$criterias->links()}}
                 </div>
                 
                 <!-- Success/Error feedback toast -->

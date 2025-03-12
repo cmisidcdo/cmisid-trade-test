@@ -45,7 +45,7 @@ class Users extends Component
                 $query->where('name','like','%'. $this->search .'%')
                 ->orWhere('email','like','%'. $this->search .'%');
             })
-            ->paginate(10);
+            ->paginate(3);
     }
 
     public function updatedSearch()

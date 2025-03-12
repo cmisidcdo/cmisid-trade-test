@@ -122,7 +122,7 @@
                 
                 <!-- Pagination with enhanced styling -->
                 <div class="d-flex justify-content-center mt-4">
-                    {{$candidates->links('pagination::bootstrap-5')}}
+                    {{$candidates->links()}}
                 </div>
                 
                 <!-- Success/Error feedback toast -->

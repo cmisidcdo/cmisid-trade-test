@@ -13,7 +13,8 @@ use Illuminate\Validation\Rule;
 class Positions extends Component
 {
     use WithPagination;
-    public $editMode;
+
+    public $editMode, $viewMode;
 
     public $archive = false;
 
@@ -185,6 +186,27 @@ class Positions extends Component
         $this->dispatch('show-positionModal');
     }
 
+    public function viewPosition($positionId)
+    {
+        $position = Position::withTrashed()->findOrFail($positionId);
+
+        $this->fill([
+            'title' => $position->title,
+            'salary_grade' => $position->salary_grade,
+            'competency_level' => $position->competency_level,
+            'interview_priority' => $position->interview_priority,
+        ]);
+
+        $this->position_id = $position->id;
+
+        $this->selectedskills = PositionSkill::where('position_id', $positionId)
+            ->join('skills', 'position_skills.skill_id', '=', 'skills.id') 
+            ->select('position_skills.skill_id as id', 'skills.title', 'position_skills.competency_level')
+            ->get()
+            ->toArray();
+
+        $this->dispatch('show-viewSkillsModal');
+    }
 
 
     public function updatePosition()

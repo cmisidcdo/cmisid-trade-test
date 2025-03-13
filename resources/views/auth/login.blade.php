@@ -45,7 +45,7 @@
                     <form id="loginForm" method="POST" action="{{ route('login') }}">
                         @csrf
                         <div class="input-group mb-3">
-                            <input type="email" class="form-control form-control-lg bg-light fs-6 @error('email') is-invalid @enderror" name="email" value="{{ old('email') }}" placeholder="Email address" aria-label="Email address" required>
+                            <input type="email" class="form-control form-control-lg rounded-3 bg-light fs-6 @error('email') is-invalid @enderror" name="email" value="{{ old('email') }}" placeholder="Email address" aria-label="Email address" required>
                             @error('email')
                             <span class="invalid-feedback" role="alert">
                                 <strong>{{ $message }}</strong>
@@ -54,14 +54,12 @@
                         </div>
                         <div class="input-group mb-1 position-relative">
                         <div class="input-group mb-1 position-relative">
-                            <input type="password" id="password" class="form-control form-control-lg bg-light fs-6 @error('password') is-invalid @enderror" name="password" placeholder="Password" aria-label="Password" required>
-                            <span class="input-group-text border-0 position-absolute end-0 top-0 h-100 toggle-password" style="cursor: pointer; z-index: 10;">
-                            <i id="togglePassword" class="bi bi-eye" aria-label="Toggle password visibility"></i>
-                             </span>
+                            <input type="password" id="password" class="form-control form-control-lg bg-light rounded-3 fs-6 @error('password') is-invalid @enderror" name="password" placeholder="Password" aria-label="Password" required>
+                            <i id="togglePassword" class="bi bi-eye" aria-label="Toggle password visibility" role="button" tabindex="0" aria-hidden="true"></i>
                         </div>
 
                             @error('password')
-                            < class="invalid-feedback" role="alert">
+                            <span class="invalid-feedback" role="alert">
                                 <strong>{{ $message }}</strong>
                             </span>
                             @enderror

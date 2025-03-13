@@ -14,6 +14,7 @@ use App\Livewire\Exam\AssignExam;
 use App\Livewire\Exam\OralTestEvaluation;
 use App\Livewire\Exam\PracticalTestEvaluation;
 use App\Livewire\Logs;
+use App\Livewire\Permissions;
 use App\Livewire\Reports;
 use App\Livewire\References\EvaluationCriterias;
 use App\Livewire\References\PriorityGroups;
@@ -54,4 +55,5 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/exam/otestevaluation', OralTestEvaluation::class)->name('exam.otestevaluations');
     Route::get('/logs', Logs::class)->name('logs');
     Route::get('/reports', Reports::class)->name('reports');
+    Route::get('/permissions', Permissions::class)->name('permissions');
 });

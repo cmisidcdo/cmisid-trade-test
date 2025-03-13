@@ -276,6 +276,13 @@
       </li><!-- End Dashboard Nav -->
 
       <li class="nav-item">
+        <a class="nav-link {{ Request::routeIs('permissions') ? '' : 'collapsed' }}" href="{{ route('permissions') }}">
+            <i class="bi bi-key-fill fs-5"></i>
+            <span>Permissions</span>
+        </a>
+    </li>
+
+      <li class="nav-item">
         <a class="nav-link {{ Request::routeIs('settings.users') ? '' : 'collapsed' }}" href="{{ route('settings.users') }}">
             <i class="bi bi-people-fill fs-5"></i>
             <span>Users</span>
@@ -283,6 +290,13 @@
     </li>
 
     <li class="nav-item">
+      <a class="nav-link {{ Request::routeIs('candidate.list') ? '' : 'collapsed' }}" href="{{ route('candidate.list') }}">
+        <i class="bi bi-person-check-fill fs-5"></i>
+        <span>Candidate List</span>
+      </a>
+    </li>
+
+    {{-- <li class="nav-item">
         <a class="nav-link {{ Request::routeIs('candidate.*') ? '' : 'collapsed' }}" data-bs-target="#forms-nav" data-bs-toggle="collapse" href="#">
             <i class="bi bi-file-person fs-5"></i>
             <span>Candidates</span>
@@ -305,7 +319,7 @@
                 </a>
             </li>
         </ul>
-    </li>
+    </li> --}}
   
 
       <li class="nav-item">

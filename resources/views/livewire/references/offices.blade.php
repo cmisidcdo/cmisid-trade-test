@@ -6,7 +6,7 @@
     <section class="section dashboard">
         <div class="card shadow-sm border-0 rounded-3">
             <div class="card-body p-4">
-                
+
                 <!-- Search and Action Buttons Row -->
                 <div class="row mb-4 align-items-center">
                     <div class="col-md-6">
@@ -14,11 +14,11 @@
                             <span class="input-group-text bg-light border-end-0">
                                 <i class="bi bi-search"></i>
                             </span>
-                            <input type="text" class="form-control border-start-0 ps-0" 
-                                placeholder="Search offices..." 
+                            <input type="text" class="form-control border-start-0 ps-0"
+                                placeholder="Search offices..."
                                 wire:model.live.debounce.300ms="search"
                                 aria-label="Search offices">
-                            <button class="btn btn-outline-secondary border-start-0 bg-light" type="button" 
+                            <button class="btn btn-outline-secondary border-start-0 bg-light" type="button"
                                 wire:loading.class="d-none" wire:target="search"
                                 wire:click="$set('search', '')">
                                 <i class="bi bi-x"></i>
@@ -34,27 +34,22 @@
                         </div>
                     </div>
                     <div class="col-md-6 text-md-end mt-3 mt-md-0">
-                        <button type="button" class="btn btn-outline-secondary me-2" 
-                            wire:click="toggleArchive"
-                            aria-label="{{ $archive ? 'View general offices' : 'View archived offices' }}">
+                        <button type="button" class="btn {{ $archive ? 'btn-success' : 'btn-warning' }}" wire:click="toggleArchive">
                             <i class="bi {{ $archive ? 'bi-box-arrow-in-up' : 'bi-archive' }} me-1"></i>
-                            {{ $archive ? 'View Active' : 'View Archive' }}
-                            <span class="badge bg-secondary ms-1 rounded-pill" wire:loading wire:target="toggleArchive">
-                                <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
-                            </span>
+                            {{ $archive ? 'General' : 'View Archive' }}
                         </button>
-                        <button type="button" class="btn btn-primary" 
-                            wire:click='clear' 
-                            data-bs-toggle="modal" 
+                        <button type="button" class="btn btn-primary"
+                            wire:click='clear'
+                            data-bs-toggle="modal"
                             data-bs-target="#officeModal">
                             <i class="bi bi-plus-lg me-1"></i> Add Office
                         </button>
                     </div>
                 </div>
-  
-                <!-- Table with enhanced styling -->
+
+                <!-- Table with enhanced styling and gridlines -->
                 <div class="table-responsive">
-                    <table class="table table-hover table-striped align-middle border-bottom">
+                    <table class="table table-hover table-bordered table-striped align-middle text-center">
                         <thead class="table-light">
                             <tr>
                                 <th scope="col" class="text-center">#</th>
@@ -78,19 +73,19 @@
                                 </td>
                                 <td class="text-center">
                                     <div class="btn-group" role="group" aria-label="Office actions">
-                                        <button class="btn btn-sm btn-outline-primary" 
+                                        <button class="btn btn-sm btn-primary rounded-2 px-2 py-1 me-2"
                                             wire:click='readOffice({{$item->id}})'
-                                            data-bs-toggle="tooltip" 
+                                            data-bs-toggle="tooltip"
                                             data-bs-title="Edit office">
-                                            <i class="bi bi-pencil"></i>
+                                            <i class="bi bi-pencil-square me-1"></i>
                                             <span class="d-none d-md-inline ms-1">Edit</span>
                                         </button>
-  
-                                        <button class="btn btn-sm {{$item->deleted_at == Null ? 'btn-outline-danger': 'btn-outline-success'}}" 
+
+                                        <button class="btn btn-sm {{$item->deleted_at == Null ? 'btn-danger' : 'btn-outline-success'}} rounded-2 px-2 py-1"
                                             wire:click='{{$item->deleted_at == Null ? 'deleteOffice('.$item->id.')': 'restoreOffice('.$item->id.')'}}'
-                                            data-bs-toggle="tooltip" 
+                                            data-bs-toggle="tooltip"
                                             data-bs-title="{{$item->deleted_at == Null ? 'Delete office': 'Restore office'}}">
-                                            <i class="bi {{$item->deleted_at == Null ? 'bi-trash': 'bi-arrow-counterclockwise'}}"></i>
+                                            <i class="bi {{$item->deleted_at == Null ? 'bi bi-archive-fill': 'bi-arrow-counterclockwise'}}"></i>
                                             <span class="d-none d-md-inline ms-1">{{$item->deleted_at == Null ? 'Delete': 'Restore'}}</span>
                                         </button>
                                     </div>
@@ -107,18 +102,20 @@
                         </tbody>
                     </table>
                 </div>
-                
+                <!-- End Table with enhanced styling -->
+
+
                 <!-- Pagination with enhanced styling -->
                 <div class="d-flex justify-content-center mt-4">
                     {{$offices->links('pagination::bootstrap-5')}}
                 </div>
-                
+
                 <!-- Success/Error feedback toast -->
                 <div class="position-fixed bottom-0 end-0 p-3" style="z-index: 11">
                     <div id="successToast" class="toast align-items-center text-white bg-success border-0" role="alert" aria-live="assertive" aria-atomic="true">
                         <div class="d-flex">
                             <div class="toast-body">
-                                <i class="bi bi-check-circle me-2"></i> 
+                                <i class="bi bi-check-circle me-2"></i>
                                 <span id="successMessage">Operation completed successfully!</span>
                             </div>
                             <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
@@ -127,7 +124,7 @@
                 </div>
             </div>
         </div>
-  
+
         <!-- Enhanced Modal -->
         <div class="modal fade" id="officeModal" tabindex="-1" aria-labelledby="officeModalLabel" aria-hidden="true" wire:ignore.self>
             <div class="modal-dialog modal-dialog-centered">
@@ -143,9 +140,9 @@
                         <form class="needs-validation" wire:submit="{{$editMode ? 'updateOffice' : 'createOffice'}}">
                             <div class="mb-4">
                                 <label for="officeTitle" class="form-label fw-medium">Office Title</label>
-                                <input type="text" class="form-control form-control-lg {{$errors->has('title') ? 'is-invalid' : ''}}" 
-                                    id="officeTitle" 
-                                    wire:model="title" 
+                                <input type="text" class="form-control form-control-lg {{$errors->has('title') ? 'is-invalid' : ''}}"
+                                    id="officeTitle"
+                                    wire:model="title"
                                     placeholder="Enter office title"
                                     autocomplete="off">
                                 @error('title')
@@ -175,10 +172,10 @@
             </div>
         </div>
     </section>
-  </div>
-  
-  @push('styles')
-  <style>
+</div>
+
+@push('styles')
+<style>
     .custom-invalid-feedback {
         display: block;
         width: 100%;
@@ -186,37 +183,38 @@
         font-size: 0.875em;
         color: #dc3545;
     }
-    
+
     .sortable {
         cursor: pointer;
     }
-    
+
     .sortable:hover {
         background-color: rgba(0, 0, 0, 0.05);
     }
-    
+
     /* Responsive adjustments */
     @media (max-width: 768px) {
         .card-title {
             font-size: 1.25rem;
         }
-        
-        .table th, .table td {
+
+        .table th,
+        .table td {
             padding: 0.5rem;
         }
     }
-  </style>
-  @endpush
-  
-  @script
-  <script>
+</style>
+@endpush
+
+@script
+<script>
     // Initialize tooltips
     document.addEventListener('DOMContentLoaded', function() {
         const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
         const tooltipList = tooltipTriggerList.map(function(tooltipTriggerEl) {
             return new bootstrap.Tooltip(tooltipTriggerEl);
         });
-        
+
         // Reinitialize tooltips when Livewire updates the DOM
         window.addEventListener('livewire:update', function() {
             const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
@@ -225,53 +223,53 @@
             });
         });
     });
-  
+
     // Modal handling
     $wire.on('hide-officeModal', () => {
         console.log('Hiding office modal');
         $('#officeModal').modal('hide');
-        
+
         // Show success toast
         const toast = new bootstrap.Toast(document.getElementById('successToast'));
         document.getElementById('successMessage').textContent = 'Office saved successfully!';
         toast.show();
     });
-  
+
     $wire.on('show-officeModal', () => {
         console.log('Showing office modal');
         $('#officeModal').modal('show');
     });
-    
+
     // office operations feedback
     $wire.on('office-deleted', () => {
         const toast = new bootstrap.Toast(document.getElementById('successToast'));
         document.getElementById('successMessage').textContent = 'Office deleted successfully!';
         toast.show();
     });
-    
+
     $wire.on('office-restored', () => {
         const toast = new bootstrap.Toast(document.getElementById('successToast'));
         document.getElementById('successMessage').textContent = 'Office restored successfully!';
         toast.show();
     });
-    
+
     // Search suggestions handling
     const searchInput = document.querySelector('[wire:model\\.live\\.debounce\\.300ms="search"]');
     const suggestionsDiv = document.getElementById('searchSuggestions');
-    
+
     if (searchInput && suggestionsDiv) {
         searchInput.addEventListener('focus', function() {
             if (this.value.length > 1) {
                 suggestionsDiv.classList.remove('d-none');
             }
         });
-        
+
         searchInput.addEventListener('blur', function() {
             setTimeout(() => {
                 suggestionsDiv.classList.add('d-none');
             }, 200);
         });
-        
+
         searchInput.addEventListener('input', function() {
             if (this.value.length > 1) {
                 suggestionsDiv.classList.remove('d-none');
@@ -281,5 +279,5 @@
             }
         });
     }
-  </script>
-  @endscript
+</script>
+@endscript

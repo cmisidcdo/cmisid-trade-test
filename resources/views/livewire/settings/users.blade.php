@@ -1,86 +1,112 @@
 <div>
+  <div class="globalheader">
+    <h3 class="fw-bold m-0">Users</h3>
+  </div>
   <section class="section dashboard">
     <div class="card">
       <div class="card-body">
-        <h5 class="card-title">Users</h5>
-        <div class="col-4 text-start">
-          <input type="text" class="form-control" placeholder="search" wire:model.live="search">
-        </div>
-        <div class="text-end">
-          <button type="button" class="btn {{ $archive ? 'btn-success' : 'btn-warning' }}" wire:click="toggleArchive">
-            <i class="bi {{ $archive ? 'bi-box-arrow-in-up' : 'bi-archive' }} me-1"></i>
-            {{ $archive ? 'General' : 'View Archive' }}
-          </button>
-          <button type="button" class="btn btn-primary" wire:click='clear' data-bs-toggle="modal" data-bs-target="#userModal">
-            <i class="bi bi-person-plus-fill"></i> Add User
-          </button>
-
-        </div>
-
-
-        <
-          <!-- Table with stripped rows -->
-          <table class="table table-hover table-bordered table-striped text-center">
-            <thead class="table-light">
-              <tr>
-                <th scope="col">#</th>
-                <th scope="col">Name</th>
-                <th scope="col">Email</th>
-                <th scope="col">Status</th>
-                <th scope="col">Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              @forelse($users as $item)
-              <tr>
-                <td scope="row">{{$item->id}}</td>
-                <td>{{$item->name}}</td>
-                <td>{{$item->email}}</td>
-                <td>
-                  <span class="badge rounded-3 {{$item->deleted_at == Null ? 'bg-success': 'bg-danger'}}">
-                    {{$item->deleted_at == Null ? 'Active' : 'Inactive'}}
-                  </span>
-                </td>
-                <td class="d-flex justify-content-center">
-                  <!-- Edit Button -->
-                  <button class="btn btn-sm btn-outline-primary rounded-2 px-2 py-1"
-                    wire:click='readUser({{$item->id}})'
-                    data-bs-toggle="tooltip"
-                    data-bs-title="Edit user">
-                    <i class="bi bi-pencil"></i>
-                    <span class="d-none d-md-inline ms-1">Edit</span>
-                  </button>
-                  <button class="btn btn-sm btn-outline-info rounded-2 px-2 py-1 ms-2"
-                    wire:click='viewUser({{$item->id}})'
-                    data-bs-toggle="tooltip"
-                    data-bs-title="View user">
-                    <i class="bi bi-eye"></i>
-                    <span class="d-none d-md-inline ms-1">View</span>
-                  </button>
-                  <!-- Delete/Restore Button -->
-                  <button class="btn btn-sm {{$item->deleted_at == Null ? 'btn-outline-danger' : 'btn-outline-success'}} rounded-2 px-2 py-1 ms-2"
-                    wire:click='{{$item->deleted_at == Null ? 'deleteUser('.$item->id.')' : 'restoreUser('.$item->id.')'}}'
-                    data-bs-toggle="tooltip"
-                    data-bs-title="{{$item->deleted_at == Null ? 'Delete user' : 'Restore user'}}">
-                    <i class="bi {{$item->deleted_at == Null ? 'bi-trash' : 'bi-arrow-counterclockwise'}}"></i>
-                    <span class="d-none d-md-inline ms-1">{{$item->deleted_at == Null ? 'Delete' : 'Restore'}}</span>
-                  </button>
-                </td>
-              </tr>
-              @empty
-              <tr>
-                <th colspan="5" class="text-center">No Records Found</th>
-              </tr>
-              @endforelse
-            </tbody>
-          </table>
-
-
-
-          <!-- End Table with stripped rows -->
-          <div>
-            {{$users->links()}}
+        <div class="row align-items-center pt-3 pb-3">
+          <!-- Search Input -->
+          <div class="col-md-4 text-start">
+            <div class="input-group">
+              <span class="input-group-text bg-light border-end-0">
+                <i class="bi bi-search"></i>
+              </span>
+              <input type="text" class="form-control border-start-0 ps-0"
+                placeholder="Search users..."
+                wire:model.live.debounce.300ms="search"
+                aria-label="Search users">
+              <button class="btn btn-outline-secondary border-start-0 bg-light" type="button"
+                wire:loading.class="d-none" wire:target="search"
+                wire:click="$set('search', '')">
+                <i class="bi bi-x"></i>
+              </button>
+              <span wire:loading wire:target="search" class="input-group-text bg-light border-start-0">
+                <div class="spinner-border spinner-border-sm text-primary" role="status">
+                  <span class="visually-hidden">Searching...</span>
+                </div>
+              </span>
+            </div>
           </div>
+
+          <!-- Buttons (Aligned to the Right) -->
+          <div class="col-md-8 text-end">
+            <button type="button" class="btn {{ $archive ? 'btn-success' : 'btn-warning' }}" wire:click="toggleArchive">
+              <i class="bi {{ $archive ? 'bi-box-arrow-in-up' : 'bi-archive' }} me-1"></i>
+              {{ $archive ? 'General' : 'View Archive' }}
+            </button>
+            <button type="button" class="btn btn-primary" wire:click='clear' data-bs-toggle="modal" data-bs-target="#userModal">
+              <i class="bi bi-person-plus-fill"></i> Add User
+            </button>
+          </div>
+        </div>
+
+
+
+
+
+        <!-- Table with stripped rows -->
+        <table class="table table-hover table-bordered table-striped text-center">
+          <thead class="table-light">
+            <tr>
+              <th scope="col">#</th>
+              <th scope="col">Name</th>
+              <th scope="col">Email</th>
+              <th scope="col">Status</th>
+              <th scope="col">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            @forelse($users as $item)
+            <tr>
+              <td scope="row">{{$item->id}}</td>
+              <td>{{$item->name}}</td>
+              <td>{{$item->email}}</td>
+              <td>
+                <span class="badge rounded-3 {{$item->deleted_at == Null ? 'bg-success': 'bg-danger'}}">
+                  {{$item->deleted_at == Null ? 'Active' : 'Inactive'}}
+                </span>
+              </td>
+              <td class="d-flex justify-content-center">
+                <button class="btn btn-sm btn-info rounded-2 px-2 py-1 me-2"
+                  wire:click='viewUser({{$item->id}})'
+                  data-bs-toggle="tooltip"
+                  data-bs-title="View user">
+                  <i class="bi bi-eye-fill"></i>
+                  <span class="d-none d-md-inline ms-1">View</span>
+                </button>
+
+                <button class="btn btn-sm btn-primary rounded-2 px-2 py-1 me-2"
+                  wire:click='readUser({{$item->id}})'
+                  data-bs-toggle="tooltip"
+                  data-bs-title="Edit user">
+                  <i class="bi bi-pencil-square"></i>
+                  <span class="d-none d-md-inline ms-1">Edit</span>
+                </button>
+
+                <button class="btn btn-sm {{$item->deleted_at == Null ? 'btn-danger' : 'btn-outline-success'}} rounded-2 px-2 py-1"
+                  wire:click='{{$item->deleted_at == Null ? 'deleteUser('.$item->id.')' : 'restoreUser('.$item->id.')'}}'
+                  data-bs-toggle="tooltip"
+                  data-bs-title="{{$item->deleted_at == Null ? 'Move to archive' : 'Restore user'}}">
+                  <i class="bi {{$item->deleted_at == Null ? 'bi bi-archive-fill' : 'bi-arrow-counterclockwise'}}"></i>
+                  <span class="d-none d-md-inline ms-1">{{$item->deleted_at == Null ? 'Archive' : 'Restore'}}</span>
+                </button>
+              </td>
+            </tr>
+            @empty
+            <tr>
+              <th colspan="5" class="text-center">No Records Found</th>
+            </tr>
+            @endforelse
+          </tbody>
+        </table>
+
+
+
+        <!-- End Table with stripped rows -->
+        <div>
+          {{$users->links()}}
+        </div>
       </div>
     </div>
 

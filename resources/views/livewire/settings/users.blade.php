@@ -29,6 +29,7 @@
             </div>
           </div>
 
+
           <!-- Buttons (Aligned to the Right) -->
           <div class="col-md-8 text-end">
             <button type="button" class="btn {{ $archive ? 'btn-success' : 'btn-warning' }}" wire:click="toggleArchive">
@@ -105,7 +106,7 @@
     </div>
     <!-- View User Modal -->
     <div class="modal fade" id="viewUserModal" tabindex="-1" aria-labelledby="viewUserModalLabel" aria-hidden="true" wire:ignore.self>
-      <div class="modal-dialog modal-lg">
+      <div class="modal-dialog modal-m">
         <div class="modal-content">
           <div class="modal-header bg-info text-white">
             <h5 class="modal-title" id="viewUserModalLabel">
@@ -133,16 +134,17 @@
             </div>
 
             <hr>
-
+            <!-- Permissions -->
+            <div class="text-center">
+              <h5 class="fw-bold text-primary">Permissions</h5>
+              <ul class="list-group mb-3">
+                <li class="list-group-item"><strong>Assessor:</strong> {{ $viewUser?->permissions['assessor'] ? '✔ Yes' : '✖ No' }}</li>
+                <li class="list-group-item"><strong>Secretariat:</strong> {{ $viewUser?->permissions['secretariat'] ? '✔ Yes' : '✖ No' }}</li>
+              </ul>
+            </div>
             <div class="row">
               <!-- Left Column -->
               <div class="col-md-6">
-                <!-- Permissions -->
-                <h5 class="fw-bold text-primary">Permissions</h5>
-                <ul class="list-group mb-3">
-                  <li class="list-group-item"><strong>Assessor:</strong> {{ $viewUser?->permissions['assessor'] ? '✔ Yes' : '✖ No' }}</li>
-                  <li class="list-group-item"><strong>Secretariat:</strong> {{ $viewUser?->permissions['secretariat'] ? '✔ Yes' : '✖ No' }}</li>
-                </ul>
 
                 <!-- Accounts -->
                 <h5 class="fw-bold text-primary">Accounts</h5>
@@ -166,7 +168,7 @@
               <!-- Right Column -->
               <div class="col-md-6">
                 <!-- Exams -->
-                <h5 class="fw-bold text-primary">Exams</h5>
+                <h5 class="fw-bold text-primary mt-10">Exams</h5> <!-- Bootstrap margin-top class -->
                 <ul class="list-group mb-3">
                   <li class="list-group-item"><strong>Add:</strong> {{ $viewUser?->candidates['add'] ? '✔ Yes' : '✖ No' }}</li>
                   <li class="list-group-item"><strong>Update:</strong> {{ $viewUser?->candidates['update'] ? '✔ Yes' : '✖ No' }}</li>
@@ -183,6 +185,8 @@
                   <li class="list-group-item"><strong>Delete:</strong> {{ $viewUser?->candidates['delete'] ? '✔ Yes' : '✖ Yes' }}</li>
                 </ul>
               </div>
+
+
             </div>
           </div>
         </div>

@@ -18,6 +18,15 @@ class PriorityGroups extends Component
     public $search;
     public $title, $prioritygroup_id;
 
+    public function mount()
+    {
+        $user = auth()->user();
+
+        if(!$user->can('read reference')){
+            abort(403);
+        }
+    }
+
     public function render()
     {
         return view('livewire.references.priority-groups', [

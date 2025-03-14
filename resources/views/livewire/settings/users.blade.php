@@ -36,9 +36,12 @@
               <i class="bi {{ $archive ? 'bi-box-arrow-in-up' : 'bi-archive' }} me-1"></i>
               {{ $archive ? 'General' : 'View Archive' }}
             </button>
+
+            @can('create user')
             <button type="button" class="btn btn-primary" wire:click='clear' data-bs-toggle="modal" data-bs-target="#userModal">
               <i class="bi bi-person-plus-fill"></i> Add User
             </button>
+            @endcan
           </div>
         </div>
 
@@ -66,29 +69,28 @@
               </td>
               <td class="d-flex justify-content-center">
                 <button class="btn btn-sm btn-info rounded-2 px-2 py-1 me-2"
-                  wire:click="viewUser({{ $item->id }})"
-                  data-bs-toggle="modal"
-                  data-bs-target="#viewUserModal">
+                  wire:click="viewUser({{$item->id}})">
                   <i class="bi bi-eye-fill"></i>
                   <span class="d-none d-md-inline ms-1">View</span>
                 </button>
 
 
+                @can('update user')
                 <button class="btn btn-sm btn-primary rounded-2 px-2 py-1 me-2"
-                  wire:click='readUser({{$item->id}})'
-                  data-bs-toggle="tooltip"
-                  data-bs-title="Edit user">
+                  wire:click='readUser({{$item->id}})'>
                   <i class="bi bi-pencil-square"></i>
                   <span class="d-none d-md-inline ms-1">Edit</span>
                 </button>
-
+                @endcan
+                
+                @can('delete user')
                 <button class="btn btn-sm {{$item->deleted_at == Null ? 'btn-danger' : 'btn-outline-success'}} rounded-2 px-2 py-1"
                   wire:click='{{$item->deleted_at == Null ? 'deleteUser('.$item->id.')' : 'restoreUser('.$item->id.')'}}'
-                  data-bs-toggle="tooltip"
-                  data-bs-title="{{$item->deleted_at == Null ? 'Move to archive' : 'Restore user'}}">
+                  >
                   <i class="bi {{$item->deleted_at == Null ? 'bi bi-archive-fill' : 'bi-arrow-counterclockwise'}}"></i>
                   <span class="d-none d-md-inline ms-1">{{$item->deleted_at == Null ? 'Archive' : 'Restore'}}</span>
                 </button>
+                @endcan
               </td>
             </tr>
             @empty
@@ -104,94 +106,93 @@
         </div>
       </div>
     </div>
-    <!-- View User Modal -->
-    <div class="modal fade" id="viewUserModal" tabindex="-1" aria-labelledby="viewUserModalLabel" aria-hidden="true" wire:ignore.self>
-      <div class="modal-dialog modal-m">
-        <div class="modal-content">
-          <div class="modal-header bg-info text-white">
-            <h5 class="modal-title" id="viewUserModalLabel">
-              <i class="bi bi-eye-fill me-2"></i> View User Details
-            </h5>
-            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-          </div>
-          <div class="modal-body">
-            <div class="row">
-              <!-- User Information -->
-              <div class="col-md-6">
-                <p><strong>Name:</strong> {{ $viewUser?->name }}</p>
-                <p><strong>Email:</strong> {{ $viewUser?->email }}</p>
-                <p><strong>Employee ID:</strong> {{ $viewUser?->employeeid }}</p>
-              </div>
-              <div class="col-md-6">
-                <p><strong>Status:</strong>
-                  <span class="badge {{ $viewUser?->deleted_at == null ? 'bg-success' : 'bg-danger' }}">
-                    {{ $viewUser?->deleted_at == null ? 'Active' : 'Inactive' }}
-                  </span>
-                </p>
-                <p><strong>Type:</strong> {{ ucfirst($viewUser?->type) }}</p>
-                <p><strong>Office:</strong> {{ ucfirst($viewUser?->office) }}</p>
-              </div>
+
+
+  <div class="modal fade" id="viewModal" tabindex="-1" aria-labelledby="viewModalLabel" aria-hidden="true" wire:ignore.self>
+    <div class="modal-dialog modal-m"> 
+      <div class="modal-content">
+        <div class="modal-header bg-info text-white">
+          <h6 class="modal-title" id="viewModalLabel">
+            <i class="bi bi-eye-fill me-1"></i> User Details
+          </h6>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body p-3">
+          <div class="d-flex justify-content-between mb-2">
+            <div>
+              <p class="mb-1"><strong>Name:</strong> {{ $user?->name }}</p>
+              <p class="mb-1"><strong>Email:</strong> {{ $user?->email }}</p>
             </div>
-
-            <hr>
-            <!-- Permissions -->
-            <div class="text-center">
-              <h5 class="fw-bold text-primary">Permissions</h5>
-              <ul class="list-group mb-3">
-                <li class="list-group-item"><strong>Assessor:</strong> {{ $viewUser?->permissions['assessor'] ? '✔ Yes' : '✖ No' }}</li>
-                <li class="list-group-item"><strong>Secretariat:</strong> {{ $viewUser?->permissions['secretariat'] ? '✔ Yes' : '✖ No' }}</li>
-              </ul>
-            </div>
-            <div class="row">
-              <!-- Left Column -->
-              <div class="col-md-6">
-
-                <!-- Accounts -->
-                <h5 class="fw-bold text-primary">Accounts</h5>
-                <ul class="list-group mb-3">
-                  <li class="list-group-item"><strong>Add:</strong> {{ $viewUser?->accounts['add'] ? '✔ Yes' : '✖ No' }}</li>
-                  <li class="list-group-item"><strong>Update:</strong> {{ $viewUser?->accounts['update'] ? '✔ Yes' : '✖ No' }}</li>
-                  <li class="list-group-item"><strong>View:</strong> {{ $viewUser?->accounts['view'] ? '✔ Yes' : '✖ No' }}</li>
-                  <li class="list-group-item"><strong>Delete:</strong> {{ $viewUser?->accounts['delete'] ? '✔ Yes' : '✖ No' }}</li>
-                </ul>
-
-                <!-- Candidates -->
-                <h5 class="fw-bold text-primary">Candidates</h5>
-                <ul class="list-group mb-3">
-                  <li class="list-group-item"><strong>Add:</strong> {{ $viewUser?->candidates['add'] ? '✔ Yes' : '✖ No' }}</li>
-                  <li class="list-group-item"><strong>Update:</strong> {{ $viewUser?->candidates['update'] ? '✔ Yes' : '✖ No' }}</li>
-                  <li class="list-group-item"><strong>View:</strong> {{ $viewUser?->candidates['view'] ? '✔ Yes' : '✖ No' }}</li>
-                  <li class="list-group-item"><strong>Delete:</strong> {{ $viewUser?->candidates['delete'] ? '✔ Yes' : '✖ No' }}</li>
-                </ul>
-              </div>
-
-              <!-- Right Column -->
-              <div class="col-md-6">
-                <!-- Exams -->
-                <h5 class="fw-bold text-primary mt-10">Exams</h5> <!-- Bootstrap margin-top class -->
-                <ul class="list-group mb-3">
-                  <li class="list-group-item"><strong>Add:</strong> {{ $viewUser?->candidates['add'] ? '✔ Yes' : '✖ No' }}</li>
-                  <li class="list-group-item"><strong>Update:</strong> {{ $viewUser?->candidates['update'] ? '✔ Yes' : '✖ No' }}</li>
-                  <li class="list-group-item"><strong>View:</strong> {{ $viewUser?->candidates['view'] ? '✔ Yes' : '✖ No' }}</li>
-                  <li class="list-group-item"><strong>Delete:</strong> {{ $viewUser?->candidates['delete'] ? '✔ Yes' : '✖ No' }}</li>
-                </ul>
-
-                <!-- References -->
-                <h5 class="fw-bold text-primary">References</h5>
-                <ul class="list-group">
-                  <li class="list-group-item"><strong>Add:</strong> {{ $viewUser?->candidates['add'] ? '✔ Yes' : '✖ No' }}</li>
-                  <li class="list-group-item"><strong>Update:</strong> {{ $viewUser?->candidates['update'] ? '✔ Yes' : '✖ No' }}</li>
-                  <li class="list-group-item"><strong>View:</strong> {{ $viewUser?->candidates['view'] ? '✔ Yes' : '✖ Yes' }}</li>
-                  <li class="list-group-item"><strong>Delete:</strong> {{ $viewUser?->candidates['delete'] ? '✔ Yes' : '✖ Yes' }}</li>
-                </ul>
-              </div>
-
-
+            <div class="text-end">
+              <span class="badge {{ $user?->deleted_at ? 'bg-danger' : 'bg-success' }}">
+                {{ $user?->deleted_at ? 'Inactive' : 'Active' }}
+              </span>
+              <span class="badge bg-primary">{{ ucfirst($user?->type) }}</span>
             </div>
           </div>
+
+          <h6 class="fw-bold text-primary text-center border-bottom pb-1">Permissions</h6>
+          <table class="table table-sm text-center mb-2">
+            <thead class="table-light">
+              <tr>
+                <th>Module</th>
+                <th>Create</th>
+                <th>Update</th>
+                <th>Read</th>
+                <th>Delete</th>
+              </tr>
+            </thead>
+            <tbody>
+              @php
+                  $modules = ['user', 'candidate', 'exam', 'reference'];
+              @endphp
+              @foreach ($modules as $module)
+                <tr>
+                  <td class="fw-bold text-primary">{{ ucfirst($module) }}</td>
+                  <td class="text-center">
+                    <span class="{{ $user?->hasPermissionTo("create $module") ? 'text-success' : 'text-danger' }}">
+                      {{ $user?->hasPermissionTo("create $module") ? '✔' : '✖' }}
+                    </span>
+                  </td>
+                  <td class="text-center">
+                    <span class="{{ $user?->hasPermissionTo("update $module") ? 'text-success' : 'text-danger' }}">
+                      {{ $user?->hasPermissionTo("update $module") ? '✔' : '✖' }}
+                    </span>
+                  </td>
+                  <td class="text-center">
+                    <span class="{{ $user?->hasPermissionTo("read $module") ? 'text-success' : 'text-danger' }}">
+                      {{ $user?->hasPermissionTo("read $module") ? '✔' : '✖' }}
+                    </span>
+                  </td>
+                  <td class="text-center">
+                    <span class="{{ $user?->hasPermissionTo("delete $module") ? 'text-success' : 'text-danger' }}">
+                      {{ $user?->hasPermissionTo("delete $module") ? '✔' : '✖' }}
+                    </span>
+                  </td>
+                </tr>
+              @endforeach        
+            </tbody>
+          </table>
+
+            <p>
+              <strong>Assessor:</strong>
+              <span class="{{ $user?->hasPermissionTo('assessor permission') ? 'text-success' : 'text-danger' }}">
+                {{ $user?->hasPermissionTo('assessor permission') ? '✔' : '✖' }}
+              </span>
+            </p>
+            
+            <p>
+              <strong>Secretariat:</strong>
+              <span class="{{ $user?->hasPermissionTo('secretariat permission') ? 'text-success' : 'text-danger' }}">
+                {{ $user?->hasPermissionTo('secretariat permission') ? '✔' : '✖' }}
+              </span>
+            </p>
+          
         </div>
       </div>
     </div>
+  </div>
+
 
 
 
@@ -224,38 +225,30 @@
 
                   <div class="mb-3">
                     <label class="form-label fw-bold">Password</label>
-                    <input type="password" class="form-control" wire:model="password" placeholder="Enter password">
+                    <input type="password" class="form-control" wire:model="password" 
+                        placeholder="{{ $editMode ? 'Enter new password (leave blank to keep current)' : 'Enter password (leave blank to keep default)' }}"
+                        autocomplete="off">
                     @error('password') <div class="text-danger small">{{ $message }}</div> @enderror
-                  </div>
-
-                  <div class="row mb-3">
-                    <div class="col-6">
-                      <label class="form-label fw-bold">Type</label>
-                      <select class="form-select">
-                        <option value="superadmin">Super Admin</option>
-                        <option value="secretariat">Secretariat</option>
-                        <option value="assessor">Assessor</option>
-                        <option value="candidate">Candidate</option>
-                      </select>
-                    </div>
-
-                    <div class="col-6">
-                      <label class="form-label fw-bold">Office</label>
-                      <select class="form-select">
-                        <option value="option1">Office 1</option>
-                        <option value="option2">Office 2</option>
-                        <option value="option3">Office 3</option>
-                        <option value="option4">Office 4</option>
-                      </select>
-                    </div>
-                  </div>
-
+                </div>
 
                   <div class="mb-3">
+                    <label class="form-label fw-bold">Type</label>
+                    <select class="form-select" wire:model.live="type">
+                        <option value="" disabled selected>Select a Type</option>
+                        <option value="superadmin" {{ $type === 'superadmin' ? 'selected' : '' }}>Super Admin</option>
+                        <option value="admin" {{ $type === 'admin' ? 'selected' : '' }}>Admin</option>
+                        <option value="secretariat" {{ $type === 'secretariat' ? 'selected' : '' }}>Secretariat</option>
+                        <option value="assessor" {{ $type === 'assessor' ? 'selected' : '' }}>Assessor</option>
+                    </select>
+                </div>
+                
+
+
+                  {{-- <div class="mb-3">
                     <label class="form-label fw-bold">Employee ID</label>
                     <input type="text" class="form-control" wire:model="employeeid" placeholder="Employee ID">
                     @error('employeeid') <div class="text-danger small">{{ $message }}</div> @enderror
-                  </div>
+                  </div> --}}
 
 
                 </div>
@@ -270,11 +263,11 @@
                 <div class="col-md-6">
                   <h6 class="fw-bold text-primary">Permissions</h6>
                   <div class="form-check">
-                    <input class="form-check-input" type="checkbox" id="assessor">
+                    <input class="form-check-input" type="checkbox" value="assessor permission" wire:model="permissions">
                     <label class="form-check-label" for="assessor">Assessor</label>
                   </div>
                   <div class="form-check">
-                    <input class="form-check-input" type="checkbox" id="secretariat">
+                    <input class="form-check-input" type="checkbox" value="secretariat permission" wire:model="permissions">
                     <label class="form-check-label" for="secretariat">Secretariat</label>
                   </div>
                 </div>
@@ -285,19 +278,19 @@
                   <div class="col-md-6">
                     <h6 class="fw-bold text-primary">Accounts</h6>
                     <div class="form-check">
-                      <input class="form-check-input" type="checkbox" id="add-accounts">
-                      <label class="form-check-label" for="add-accounts">Add</label>
+                      <input class="form-check-input" type="checkbox" value="create user" wire:model="permissions">
+                      <label class="form-check-label" for="create-accounts">Create</label>
                     </div>
                     <div class="form-check">
-                      <input class="form-check-input" type="checkbox" id="update-accounts">
+                      <input class="form-check-input" type="checkbox" value="update user" wire:model="permissions">
                       <label class="form-check-label" for="update-accounts">Update</label>
                     </div>
                     <div class="form-check">
-                      <input class="form-check-input" type="checkbox" id="view-accounts">
-                      <label class="form-check-label" for="view-accounts">View</label>
+                      <input class="form-check-input" type="checkbox" value="read user" wire:model="permissions">
+                      <label class="form-check-label" for="read-accounts">Read</label>
                     </div>
                     <div class="form-check">
-                      <input class="form-check-input" type="checkbox" id="delete-accounts">
+                      <input class="form-check-input" type="checkbox" value="delete user" wire:model="permissions">
                       <label class="form-check-label" for="delete-accounts">Delete</label>
                     </div>
                   </div>
@@ -306,19 +299,19 @@
                   <div class="col-md-6">
                     <h6 class="fw-bold text-primary">Candidates</h6>
                     <div class="form-check">
-                      <input class="form-check-input" type="checkbox" id="add-candidates">
-                      <label class="form-check-label" for="add-candidates">Add</label>
+                      <input class="form-check-input" type="checkbox" value="create candidate" wire:model="permissions">
+                      <label class="form-check-label" for="create-candidates">Create</label>
                     </div>
                     <div class="form-check">
-                      <input class="form-check-input" type="checkbox" id="update-candidates">
+                      <input class="form-check-input" type="checkbox" value="update candidate" wire:model="permissions">
                       <label class="form-check-label" for="update-candidates">Update</label>
                     </div>
                     <div class="form-check">
-                      <input class="form-check-input" type="checkbox" id="view-candidates">
-                      <label class="form-check-label" for="view-candidates">View</label>
+                      <input class="form-check-input" type="checkbox" value="read candidate" wire:model="permissions">
+                      <label class="form-check-label" for="read-candidates">Read</label>
                     </div>
                     <div class="form-check">
-                      <input class="form-check-input" type="checkbox" id="delete-candidates">
+                      <input class="form-check-input" type="checkbox" value="delete candidate" wire:model="permissions">
                       <label class="form-check-label" for="delete-candidates">Delete</label>
                     </div>
                   </div>
@@ -327,19 +320,19 @@
                   <div class="col-md-6 mt-3">
                     <h6 class="fw-bold text-primary">Reference</h6>
                     <div class="form-check">
-                      <input class="form-check-input" type="checkbox" id="add-Reference">
-                      <label class="form-check-label" for="add-Reference">Add</label>
+                      <input class="form-check-input" type="checkbox" type="checkbox" value="create reference" wire:model="permissions">
+                      <label class="form-check-label" for="add-Reference">Create</label>
                     </div>
                     <div class="form-check">
-                      <input class="form-check-input" type="checkbox" id="update-Reference">
+                      <input class="form-check-input" type="checkbox" type="checkbox" value="update reference" wire:model="permissions">
                       <label class="form-check-label" for="update-Reference">Update</label>
                     </div>
                     <div class="form-check">
-                      <input class="form-check-input" type="checkbox" id="view-reference">
-                      <label class="form-check-label" for="view-reference">View</label>
+                      <input class="form-check-input" type="checkbox" type="checkbox" value="read reference" wire:model="permissions">
+                      <label class="form-check-label" for="read-reference">Read</label>
                     </div>
                     <div class="form-check">
-                      <input class="form-check-input" type="checkbox" id="delete-reference">
+                      <input class="form-check-input" type="checkbox" type="checkbox" value="delete reference" wire:model="permissions">
                       <label class="form-check-label" for="delete-reference">Delete</label>
                     </div>
                   </div>
@@ -348,19 +341,19 @@
                   <div class="col-md-6 mt-3">
                     <h6 class="fw-bold text-primary">Exam</h6>
                     <div class="form-check">
-                      <input class="form-check-input" type="checkbox" id="add-exam">
-                      <label class="form-check-label" for="add-exam">Add</label>
+                      <input class="form-check-input" type="checkbox" type="checkbox" value="create exam" wire:model="permissions">
+                      <label class="form-check-label" for="create-exam">Create</label>
                     </div>
                     <div class="form-check">
-                      <input class="form-check-input" type="checkbox" id="update-exam">
+                      <input class="form-check-input" type="checkbox" type="checkbox" value="update exam" wire:model="permissions">
                       <label class="form-check-label" for="update-exam">Update</label>
                     </div>
                     <div class="form-check">
-                      <input class="form-check-input" type="checkbox" id="view-exam">
-                      <label class="form-check-label" for="view-exam">View</label>
+                      <input class="form-check-input" type="checkbox" type="checkbox" value="read exam" wire:model="permissions">
+                      <label class="form-check-label" for="read-exam">Read</label>
                     </div>
                     <div class="form-check">
-                      <input class="form-check-input" type="checkbox" id="delete-exam">
+                      <input class="form-check-input" type="checkbox" type="checkbox" value="delete exam" wire:model="permissions">
                       <label class="form-check-label" for="delete-exam">Delete</label>
                     </div>
                   </div>
@@ -450,6 +443,16 @@
   $wire.on('show-userModal', () => {
     console.log('Showing user modal');
     $('#userModal').modal('show');
+  });
+
+  $wire.on('hide-viewModal', () => {
+    console.log('Hiding view modal');
+    $('#viewModal').modal('hide');
+  });
+
+  $wire.on('show-viewModal', () => {
+    console.log('Showing view modal');
+    $('#viewModal').modal('show');
   });
 
   let currentPage = 1;

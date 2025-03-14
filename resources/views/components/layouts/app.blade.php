@@ -282,20 +282,23 @@
         </a>
     </li>
 
-      <li class="nav-item">
+    @can('read user')
+    <li class="nav-item">
         <a class="nav-link {{ Request::routeIs('settings.users') ? '' : 'collapsed' }}" href="{{ route('settings.users') }}">
             <i class="bi bi-people-fill fs-5"></i>
             <span>Users</span>
         </a>
     </li>
+    @endcan
 
+    @can('read candidate')
     <li class="nav-item">
       <a class="nav-link {{ Request::routeIs('candidate.list') ? '' : 'collapsed' }}" href="{{ route('candidate.list') }}">
         <i class="bi bi-person-check-fill fs-5"></i>
         <span>Candidate List</span>
       </a>
     </li>
-
+    @endcan
     {{-- <li class="nav-item">
         <a class="nav-link {{ Request::routeIs('candidate.*') ? '' : 'collapsed' }}" data-bs-target="#forms-nav" data-bs-toggle="collapse" href="#">
             <i class="bi bi-file-person fs-5"></i>
@@ -321,7 +324,7 @@
         </ul>
     </li> --}}
   
-
+    @can('read reference')
       <li class="nav-item">
         <a class="nav-link {{ Request::routeIs('references.*') ? '' : 'collapsed' }}" data-bs-target="#tables-nav" data-bs-toggle="collapse" href="#">
           <i class="bi bi-layout-text-window-reverse fs-5"></i><span>References</span><i class="bi bi-chevron-down ms-auto"></i>
@@ -359,7 +362,9 @@
           </li>
         </ul>
       </li><!-- End Tables Nav -->
+    @endcan
 
+    @can('assessor permission')
       <li class="nav-item">
         <a class="nav-link {{ Request::routeIs('test.*') ? '' : 'collapsed' }}" data-bs-target="#charts-nav" data-bs-toggle="collapse" href="#">
           <i class="bi bi-clipboard-check-fill fs-5"></i><span>Tests</span><i class="bi bi-chevron-down ms-auto"></i>
@@ -382,15 +387,18 @@
           </li>
         </ul>
       </li><!-- End Charts Nav -->
+    @endcan
 
-
+    @can('read exam')
       <li class="nav-item">
         <a class="nav-link {{ Request::routeIs('assign.exam') ? '' : 'collapsed' }}" href="{{ route('assign.exam') }}">
           <i class="bi bi-person-check-fill fs-5"></i>
           <span>Assign Exam</span>
         </a>
       </li>
+    @endcan
 
+    @can('secretariat permission')
       <li class="nav-item">
         <a class="nav-link {{ Request::routeIs('exam.*') ? '' : 'collapsed' }}" data-bs-target="#icons-nav" data-bs-toggle="collapse" href="#">
           <i class="bi bi-arrow-clockwise fs-5"></i><span>Ongoing Exams</span><i class="bi bi-chevron-down ms-auto"></i>
@@ -413,7 +421,7 @@
           </li>
         </ul>
       </li><!-- End Icons Nav -->
-
+    @endcan
       {{-- <li class="nav-heading">Pages</li> --}}
 
       <li class="nav-item">
@@ -433,9 +441,10 @@
     </ul>
 
   </aside><!-- End Sidebar-->
-  <main id="main" class="main">
-    {{ $slot }}
+  <main id="main" class="main" style="padding-top: 0;"> 
+    {{ $slot }} 
   </main>
+
 
 
   <footer id="footer" class="footer">

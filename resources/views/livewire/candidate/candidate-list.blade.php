@@ -43,12 +43,14 @@
                                 <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
                             </span>
                         </button>
+                        @can('create candidate')
                         <button type="button" class="btn btn-primary" 
                             wire:click='clear' 
                             data-bs-toggle="modal" 
                             data-bs-target="#candidateModal">
                             <i class="bi bi-plus-lg me-1"></i> Add Candidate
                         </button>
+                        @endcan
                     </div>
                 </div>
   
@@ -93,6 +95,7 @@
                                 </td>
                                 <td class="text-center">
                                     <div class="btn-group" role="group" aria-label="Candidate actions">
+                                        @can('update candidate')
                                         <button class="btn btn-sm btn-outline-primary" 
                                             wire:click='readCandidate({{$item->id}})'
                                             data-bs-toggle="tooltip" 
@@ -100,7 +103,9 @@
                                             <i class="bi bi-pencil"></i>
                                             <span class="d-none d-md-inline ms-1">Edit</span>
                                         </button>
-  
+                                        @endcan
+                                        
+                                        @can('delete candidate')
                                         <button class="btn btn-sm {{$item->deleted_at == Null ? 'btn-outline-danger': 'btn-outline-success'}}" 
                                             wire:click='{{$item->deleted_at == Null ? 'deleteCandidate('.$item->id.')': 'restoreCandidate('.$item->id.')'}}'
                                             data-bs-toggle="tooltip" 
@@ -108,6 +113,7 @@
                                             <i class="bi {{$item->deleted_at == Null ? 'bi-trash': 'bi-arrow-counterclockwise'}}"></i>
                                             <span class="d-none d-md-inline ms-1">{{$item->deleted_at == Null ? 'Delete': 'Restore'}}</span>
                                         </button>
+                                        @endcan
                                     </div>
                                 </td>
                             </tr>

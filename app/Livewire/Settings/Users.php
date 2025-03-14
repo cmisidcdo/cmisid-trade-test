@@ -8,7 +8,7 @@ use Illuminate\Support\Facades\DB;
 use Livewire\Component;
 use Livewire\WithPagination;
 use Illuminate\Validation\Rule;
-
+use Spatie\Permission\Models\Role;
 
 class Users extends Component
 {
@@ -16,8 +16,20 @@ class Users extends Component
     use WithPagination;
     public $editMode;
     public $search;
-    public $name, $email, $user_id;
+    public $user; 
+    public $name, $email, $password, $type = '', $user_id;
+    public $permission;
+    public $permissions = [];
     public $archive = false;
+
+    public function mount()
+    {
+        $user = auth()->user();
+
+        if(!$user->can('read user')){
+            abort(403);
+        }
+    }
 
     public function render()
     {
@@ -57,10 +69,11 @@ class Users extends Component
     {
         return [
             'name'  => ['required', 'string'],
+            'type'  => ['required', 'string', Rule::in(['superadmin', 'admin', 'assessor', 'secretariat'])],
             'email' => [
                 'required',
                 'string',
-                'email:rfc,dns',
+                'email',
                 Rule::unique('users', 'email')->ignore($this->user_id),
             ],
         ];
@@ -85,9 +98,33 @@ class Users extends Component
             $user = new User();
             $user->name = $this->name;
             $user->email = $this->email;
-            $user->password = Hash::make('password');
+            $user->type = $this->type;
+            if (!empty($this->password)) 
+            {
+                $user->password = Hash::make($this->password);
+            }
+            else
+            {
+                $user->password = Hash::make('admin12345');
+            } 
             $user->save();
+
+            
+
+            $this->permission = $user->permission;
+
+            if (!empty($this->permissions)) {
+                $user->syncPermissions($this->permissions);
+            }
+
+            activity('user_management')
+                ->performedOn($user)
+                ->causedBy(auth()->user()) 
+                ->withProperties(['name' => $user->name, 'email' => $user->email])
+                ->log('Created a new user');
         });
+
+       
 
         $this->clear();
         $this->dispatch('hide-userModal');
@@ -98,22 +135,24 @@ class Users extends Component
     public function clear()
     {
         $this->reset();
+        $this->password = null;
         $this->resetValidation();
     }
 
     public function readUser($userId)
     {
         $user = User::withTrashed()->findOrFail($userId);
-
+    
         $this->fill(
-            $user->only(['name', 'email'])
+            $user->only(['name', 'email', 'type'])
         );
-
+    
         $this->user_id = $user->id;
         $this->editMode = true;
+        $this->permissions = $user->getPermissionNames()->toArray();
         $this->dispatch('show-userModal');
-
     }
+    
 
     public function updateUser()
     {
@@ -123,9 +162,23 @@ class Users extends Component
         
             $user = User::withTrashed()->findOrFail($this->user_id);
             $user->name = $this->name;
+            $user->type = $this->type;
             $user->email = $this->email;
-            // $user->password = Hash::make('password');
+            if (!empty($this->password)) {
+                $user->password = Hash::make($this->password);
+                }
             $user->save();
+
+            $user->syncPermissions($this->permissions);
+
+            activity('user_management')
+            ->performedOn($user)
+            ->causedBy(auth()->user())
+            ->withProperties([
+                'old' => $originalData,
+                'new' => $user->getChanges()
+            ])
+            ->log('Updated user details');
         });
 
         $this->clear();
@@ -147,16 +200,42 @@ class Users extends Component
     
         $this->dispatch('success', 'User restored successfully.');
     }
-    public $user; // Declare the user property
 
+    public function updatedType($value)
+    {
+        if ($value === 'superadmin') {
+            $this->permissions = [
+                "assessor permission",
+                "secretariat permission",
+                "create user", "update user", "read user", "delete user",
+                "create candidate", "update candidate", "read candidate", "delete candidate",
+                "create reference", "update reference", "read reference", "delete reference",
+                "create exam", "update exam", "read exam", "delete exam"
+            ];
+        } elseif ($value === 'admin') {
+            $this->permissions = [
+                "read user",
+                "read candidate",
+                "read reference",
+                "read exam"
+            ];
+        } elseif ($value === 'assessor') {
+            $this->permissions = ["assessor permission"];
+        } elseif ($value === 'secretariat') {
+            $this->permissions = ["secretariat permission"];
+        } else {
+            $this->permissions = [];
+        }
+    }
 
+    public function viewUser($userId)
+    {
+        $this->user = User::withTrashed()->findOrFail($userId);
 
-public $viewUser;
+        $this->permissions = $this->user->getPermissionNames()->toArray();
 
-public function viewUser($id)
-{
-    $this->viewUser = User::find($id);
-}
+        $this->dispatch('show-viewModal');
+    }
 
 
 }

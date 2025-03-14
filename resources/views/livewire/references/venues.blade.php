@@ -37,12 +37,14 @@
                             <i class="bi {{ $archive ? 'bi-box-arrow-in-up' : 'bi-archive' }} me-1"></i>
                             {{ $archive ? 'General' : 'View Archive' }}
                         </button>
+                        @can('create reference')
                         <button type="button" class="btn btn-primary"
                             wire:click='clear'
                             data-bs-toggle="modal"
                             data-bs-target="#venueModal">
                             <i class="bi bi-plus-lg me-1"></i> Add Venue
                         </button>
+                        @endcan
                     </div>
                 </div>
 
@@ -72,6 +74,7 @@
                                 </td>
                                 <td class="text-center">
                                     <div class="btn-group" role="group" aria-label="Venue actions">
+                                        @can('update reference')
                                         <button class="btn btn-sm btn-primary rounded-2 px-2 py-1 me-2"
                                             wire:click='readVenue({{$item->id}})'
                                             data-bs-toggle="tooltip"
@@ -79,7 +82,9 @@
                                             <i class="bi bi-pencil-square me-1"></i>
                                             <span class="d-none d-md-inline ms-1">Edit</span>
                                         </button>
+                                        @endcan
 
+                                        @can('delete reference')
                                         <button class="btn btn-sm {{$item->deleted_at == Null ? 'btn-danger' : 'btn-outline-success'}} rounded-2 px-2 py-1"
                                             wire:click='{{$item->deleted_at == Null ? 'deleteVenue('.$item->id.')': 'restoreVenue('.$item->id.')'}}'
                                             data-bs-toggle="tooltip"
@@ -87,6 +92,7 @@
                                             <i class="bi {{$item->deleted_at == Null ? 'bi bi-archive-fill': 'bi-arrow-counterclockwise'}}"></i>
                                             <span class="d-none d-md-inline ms-1">{{$item->deleted_at == Null ? 'Archive': 'Restore'}}</span>
                                         </button>
+                                        @endcan
                                     </div>
                                 </td>
                             </tr>

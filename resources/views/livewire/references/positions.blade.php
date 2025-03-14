@@ -35,6 +35,8 @@
                             <i class="bi {{ $archive ? 'bi-box-arrow-in-up' : 'bi-archive' }} me-1"></i>
                             {{ $archive ? 'General' : 'View Archive' }}
                         </button>
+
+                        @can('create reference')
                         <button
                             type="button"
                             class="btn btn-primary d-flex align-items-center"
@@ -44,6 +46,7 @@
                             title="Add new position">
                             <i class="bi bi-plus-circle me-1"></i> Add Position
                         </button>
+                        @endcan
                     </div>
                 </div>
 
@@ -92,13 +95,17 @@
                                             title="View position skills">
                                             <i class="bi bi-eye me-1"></i> View
                                         </button>
+
+                                        @can('update reference')
                                         <button
                                             class="btn btn-sm btn-primary"
                                             wire:click='readPosition({{$item->id}})'
                                             title="Edit position">
                                             <i class="bi bi-pencil-square me-1"></i> Edit
                                         </button>
+                                        @endcan
 
+                                        @can('delete reference')
                                         <button
                                             class="btn btn-sm {{$item->deleted_at == Null ? 'btn-danger': 'btn-outline-success'}}"
                                             wire:click='{{$item->deleted_at == Null ? 'deletePosition('.$item->id.')': 'restorePosition('.$item->id.')'}}'
@@ -106,6 +113,7 @@
                                             <i class="bi {{$item->deleted_at == Null ? 'bi-archive' : 'bi-arrow-counterclockwise'}} me-1"></i>
                                             {{$item->deleted_at == Null ? 'Archive': 'Restore'}}
                                         </button>
+                                        @endcan
                                     </div>
                                 </td>
                             </tr>

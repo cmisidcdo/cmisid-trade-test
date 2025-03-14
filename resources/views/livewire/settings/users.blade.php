@@ -1,6 +1,6 @@
 <div>
-  <div class="globalheader">
-    <h3 class="fw-bold m-0">Users</h3>
+  <div class="card-header text-white text-center py-3" style="background-color: #1a1851; border-radius: 12px 12px 0 0;">
+    <h2 class="fw-bold m-0">Users</h2>
   </div>
   <section class="section dashboard">
     <div class="card">
@@ -29,7 +29,6 @@
             </div>
           </div>
 
-          <!-- Buttons (Aligned to the Right) -->
           <div class="col-md-8 text-end">
             <button type="button" class="btn {{ $archive ? 'btn-success' : 'btn-warning' }}" wire:click="toggleArchive">
               <i class="bi {{ $archive ? 'bi-box-arrow-in-up' : 'bi-archive' }} me-1"></i>
@@ -45,7 +44,6 @@
 
 
 
-        <!-- Table with stripped rows -->
         <table class="table table-hover table-bordered table-striped text-center">
           <thead class="table-light">
             <tr>
@@ -103,7 +101,6 @@
 
 
 
-        <!-- End Table with stripped rows -->
         <div>
           {{$users->links()}}
         </div>
@@ -124,7 +121,6 @@
           <div class="modal-body">
             <form class="row g-3" wire:submit.prevent="{{ $editMode ? 'updateUser' : 'createUser' }}">
               <div class="row">
-                <!-- Left Column -->
                 <div class="col-md-6">
                   <div class="mb-3">
                     <label class="form-label fw-bold">Full Name</label>
@@ -155,7 +151,6 @@
                   </div>
                 </div>
 
-                <!-- Right Column -->
                 <div class="col-md-6">
                   <div class="mb-3">
                     <label class="form-label fw-bold">Type</label>
@@ -182,10 +177,9 @@
                 </div>
               </div>
 
-              <!-- Additional Permissions -->
               <hr class="my-3">
               <div class="row">
-                <!-- Accounts Permissions -->
+
                 <div class="col-md-6">
                   <h6 class="fw-bold text-primary">Accounts</h6>
                   <div class="form-check">
@@ -206,7 +200,6 @@
                   </div>
                 </div>
 
-                <!-- Candidates Permissions -->
                 <div class="col-md-6">
                   <h6 class="fw-bold text-primary">Candidates</h6>
                   <div class="form-check">
@@ -227,7 +220,6 @@
                   </div>
                 </div>
 
-                <!-- Reference Permissions -->
                 <div class="col-md-6 mt-3">
                   <h6 class="fw-bold text-primary">Reference</h6>
                   <div class="form-check">
@@ -248,7 +240,6 @@
                   </div>
                 </div>
 
-                <!-- Exam Permissions -->
                 <div class="col-md-6 mt-3">
                   <h6 class="fw-bold text-primary">Exam</h6>
                   <div class="form-check">

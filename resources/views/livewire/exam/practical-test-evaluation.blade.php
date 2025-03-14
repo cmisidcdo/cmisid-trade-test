@@ -3,16 +3,12 @@
 @section('content')
     <style>
         .evaluator {
-            margin: 60px 0 33px 0;
+            margin: 70px 0 24px 0;
         }
 
         body {
             font-family: "Open Sans", sans-serif;
             font-size: 15px;
-        }
-
-        .custom-table th {
-            background-color: #ffffff !important;
         }
 
           /* Dropdown container */
@@ -101,12 +97,12 @@
         }
 
         .custom-table th {
-            background-color: #f8f9fa; /* Same as Bootstrap's .table-light */
+            background-color: #f8f9fa; 
             font-weight: bold;
         }
 
         .custom-table td {
-            background-color: #ffffff; /* White background for table cells */
+            background-color: #ffffff;
         }
 
 
@@ -141,8 +137,6 @@
                 </div>
             </div>
 
-
-            <!-- Evaluation Criteria Table -->
             <!-- Evaluation Criteria Table -->
             <div class="table-responsive">
                 <table class="table custom-table">
@@ -184,11 +178,11 @@
             <!-- Comment Section -->
             <div style="width: 45%;"> 
                 <label for="comments" class="form-label fw-bold">Comment & Recommendations</label>
-                <textarea class="form-control bg-white border-dark" id="comments" rows="6"></textarea>
+                <textarea class="form-control bg-white border-dark " id="comments" rows="6"></textarea>
             </div>
 
             <div class="d-flex flex-column align-items-end" style="width: 40%;">
-                
+
                 <!-- Total Score Section -->
                 <div class="d-flex align-items-center total-score-section">
                     <label for="totalScore" class="form-label fw-bold me-2">Total Score</label>
@@ -201,7 +195,7 @@
                     <p class="border-bottom border-dark" style="width: 270px;"></p>
                 </div>
             </div>
-    </div>
+        </div>
 
         </div>
     </section>

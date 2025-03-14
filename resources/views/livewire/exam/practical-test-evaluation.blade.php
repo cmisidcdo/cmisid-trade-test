@@ -109,8 +109,8 @@
     </style>
 
 <div class="">
-    <div class="globalheader m-0">
-        <h3 class="fw-bold m-0">Practical Test Evaluation Form</h3>
+    <div class="card-header text-white text-center py-3" style="background-color: #1a1851; border-radius: 12px 12px 0 0;">
+        <h2 class="fw-bold m-0">Practical Test Evaluation Form</h2>
     </div>
 
     <section class="section dashboard mt-4" >

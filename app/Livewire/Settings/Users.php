@@ -147,4 +147,16 @@ class Users extends Component
     
         $this->dispatch('success', 'User restored successfully.');
     }
+    public $user; // Declare the user property
+
+
+
+public $viewUser;
+
+public function viewUser($id)
+{
+    $this->viewUser = User::find($id);
+}
+
+
 }

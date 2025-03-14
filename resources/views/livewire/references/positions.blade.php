@@ -1,13 +1,11 @@
 <div>
-    <div class="globalheader">
-        <h3 style="font-weight: bold; margin: 0;">Positions</h3>
+    <div class="card-header text-white text-center py-3" style="background-color: #1a1851; border-radius: 12px 12px 0 0;">
+        <h2 class="fw-bold m-0">Positions</h2>
     </div>
 
     <section class="section dashboard">
         <div class="card shadow-sm">
             <div class="card-body p-4">
-
-                <!-- Search and Action Buttons Row -->
                 <div class="row mb-4 align-items-center">
                     <div class="col-md-6">
                         <div class="input-group">
@@ -49,8 +47,6 @@
                         @endcan
                     </div>
                 </div>
-
-                <!-- Table with improved styling and gridlines -->
                 <div class="table-responsive">
                     <table class="table table-hover table-bordered table-striped text-center align-middle">
                         <thead class="table-light">
@@ -133,10 +129,7 @@
                         </tbody>
                     </table>
                 </div>
-                <!-- End Table with improved styling -->
 
-
-                <!-- Pagination with improved styling -->
                 <div class="mt-4">
                     <div class="d-flex justify-content-between align-items-center">
                         <div class="pagination-info text-muted small">
@@ -148,7 +141,6 @@
             </div>
         </div>
 
-        <!-- Position Modal with improved layout -->
         <div class="modal fade" id="positionModal" tabindex="-1" aria-labelledby="positionModalLabel" aria-hidden="true" wire:ignore.self>
             <div class="modal-dialog modal-lg">
                 <div class="modal-content">
@@ -162,7 +154,6 @@
                     <div class="modal-body">
                         <form class="row g-4" wire:submit.prevent="{{$editMode ? 'updatePosition' : 'createPosition'}}">
 
-                            <!-- Title Field -->
                             <div class="col-12">
                                 <label for="title" class="form-label fw-semibold">Title <span class="text-danger">*</span></label>
                                 <input
@@ -176,7 +167,6 @@
                                 @enderror
                             </div>
 
-                            <!-- Salary Grade & Interview Priority -->
                             <div class="row g-3">
                                 <div class="col-md-6">
                                     <label for="salary_grade" class="form-label fw-semibold">Salary Grade <span class="text-danger">*</span></label>
@@ -217,7 +207,6 @@
                                 </div>
                             </div>
 
-                            <!-- Competency Level -->
                             <div class="col-12">
                                 <label for="competency_level" class="form-label fw-semibold">Competency Level <span class="text-danger">*</span></label>
                                 <select
@@ -234,7 +223,6 @@
                                 @enderror
                             </div>
 
-                            <!-- Skills Section -->
                             <div class="col-12">
                                 <div class="d-flex justify-content-between align-items-center mb-3">
                                     <h5 class="fw-semibold mb-0">Required Skills</h5>
@@ -246,7 +234,6 @@
                                     </button>
                                 </div>
 
-                                <!-- Skills Table -->
                                 <div class="table-responsive">
                                     <table class="table table-hover">
                                         <thead class="table-light">
@@ -293,7 +280,6 @@
                                 </div>
                             </div>
 
-                            <!-- Modal Footer Buttons -->
                             <div class="col-12 d-flex justify-content-end gap-2 mt-4">
                                 <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal" wire:click='clear'>
                                     <i class="bi bi-x-circle me-1"></i> Cancel
@@ -309,7 +295,6 @@
             </div>
         </div>
 
-        <!-- Skills Selection Modal with improved styling -->
         <div class="modal fade" id="skillsModal" tabindex="-1" aria-labelledby="skillsModalLabel" aria-hidden="true" wire:ignore.self>
             <div class="modal-dialog modal-lg">
                 <div class="modal-content">
@@ -320,7 +305,6 @@
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" wire:click='clear'></button>
                     </div>
                     <div class="modal-body">
-                        <!-- Search Skills Input -->
                         <div class="mb-3">
                             <div class="input-group">
                                 <span class="input-group-text bg-light border">
@@ -340,7 +324,6 @@
                             </div>
                         </div>
 
-                        <!-- Skills Table -->
                         <div class="table-responsive">
                             <table class="table table-hover align-middle">
                                 <thead class="table-light">
@@ -378,13 +361,11 @@
                                 </tbody>
                             </table>
 
-                            <!-- Skills Pagination -->
                             <div class="mt-3">
                                 {{ $skills->links() }}
                             </div>
                         </div>
 
-                        <!-- Skills Modal Footer -->
                         <div class="d-flex justify-content-end gap-2 mt-4">
                             <button
                                 type="button"
@@ -397,7 +378,7 @@
                 </div>
             </div>
         </div>
-        <!-- View Position Skills Modal -->
+
         <div class="modal fade" id="viewSkillsModal" tabindex="-1" aria-labelledby="viewSkillsModalLabel" aria-hidden="true" wire:ignore.self>
             <div class="modal-dialog modal-lg">
                 <div class="modal-content">
@@ -408,7 +389,6 @@
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
                     <div class="modal-body">
-                        <!-- Position Details Section -->
                         <div class="mb-4">
                             <h6 class="fw-bold mb-3">Position Details</h6>
                             <div class="row g-3">
@@ -436,7 +416,6 @@
                         <div class="border-top pt-3">
                             <h6 class="fw-bold mb-3">Required Skills</h6>
 
-                            <!-- Skills Table -->
                             <div class="table-responsive">
                                 <table class="table table-hover">
                                     <thead class="table-light">
@@ -472,7 +451,6 @@
                             </div>
                         </div>
 
-                        <!-- Modal Footer Buttons -->
                         <div class="d-flex justify-content-end gap-2 mt-4">
                             <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
                                 <i class="bi bi-x-circle me-1"></i> Close
@@ -486,7 +464,6 @@
 
     @script
     <script>
-        // Initialize tooltips
         document.addEventListener('DOMContentLoaded', function() {
             var tooltipTriggerList = [].slice.call(document.querySelectorAll('[title]'));
             var tooltipList = tooltipTriggerList.map(function(tooltipTriggerEl) {
@@ -495,7 +472,6 @@
                 });
             });
 
-            // Reinitialize tooltips when Livewire updates the DOM
             document.addEventListener('livewire:load', function() {
                 initTooltips();
             });
@@ -514,7 +490,6 @@
             }
         });
 
-        // Modal control
         $wire.on('hide-positionModal', () => {
             console.log('Hiding position modal');
             bootstrap.Modal.getInstance(document.getElementById('positionModal')).hide();
@@ -548,13 +523,11 @@
     @endscript
 
     <style>
-        /* Improve table row hover effect */
         .table tbody tr:hover {
             background-color: rgba(0, 123, 255, 0.05);
             transition: background-color 0.2s ease;
         }
 
-        /* Improve button hover effects */
         .btn {
             transition: all 0.2s ease-in-out;
         }
@@ -564,12 +537,10 @@
             box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
         }
 
-        /* Improve modal transitions */
         .modal.fade .modal-dialog {
             transition: transform 0.3s ease-out;
         }
 
-        /* Empty state styling */
         .empty-state {
             display: flex;
             flex-direction: column;
@@ -578,7 +549,6 @@
             color: #6c757d;
         }
 
-        /* Improve form validation styling */
         .was-validated .form-control:invalid,
         .form-control.is-invalid {
             border-color: #dc3545;
@@ -589,7 +559,6 @@
             background-size: calc(0.75em + 0.375rem) calc(0.75em + 0.375rem);
         }
 
-        /* Responsive adjustments */
         @media (max-width: 768px) {
             .table-responsive {
                 border: 0;

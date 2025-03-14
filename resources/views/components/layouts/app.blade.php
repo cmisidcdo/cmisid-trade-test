@@ -296,30 +296,7 @@
       </a>
     </li>
     @endcan
-    {{-- <li class="nav-item">
-        <a class="nav-link {{ Request::routeIs('candidate.*') ? '' : 'collapsed' }}" data-bs-target="#forms-nav" data-bs-toggle="collapse" href="#">
-            <i class="bi bi-file-person fs-5"></i>
-            <span>Candidates</span>
-            <i class="bi bi-chevron-down ms-auto"></i>
-        </a>
-        <ul id="forms-nav" class="nav-content collapse {{ Request::routeIs('candidate.*') ? 'show' : '' }}" data-bs-parent="#sidebar-nav">
-            <li>
-                <a class="{{ Request::routeIs('candidate.list') ? 'active' : '' }}" href="{{ route('candidate.list') }}">
-                    <i class="bi bi-person-lines-fill fs-5"></i><span>Candidate List</span>
-                </a>
-            </li>
-            <li>
-                <a class="{{ Request::routeIs('candidate.add') ? 'active' : '' }}" href="{{ route('candidate.add') }}">
-                    <i class="bi bi-person-fill-add fs-5"></i><span>Add New Candidate</span>
-                </a>
-            </li>
-            <li>
-                <a class="{{ Request::routeIs('candidate.update') ? 'active' : '' }}" href="{{ route('candidate.update') }}">
-                    <i class="bi bi-person-fill-up fs-5"></i><span>Update Candidate</span>
-                </a>
-            </li>
-        </ul>
-    </li> --}}
+
   
     @can('read reference')
       <li class="nav-item">

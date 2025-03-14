@@ -22,14 +22,14 @@ class Users extends Component
     public $permissions = [];
     public $archive = false;
 
-    public function mount()
-    {
-        $user = auth()->user();
+    // public function mount()
+    // {
+    //     $user = auth()->user();
 
-        if(!$user->can('read user')){
-            abort(403);
-        }
-    }
+    //     if(!$user->can('read user')){
+    //         abort(403);
+    //     }
+    // }
 
     public function render()
     {

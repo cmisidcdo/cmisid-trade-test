@@ -24,6 +24,16 @@ class CandidateList extends Component
     public $positions = [], $offices = [], $priorityGroups = [];
     public $fullname, $email, $contactno, $remarks, $position_id, $office_id, $priority_group_id;
     public $endorsement_date;
+
+    public function mount()
+    {
+        $user = auth()->user();
+
+        if(!$user->can('read candidate')){
+            abort(403);
+        }
+    }
+
     public function render()
     {
         return view('livewire.candidate.candidate-list', [

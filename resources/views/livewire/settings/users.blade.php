@@ -29,20 +29,21 @@
             </div>
           </div>
 
+
+          <!-- Buttons (Aligned to the Right) -->
           <div class="col-md-8 text-end">
             <button type="button" class="btn {{ $archive ? 'btn-success' : 'btn-warning' }}" wire:click="toggleArchive">
               <i class="bi {{ $archive ? 'bi-box-arrow-in-up' : 'bi-archive' }} me-1"></i>
               {{ $archive ? 'General' : 'View Archive' }}
             </button>
+
+            @can('create user')
             <button type="button" class="btn btn-primary" wire:click='clear' data-bs-toggle="modal" data-bs-target="#userModal">
               <i class="bi bi-person-plus-fill"></i> Add User
             </button>
+            @endcan
           </div>
         </div>
-
-
-
-
 
         <table class="table table-hover table-bordered table-striped text-center">
           <thead class="table-light">
@@ -67,28 +68,28 @@
               </td>
               <td class="d-flex justify-content-center">
                 <button class="btn btn-sm btn-info rounded-2 px-2 py-1 me-2"
-                  wire:click='viewUser({{$item->id}})'
-                  data-bs-toggle="tooltip"
-                  data-bs-title="View user">
+                  wire:click="viewUser({{$item->id}})">
                   <i class="bi bi-eye-fill"></i>
                   <span class="d-none d-md-inline ms-1">View</span>
                 </button>
 
+
+                @can('update user')
                 <button class="btn btn-sm btn-primary rounded-2 px-2 py-1 me-2"
-                  wire:click='readUser({{$item->id}})'
-                  data-bs-toggle="tooltip"
-                  data-bs-title="Edit user">
+                  wire:click='readUser({{$item->id}})'>
                   <i class="bi bi-pencil-square"></i>
                   <span class="d-none d-md-inline ms-1">Edit</span>
                 </button>
-
+                @endcan
+                
+                @can('delete user')
                 <button class="btn btn-sm {{$item->deleted_at == Null ? 'btn-danger' : 'btn-outline-success'}} rounded-2 px-2 py-1"
                   wire:click='{{$item->deleted_at == Null ? 'deleteUser('.$item->id.')' : 'restoreUser('.$item->id.')'}}'
-                  data-bs-toggle="tooltip"
-                  data-bs-title="{{$item->deleted_at == Null ? 'Move to archive' : 'Restore user'}}">
+                  >
                   <i class="bi {{$item->deleted_at == Null ? 'bi bi-archive-fill' : 'bi-arrow-counterclockwise'}}"></i>
                   <span class="d-none d-md-inline ms-1">{{$item->deleted_at == Null ? 'Archive' : 'Restore'}}</span>
                 </button>
+                @endcan
               </td>
             </tr>
             @empty
@@ -108,8 +109,96 @@
     </div>
 
 
+  <div class="modal fade" id="viewModal" tabindex="-1" aria-labelledby="viewModalLabel" aria-hidden="true" wire:ignore.self>
+    <div class="modal-dialog modal-m"> 
+      <div class="modal-content">
+        <div class="modal-header bg-info text-white">
+          <h6 class="modal-title" id="viewModalLabel">
+            <i class="bi bi-eye-fill me-1"></i> User Details
+          </h6>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body p-3">
+          <div class="d-flex justify-content-between mb-2">
+            <div>
+              <p class="mb-1"><strong>Name:</strong> {{ $user?->name }}</p>
+              <p class="mb-1"><strong>Email:</strong> {{ $user?->email }}</p>
+            </div>
+            <div class="text-end">
+              <span class="badge {{ $user?->deleted_at ? 'bg-danger' : 'bg-success' }}">
+                {{ $user?->deleted_at ? 'Inactive' : 'Active' }}
+              </span>
+              <span class="badge bg-primary">{{ ucfirst($user?->type) }}</span>
+            </div>
+          </div>
+
+          <h6 class="fw-bold text-primary text-center border-bottom pb-1">Permissions</h6>
+          <table class="table table-sm text-center mb-2">
+            <thead class="table-light">
+              <tr>
+                <th>Module</th>
+                <th>Create</th>
+                <th>Update</th>
+                <th>Read</th>
+                <th>Delete</th>
+              </tr>
+            </thead>
+            <tbody>
+              @php
+                  $modules = ['user', 'candidate', 'exam', 'reference'];
+              @endphp
+              @foreach ($modules as $module)
+                <tr>
+                  <td class="fw-bold text-primary">{{ ucfirst($module) }}</td>
+                  <td class="text-center">
+                    <span class="{{ $user?->hasPermissionTo("create $module") ? 'text-success' : 'text-danger' }}">
+                      {{ $user?->hasPermissionTo("create $module") ? '✔' : '✖' }}
+                    </span>
+                  </td>
+                  <td class="text-center">
+                    <span class="{{ $user?->hasPermissionTo("update $module") ? 'text-success' : 'text-danger' }}">
+                      {{ $user?->hasPermissionTo("update $module") ? '✔' : '✖' }}
+                    </span>
+                  </td>
+                  <td class="text-center">
+                    <span class="{{ $user?->hasPermissionTo("read $module") ? 'text-success' : 'text-danger' }}">
+                      {{ $user?->hasPermissionTo("read $module") ? '✔' : '✖' }}
+                    </span>
+                  </td>
+                  <td class="text-center">
+                    <span class="{{ $user?->hasPermissionTo("delete $module") ? 'text-success' : 'text-danger' }}">
+                      {{ $user?->hasPermissionTo("delete $module") ? '✔' : '✖' }}
+                    </span>
+                  </td>
+                </tr>
+              @endforeach        
+            </tbody>
+          </table>
+
+            <p>
+              <strong>Assessor:</strong>
+              <span class="{{ $user?->hasPermissionTo('assessor permission') ? 'text-success' : 'text-danger' }}">
+                {{ $user?->hasPermissionTo('assessor permission') ? '✔' : '✖' }}
+              </span>
+            </p>
+            
+            <p>
+              <strong>Secretariat:</strong>
+              <span class="{{ $user?->hasPermissionTo('secretariat permission') ? 'text-success' : 'text-danger' }}">
+                {{ $user?->hasPermissionTo('secretariat permission') ? '✔' : '✖' }}
+              </span>
+            </p>
+          
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+
+
     <div class="modal fade" id="userModal" tabindex="-1" aria-labelledby="userModalLabel" aria-hidden="true" wire:ignore.self>
-      <div class="modal-dialog modal-lg">
+      <div class="modal-dialog modal-m">
         <div class="modal-content">
           <div class="modal-header bg-primary text-white">
             <h5 class="modal-title" id="userModalLabel">
@@ -120,8 +209,9 @@
 
           <div class="modal-body">
             <form class="row g-3" wire:submit.prevent="{{ $editMode ? 'updateUser' : 'createUser' }}">
-              <div class="row">
-                <div class="col-md-6">
+              <div id="page-1">
+                <!-- Left Column -->
+                <div class="col-12">
                   <div class="mb-3">
                     <label class="form-label fw-bold">Full Name</label>
                     <input type="text" class="form-control" wire:model="name" placeholder="Enter full name">
@@ -135,149 +225,177 @@
                   </div>
 
                   <div class="mb-3">
-                    <label class="form-label fw-bold">Office</label>
-                    <select class="form-select">
-                      <option value="option1">Office 1</option>
-                      <option value="option2">Office 2</option>
-                      <option value="option3">Office 3</option>
-                      <option value="option4">Office 4</option>
-                    </select>
-                  </div>
+                    <label class="form-label fw-bold">Password</label>
+                    <input type="password" class="form-control" wire:model="password" 
+                        placeholder="{{ $editMode ? 'Enter new password (leave blank to keep current)' : 'Enter password (leave blank to keep default)' }}"
+                        autocomplete="off">
+                    @error('password') <div class="text-danger small">{{ $message }}</div> @enderror
+                </div>
 
                   <div class="mb-3">
+                    <label class="form-label fw-bold">Type</label>
+                    <select class="form-select" wire:model.live="type">
+                        <option value="" disabled selected>Select a Type</option>
+                        <option value="superadmin" {{ $type === 'superadmin' ? 'selected' : '' }}>Super Admin</option>
+                        <option value="admin" {{ $type === 'admin' ? 'selected' : '' }}>Admin</option>
+                        <option value="secretariat" {{ $type === 'secretariat' ? 'selected' : '' }}>Secretariat</option>
+                        <option value="assessor" {{ $type === 'assessor' ? 'selected' : '' }}>Assessor</option>
+                    </select>
+                </div>
+                
+
+
+                  {{-- <div class="mb-3">
                     <label class="form-label fw-bold">Employee ID</label>
                     <input type="text" class="form-control" wire:model="employeeid" placeholder="Employee ID">
                     @error('employeeid') <div class="text-danger small">{{ $message }}</div> @enderror
-                  </div>
+                  </div> --}}
+
+
                 </div>
-
-                <div class="col-md-6">
-                  <div class="mb-3">
-                    <label class="form-label fw-bold">Type</label>
-                    <select class="form-select">
-                      <option value="superadmin">Super Admin</option>
-                      <option value="secretariat">Secretariat</option>
-                      <option value="assessor">Assessor</option>
-                      <option value="candidate">Candidate</option>
-                    </select>
-                  </div>
-
-                  <div class="mb-3">
-                    <label class="form-label fw-bold">Permission</label>
-                    <div class="form-check">
-                      <input class="form-check-input" type="checkbox" id="assessor" name="permissions" value="Assessor">
-                      <label class="form-check-label" for="assessor">Assessor</label>
-                    </div>
-                    <div class="form-check">
-                      <input class="form-check-input" type="checkbox" id="secretariat" name="permissions" value="Secretariat">
-                      <label class="form-check-label" for="secretariat">Secretariat</label>
-                    </div>
-                  </div>
-
+                <!-- Next Button -->
+                <div class="col-12 d-flex justify-content-center">
+                  <button type="button" class="btn btn-primary" onclick="nextPage()">User Permissions</button>
                 </div>
               </div>
 
-              <hr class="my-3">
-              <div class="row">
-
+              <!-- Right Column (Page 2) -->
+              <div id="page-2" style="display: none;">
                 <div class="col-md-6">
-                  <h6 class="fw-bold text-primary">Accounts</h6>
+                  <h6 class="fw-bold text-primary">Permissions</h6>
                   <div class="form-check">
-                    <input class="form-check-input" type="checkbox" id="add-accounts">
-                    <label class="form-check-label" for="add-accounts">Add</label>
+                    <input class="form-check-input" type="checkbox" value="assessor permission" wire:model="permissions">
+                    <label class="form-check-label" for="assessor">Assessor</label>
                   </div>
                   <div class="form-check">
-                    <input class="form-check-input" type="checkbox" id="update-accounts">
-                    <label class="form-check-label" for="update-accounts">Update</label>
-                  </div>
-                  <div class="form-check">
-                    <input class="form-check-input" type="checkbox" id="view-accounts">
-                    <label class="form-check-label" for="view-accounts">View</label>
-                  </div>
-                  <div class="form-check">
-                    <input class="form-check-input" type="checkbox" id="delete-accounts">
-                    <label class="form-check-label" for="delete-accounts">Delete</label>
+                    <input class="form-check-input" type="checkbox" value="secretariat permission" wire:model="permissions">
+                    <label class="form-check-label" for="secretariat">Secretariat</label>
                   </div>
                 </div>
+                <!-- Additional Permissions -->
+                <hr class="my-3">
+                <div class="row">
+                  <!-- Accounts Permissions -->
+                  <div class="col-md-6">
+                    <h6 class="fw-bold text-primary">Accounts</h6>
+                    <div class="form-check">
+                      <input class="form-check-input" type="checkbox" value="create user" wire:model="permissions">
+                      <label class="form-check-label" for="create-accounts">Create</label>
+                    </div>
+                    <div class="form-check">
+                      <input class="form-check-input" type="checkbox" value="update user" wire:model="permissions">
+                      <label class="form-check-label" for="update-accounts">Update</label>
+                    </div>
+                    <div class="form-check">
+                      <input class="form-check-input" type="checkbox" value="read user" wire:model="permissions">
+                      <label class="form-check-label" for="read-accounts">Read</label>
+                    </div>
+                    <div class="form-check">
+                      <input class="form-check-input" type="checkbox" value="delete user" wire:model="permissions">
+                      <label class="form-check-label" for="delete-accounts">Delete</label>
+                    </div>
+                  </div>
 
-                <div class="col-md-6">
-                  <h6 class="fw-bold text-primary">Candidates</h6>
-                  <div class="form-check">
-                    <input class="form-check-input" type="checkbox" id="add-candidates">
-                    <label class="form-check-label" for="add-candidates">Add</label>
+                  <!-- Candidates Permissions -->
+                  <div class="col-md-6">
+                    <h6 class="fw-bold text-primary">Candidates</h6>
+                    <div class="form-check">
+                      <input class="form-check-input" type="checkbox" value="create candidate" wire:model="permissions">
+                      <label class="form-check-label" for="create-candidates">Create</label>
+                    </div>
+                    <div class="form-check">
+                      <input class="form-check-input" type="checkbox" value="update candidate" wire:model="permissions">
+                      <label class="form-check-label" for="update-candidates">Update</label>
+                    </div>
+                    <div class="form-check">
+                      <input class="form-check-input" type="checkbox" value="read candidate" wire:model="permissions">
+                      <label class="form-check-label" for="read-candidates">Read</label>
+                    </div>
+                    <div class="form-check">
+                      <input class="form-check-input" type="checkbox" value="delete candidate" wire:model="permissions">
+                      <label class="form-check-label" for="delete-candidates">Delete</label>
+                    </div>
                   </div>
-                  <div class="form-check">
-                    <input class="form-check-input" type="checkbox" id="update-candidates">
-                    <label class="form-check-label" for="update-candidates">Update</label>
+
+                  <!-- Reference Permissions -->
+                  <div class="col-md-6 mt-3">
+                    <h6 class="fw-bold text-primary">Reference</h6>
+                    <div class="form-check">
+                      <input class="form-check-input" type="checkbox" type="checkbox" value="create reference" wire:model="permissions">
+                      <label class="form-check-label" for="add-Reference">Create</label>
+                    </div>
+                    <div class="form-check">
+                      <input class="form-check-input" type="checkbox" type="checkbox" value="update reference" wire:model="permissions">
+                      <label class="form-check-label" for="update-Reference">Update</label>
+                    </div>
+                    <div class="form-check">
+                      <input class="form-check-input" type="checkbox" type="checkbox" value="read reference" wire:model="permissions">
+                      <label class="form-check-label" for="read-reference">Read</label>
+                    </div>
+                    <div class="form-check">
+                      <input class="form-check-input" type="checkbox" type="checkbox" value="delete reference" wire:model="permissions">
+                      <label class="form-check-label" for="delete-reference">Delete</label>
+                    </div>
                   </div>
-                  <div class="form-check">
-                    <input class="form-check-input" type="checkbox" id="view-candidates">
-                    <label class="form-check-label" for="view-candidates">View</label>
-                  </div>
-                  <div class="form-check">
-                    <input class="form-check-input" type="checkbox" id="delete-candidates">
-                    <label class="form-check-label" for="delete-candidates">Delete</label>
+
+                  <!-- Exam Permissions -->
+                  <div class="col-md-6 mt-3">
+                    <h6 class="fw-bold text-primary">Exam</h6>
+                    <div class="form-check">
+                      <input class="form-check-input" type="checkbox" type="checkbox" value="create exam" wire:model="permissions">
+                      <label class="form-check-label" for="create-exam">Create</label>
+                    </div>
+                    <div class="form-check">
+                      <input class="form-check-input" type="checkbox" type="checkbox" value="update exam" wire:model="permissions">
+                      <label class="form-check-label" for="update-exam">Update</label>
+                    </div>
+                    <div class="form-check">
+                      <input class="form-check-input" type="checkbox" type="checkbox" value="read exam" wire:model="permissions">
+                      <label class="form-check-label" for="read-exam">Read</label>
+                    </div>
+                    <div class="form-check">
+                      <input class="form-check-input" type="checkbox" type="checkbox" value="delete exam" wire:model="permissions">
+                      <label class="form-check-label" for="delete-exam">Delete</label>
+                    </div>
                   </div>
                 </div>
+                <hr class="my-3">
 
-                <div class="col-md-6 mt-3">
-                  <h6 class="fw-bold text-primary">Reference</h6>
-                  <div class="form-check">
-                    <input class="form-check-input" type="checkbox" id="add-Reference">
-                    <label class="form-check-label" for="add-Reference">Add</label>
-                  </div>
-                  <div class="form-check">
-                    <input class="form-check-input" type="checkbox" id="update-Reference">
-                    <label class="form-check-label" for="update-Reference">Update</label>
-                  </div>
-                  <div class="form-check">
-                    <input class="form-check-input" type="checkbox" id="view-reference">
-                    <label class="form-check-label" for="view-reference">View</label>
-                  </div>
-                  <div class="form-check">
-                    <input class="form-check-input" type="checkbox" id="delete-reference">
-                    <label class="form-check-label" for="delete-reference">Delete</label>
-                  </div>
+                <!-- Save & Cancel Buttons (Only visible on Page 2) -->
+                <div class="col-12 d-flex justify-content-center">
+                  <button type="button" class="btn btn-primary mx-1" onclick="previousPage()">User Information</button>
+                  <button type="submit" class="btn btn-success mx-1">
+                    <i class="bi bi-check-circle"></i> {{ $editMode ? 'Update' : 'Save' }}
+                  </button>
+                  <button type="button" class="btn btn-secondary mx-1" data-bs-dismiss="modal">Cancel</button>
                 </div>
 
-                <div class="col-md-6 mt-3">
-                  <h6 class="fw-bold text-primary">Exam</h6>
-                  <div class="form-check">
-                    <input class="form-check-input" type="checkbox" id="add-exam">
-                    <label class="form-check-label" for="add-exam">Add</label>
-                  </div>
-                  <div class="form-check">
-                    <input class="form-check-input" type="checkbox" id="update-exam">
-                    <label class="form-check-label" for="update-exam">Update</label>
-                  </div>
-                  <div class="form-check">
-                    <input class="form-check-input" type="checkbox" id="view-exam">
-                    <label class="form-check-label" for="view-exam">View</label>
-                  </div>
-                  <div class="form-check">
-                    <input class="form-check-input" type="checkbox" id="delete-exam">
-                    <label class="form-check-label" for="delete-exam">Delete</label>
-                  </div>
-                </div>
-              </div>
-              <hr class="my-3">
-
-
-              <div class="text-end">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                <button type="submit" class="btn btn-success">
-                  <i class="bi bi-check-circle"></i> {{ $editMode ? 'Update' : 'Save' }}
-                </button>
               </div>
             </form>
           </div>
         </div>
       </div>
     </div>
+  </section>
+</div>
 
-</div>
-</section>
-</div>
+<script>
+  function nextPage() {
+    currentPage = 2;
+    updatePageDisplay();
+  }
+
+  function previousPage() {
+    currentPage = 1;
+    updatePageDisplay();
+  }
+
+  function updatePageDisplay() {
+    document.getElementById('page-1').style.display = currentPage === 1 ? 'block' : 'none';
+    document.getElementById('page-2').style.display = currentPage === 2 ? 'block' : 'none';
+  }
+</script>
+
 
 @push('styles')
 <style>
@@ -325,6 +443,37 @@
 
   $wire.on('show-userModal', () => {
     console.log('Showing user modal');
+    $('#userModal').modal('show');
+  });
+
+  $wire.on('hide-viewModal', () => {
+    console.log('Hiding view modal');
+    $('#viewModal').modal('hide');
+  });
+
+  $wire.on('show-viewModal', () => {
+    console.log('Showing view modal');
+    $('#viewModal').modal('show');
+  });
+
+  let currentPage = 1;
+
+  function nextPage() {
+    if (currentPage === 1) {
+      document.getElementById("page-1").style.display = "none";
+      document.getElementById("page-2").style.display = "block";
+      currentPage = 2;
+    }
+  }
+
+  function previousPage() {
+    if (currentPage === 2) {
+      document.getElementById("page-2").style.display = "none";
+      document.getElementById("page-1").style.display = "block";
+      currentPage = 1;
+    }
+  }
+  $wire.on('show-userModal', () => {
     $('#userModal').modal('show');
   });
 </script>

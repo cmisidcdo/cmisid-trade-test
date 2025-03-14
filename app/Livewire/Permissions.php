@@ -17,7 +17,7 @@ class Permissions extends Component
     public function render()
     {
         return view('livewire.permissions', [
-            'permissions' => $this->loadPermissions() // Pass directly to the view
+            'permissions' => $this->loadPermissions()
         ]);
     }
 

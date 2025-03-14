@@ -30,7 +30,6 @@
           </div>
 
 
-          <!-- Buttons (Aligned to the Right) -->
           <div class="col-md-8 text-end">
             <button type="button" class="btn {{ $archive ? 'btn-success' : 'btn-warning' }}" wire:click="toggleArchive">
               <i class="bi {{ $archive ? 'bi-box-arrow-in-up' : 'bi-archive' }} me-1"></i>
@@ -210,7 +209,7 @@
           <div class="modal-body">
             <form class="row g-3" wire:submit.prevent="{{ $editMode ? 'updateUser' : 'createUser' }}">
               <div id="page-1">
-                <!-- Left Column -->
+               
                 <div class="col-12">
                   <div class="mb-3">
                     <label class="form-label fw-bold">Full Name</label>
@@ -253,7 +252,6 @@
 
 
                 </div>
-                <!-- Next Button -->
                 <div class="col-12 d-flex justify-content-center">
                   <button type="button" class="btn btn-primary" onclick="nextPage()">User Permissions</button>
                 </div>

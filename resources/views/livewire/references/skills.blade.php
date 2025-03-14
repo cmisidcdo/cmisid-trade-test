@@ -106,7 +106,7 @@
                 </div>
 
                 <div class="d-flex justify-content-center mt-4">
-                    {{$skills->links('pagination::bootstrap-5')}}
+                    {{$skills->links()}}
                 </div>
 
                 <div class="position-fixed bottom-0 end-0 p-3" style="z-index: 11">

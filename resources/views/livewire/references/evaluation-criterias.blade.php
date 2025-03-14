@@ -6,7 +6,6 @@
         <div class="card shadow-sm border-0 rounded-3">
             <div class="card-body p-4">
 
-                <!-- Search and Action Buttons Row -->
                 <div class="row mb-4 align-items-center">
                     <div class="col-md-6">
                         <div class="input-group">
@@ -29,7 +28,6 @@
                             </span>
                         </div>
                         <div id="searchSuggestions" class="position-absolute bg-white shadow-sm rounded p-2 d-none">
-                            <!-- Dynamic search suggestions would appear here -->
                         </div>
                     </div>
                     <div class="col-md-6 text-md-end mt-3 mt-md-0">
@@ -48,7 +46,6 @@
                     </div>
                 </div>
 
-                <!-- Table with enhanced styling and gridlines -->
                 <div class="table-responsive">
                     <table class="table table-hover table-bordered table-striped align-middle border-bottom">
                         <thead class="table-light">
@@ -109,27 +106,13 @@
                 </div>
 
 
-                <!-- Pagination with enhanced styling -->
                 <div class="d-flex justify-content-center mt-4">
-                    {{$criterias->links('pagination::bootstrap-5')}}
+                    {{$criterias->links()}}
                 </div>
 
-                <!-- Success/Error feedback toast -->
-                <div class="position-fixed bottom-0 end-0 p-3" style="z-index: 11">
-                    <div id="successToast" class="toast align-items-center text-white bg-success border-0" role="alert" aria-live="assertive" aria-atomic="true">
-                        <div class="d-flex">
-                            <div class="toast-body">
-                                <i class="bi bi-check-circle me-2"></i>
-                                <span id="successMessage">Operation completed successfully!</span>
-                            </div>
-                            <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
-                        </div>
-                    </div>
-                </div>
             </div>
         </div>
 
-        <!-- Enhanced Modal -->
         <div class="modal fade" id="criteriaModal" tabindex="-1" aria-labelledby="criteriaModalLabel" aria-hidden="true" wire:ignore.self>
             <div class="modal-dialog modal-dialog-centered">
                 <div class="modal-content border-0 shadow">

@@ -94,43 +94,41 @@ class Users extends Component
     public function createUser()
     {
         $this->validate();
+
         DB::transaction(function () {
             $user = new User();
             $user->name = $this->name;
             $user->email = $this->email;
             $user->type = $this->type;
-            if (!empty($this->password)) 
-            {
+            if (!empty($this->password)) {
                 $user->password = Hash::make($this->password);
-            }
-            else
-            {
+            } else {
                 $user->password = Hash::make('admin12345');
-            } 
+            }
             $user->save();
-
-            
-
-            $this->permission = $user->permission;
 
             if (!empty($this->permissions)) {
                 $user->syncPermissions($this->permissions);
             }
 
             activity('user_management')
+                ->event('create') 
                 ->performedOn($user)
-                ->causedBy(auth()->user()) 
-                ->withProperties(['name' => $user->name, 'email' => $user->email])
+                ->causedBy(auth()->user())
+                ->withProperties([
+                    'name' => $user->name,
+                    'email' => $user->email,
+                    'type' => $user->type,
+                    'permissions' => $user->permissions->pluck('name')->toArray(),
+                ])
                 ->log('Created a new user');
         });
 
-       
-
         $this->clear();
         $this->dispatch('hide-userModal');
-        $this->dispatch('success', 'User Created Successfuly');
-       
+        $this->dispatch('success', 'User Created Successfully');
     }
+
 
     public function clear()
     {
@@ -159,47 +157,113 @@ class Users extends Component
         $this->validate();
 
         DB::transaction(function () {  
-        
             $user = User::withTrashed()->findOrFail($this->user_id);
+            
+            $originalData = [
+                'name' => $user->name,
+                'type' => $user->type,
+                'email' => $user->email,
+                'permissions' => $user->permissions->pluck('name')->toArray(),
+            ];
+
             $user->name = $this->name;
             $user->type = $this->type;
             $user->email = $this->email;
             if (!empty($this->password)) {
                 $user->password = Hash::make($this->password);
-                }
+            }
             $user->save();
 
             $user->syncPermissions($this->permissions);
 
-            activity('user_management')
-            ->performedOn($user)
-            ->causedBy(auth()->user())
-            ->withProperties([
-                'old' => $originalData,
-                'new' => $user->getChanges()
-            ])
-            ->log('Updated user details');
+            $updatedData = [
+                'name' => $user->name,
+                'type' => $user->type,
+                'email' => $user->email,
+                'permissions' => $user->permissions->pluck('name')->toArray(),
+            ];
+
+            if ($user instanceof User) {
+                activity('user_management')
+                    ->event('update')
+                    ->performedOn($user)
+                    ->causedBy(auth()->user())
+                    ->withProperties([
+                        'old' => $originalData,
+                        'new' => $updatedData,
+                    ])
+                    ->log('updated');
+            } else {
+                \Log::warning('Activity log skipped: Expected User model but got ' . gettype($user));
+            }
+            
         });
 
         $this->clear();
         $this->dispatch('hide-userModal');
         $this->dispatch('success', 'User updated successfully.');
-    } 
+    }
+
+    
+
     
     public function deleteUser(User $user)
     {
-        $user->delete();
-
+        DB::transaction(function () use ($user) {
+            $originalData = [
+                'name' => $user->name,
+                'email' => $user->email,
+                'type' => $user->type,
+                'permissions' => $user->permissions->pluck('name')->toArray(),
+            ];
+    
+            $user->delete();
+    
+            activity('user_management')
+                ->event('deleted')
+                ->performedOn($user)
+                ->causedBy(auth()->user())
+                ->withProperties([
+                    'deleted_user' => $originalData,
+                    'deleted_at' => now(),
+                ])
+                ->log('deleted');
+        });
+    
         $this->dispatch('success', 'User deleted successfully');
     }
+    
 
     public function restoreUser($user_id)
     {
-        $user = User::withTrashed()->findOrFail($user_id);
-        $user->restore();
+        DB::transaction(function () use ($user_id) {
+            $user = User::withTrashed()->findOrFail($user_id);
+            
+            $user->restore();
+            
+            if ($user instanceof User) {
+                activity('user_management')
+                    ->event('restored') 
+                    ->performedOn($user)
+                    ->causedBy(auth()->user())
+                    ->withProperties([
+                        'restored_user' => [
+                            'name' => $user->name,
+                            'email' => $user->email,
+                            'type' => $user->type,
+                            'permissions' => optional($user->permissions)->pluck('name')->toArray(),
+                        ],
+                        'restored_at' => now(),
+                    ])
+                    ->log('restored');
+            }
+            
+        });
     
         $this->dispatch('success', 'User restored successfully.');
     }
+    
+
 
     public function updatedType($value)
     {

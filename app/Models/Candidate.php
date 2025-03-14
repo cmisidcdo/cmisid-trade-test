@@ -5,10 +5,12 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Spatie\Activitylog\Traits\LogsActivity;
+use Spatie\Activitylog\LogOptions;
 
 class Candidate extends Model
 {
-    use SoftDeletes, HasFactory;
+    use SoftDeletes, HasFactory, LogsActivity;
 
     protected $table = 'candidates'; 
     protected $guarded = [];
@@ -27,4 +29,20 @@ class Candidate extends Model
     {
         return $this->belongsTo(PriorityGroup::class);
     }
-}
+
+    public function getActivitylogOptions(): LogOptions
+    {
+        $logOptions = LogOptions::defaults()
+            ->useLogName('candidate_management')
+            ->logAll()
+            ->logOnlyDirty()
+            ->dontSubmitEmptyLogs();
+
+        if ($this->exists && is_null($this->deleted_at)) {
+            $logOptions->logExcept(['updated_at', 'deleted_at']);
+        }
+
+        return $logOptions;
+    }
+
+}   

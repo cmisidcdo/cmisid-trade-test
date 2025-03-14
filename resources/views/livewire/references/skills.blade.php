@@ -1,11 +1,12 @@
 <div>
-    <div class="card-header text-white text-center py-3" style="background-color: #1a1851; border-radius: 12px 12px 0 0;">
-        <h2 class="fw-bold m-0">Skills</h2>
+    <div class="globalheader">
+        <h3 style="font-weight: bold; margin: 0;">Skills</h3>
     </div>
     <section class="section dashboard">
         <div class="card shadow-sm border-0 rounded-3">
             <div class="card-body p-4">
 
+                <!-- Search and Action Buttons Row -->
                 <div class="row mb-4 align-items-center">
                     <div class="col-md-6">
                         <div class="input-group">
@@ -28,6 +29,7 @@
                             </span>
                         </div>
                         <div id="searchSuggestions" class="position-absolute bg-white shadow-sm rounded p-2 d-none">
+                            <!-- Dynamic search suggestions would appear here -->
                         </div>
                     </div>
                     <div class="col-md-6 text-md-end mt-3 mt-md-0">
@@ -47,6 +49,7 @@
                     </div>
                 </div>
 
+                <!-- Table with enhanced styling -->
                 <div class="table-responsive">
                     <table class="table table-hover table-bordered table-striped text-center">
                         <thead class="table-light">
@@ -105,10 +108,13 @@
                     </table>
                 </div>
 
+                <!-- Pagination with enhanced styling -->
+
                 <div class="d-flex justify-content-center mt-4">
                     {{$skills->links('pagination::bootstrap-5')}}
                 </div>
 
+                <!-- Success/Error feedback toast -->
                 <div class="position-fixed bottom-0 end-0 p-3" style="z-index: 11">
                     <div id="successToast" class="toast align-items-center text-white bg-success border-0" role="alert" aria-live="assertive" aria-atomic="true">
                         <div class="d-flex">
@@ -123,6 +129,7 @@
             </div>
         </div>
 
+        <!-- Enhanced Modal -->
         <div class="modal fade" id="skillModal" tabindex="-1" aria-labelledby="skillModalLabel" aria-hidden="true" wire:ignore.self>
             <div class="modal-dialog modal-dialog-centered">
                 <div class="modal-content border-0 shadow">
@@ -189,6 +196,7 @@
         background-color: rgba(0, 0, 0, 0.05);
     }
 
+    /* Responsive adjustments */
     @media (max-width: 768px) {
         .card-title {
             font-size: 1.25rem;
@@ -204,12 +212,14 @@
 
 @script
 <script>
+    // Initialize tooltips
     document.addEventListener('DOMContentLoaded', function() {
         const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
         const tooltipList = tooltipTriggerList.map(function(tooltipTriggerEl) {
             return new bootstrap.Tooltip(tooltipTriggerEl);
         });
 
+        // Reinitialize tooltips when Livewire updates the DOM
         window.addEventListener('livewire:update', function() {
             const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
             const tooltipList = tooltipTriggerList.map(function(tooltipTriggerEl) {
@@ -218,10 +228,12 @@
         });
     });
 
+    // Modal handling
     $wire.on('hide-skillModal', () => {
         console.log('Hiding skill modal');
         $('#skillModal').modal('hide');
 
+        // Show success toast
         const toast = new bootstrap.Toast(document.getElementById('successToast'));
         document.getElementById('successMessage').textContent = 'Skill saved successfully!';
         toast.show();
@@ -232,6 +244,7 @@
         $('#skillModal').modal('show');
     });
 
+    // Skill operations feedback
     $wire.on('skill-deleted', () => {
         const toast = new bootstrap.Toast(document.getElementById('successToast'));
         document.getElementById('successMessage').textContent = 'Skill deleted successfully!';
@@ -244,6 +257,7 @@
         toast.show();
     });
 
+    // Search suggestions handling
     const searchInput = document.querySelector('[wire:model\\.live\\.debounce\\.300ms="search"]');
     const suggestionsDiv = document.getElementById('searchSuggestions');
 
@@ -263,6 +277,7 @@
         searchInput.addEventListener('input', function() {
             if (this.value.length > 1) {
                 suggestionsDiv.classList.remove('d-none');
+                // In a real implementation, you would fetch suggestions from the server here
             } else {
                 suggestionsDiv.classList.add('d-none');
             }

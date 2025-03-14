@@ -1,6 +1,6 @@
 <div>
-  <div class="card-header text-white text-center py-3" style="background-color: #1a1851; border-radius: 12px 12px 0 0;">
-    <h2 class="fw-bold m-0">Users</h2>
+  <div class="globalheader">
+    <h3 class="fw-bold m-0">Users</h3>
   </div>
   <section class="section dashboard">
     <div class="card">
@@ -45,6 +45,7 @@
           </div>
         </div>
 
+        <!-- Table with stripped rows -->
         <table class="table table-hover table-bordered table-striped text-center">
           <thead class="table-light">
             <tr>
@@ -99,8 +100,6 @@
             @endforelse
           </tbody>
         </table>
-
-
 
         <div>
           {{$users->links()}}

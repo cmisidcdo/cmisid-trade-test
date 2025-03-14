@@ -83,6 +83,33 @@
         .dropdown-option:hover {
             background-color: #f0f0f0;
         }
+
+        /* Table Design */
+        .table tbody tr th {
+            background-color: white;
+        }
+
+        .custom-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .custom-table th,
+        .custom-table td {
+            border-bottom: 1px solid #ccc;
+            padding: 10px;
+        }
+
+        .custom-table th {
+            background-color: #f8f9fa; /* Same as Bootstrap's .table-light */
+            font-weight: bold;
+        }
+
+        .custom-table td {
+            background-color: #ffffff; /* White background for table cells */
+        }
+
+
     </style>
 
 <div class="">
@@ -116,39 +143,41 @@
 
 
             <!-- Evaluation Criteria Table -->
+            <!-- Evaluation Criteria Table -->
             <div class="table-responsive">
-                <table class="table">
-                    <thead class="table-light">
+                <table class="table custom-table">
+                    <thead>
                         <tr>
-                            <th style="border-bottom: 1px solid #ccc; border-top: none; border-left: none; border-right: none;">Criteria Name</th>
-                            <th style="border-bottom: 1px solid #ccc; border-top: none; border-left: none; border-right: none;">Percentage</th>
-                            <th style="border-bottom: 1px solid #ccc; border-top: none; border-left: none; border-right: none;">Score</th>
+                            <th>Criteria Name</th>
+                            <th>Percentage</th>
+                            <th>Score</th>
                         </tr>
                     </thead>
                     <tbody>
                         <tr>
-                            <td class="bg-white" style="border-bottom: 1px solid #ccc; border-top: none; border-left: none; border-right: none;">Analytical Thinking</td>
-                            <td class="bg-white" style="border-bottom: 1px solid #ccc; border-top: none; border-left: none; border-right: none;"></td>
-                            <td class="bg-white" style="border-bottom: 1px solid #ccc; border-top: none; border-left: none; border-right: none;"></td>
+                            <td>Analytical Thinking</td>
+                            <td></td>
+                            <td></td>
                         </tr>
                         <tr>
-                            <td class="bg-white" style="border-bottom: 1px solid #ccc; border-top: none; border-left: none; border-right: none;">Problem Solving</td>
-                            <td class="bg-white" style="border-bottom: 1px solid #ccc; border-top: none; border-left: none; border-right: none;"></td>
-                            <td class="bg-white" style="border-bottom: 1px solid #ccc; border-top: none; border-left: none; border-right: none;"></td>
+                            <td>Problem Solving</td>
+                            <td></td>
+                            <td></td>
                         </tr>
                         <tr>
-                            <td class="bg-white" style="border-bottom: 1px solid #ccc; border-top: none; border-left: none; border-right: none;">Criteria #3</td>
-                            <td class="bg-white" style="border-bottom: 1px solid #ccc; border-top: none; border-left: none; border-right: none;"></td>
-                            <td class="bg-white" style="border-bottom: 1px solid #ccc; border-top: none; border-left: none; border-right: none;"></td>
+                            <td>Criteria #3</td>
+                            <td></td>
+                            <td></td>
                         </tr>
                         <tr>
-                            <td class="bg-white" style="border-bottom: 1px solid #ccc; border-top: none; border-left: none; border-right: none;">Criteria #4</td>
-                            <td class="bg-white" style="border-bottom: 1px solid #ccc; border-top: none; border-left: none; border-right: none;"></td>
-                            <td class="bg-white" style="border-bottom: 1px solid #ccc; border-top: none; border-left: none; border-right: none;"></td>
+                            <td>Criteria #4</td>
+                            <td></td>
+                            <td></td>
                         </tr>
                     </tbody>
                 </table>
-        </div>
+            </div>
+
 
         <div class="d-flex justify-content-between align-items-start">
             

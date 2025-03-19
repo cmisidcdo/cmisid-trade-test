@@ -80,7 +80,7 @@
                                 </td>
                                 <td>
                                     <span class="badge rounded-pill {{$item->interview_priority == True ? 'bg-success': 'bg-secondary'}}">
-                                        {{$item->interview_priority == True ? 'Priority': 'Standard'}}
+                                        {{$item->interview_priority == True ? 'Yes': 'No    '}}
                                     </span>
                                 </td>
                                 <td>
@@ -190,7 +190,7 @@
                                             id="priorityYes"
                                             wire:model="interview_priority"
                                             value="1">
-                                        <label class="form-check-label" for="priorityYes">Priority</label>
+                                        <label class="form-check-label" for="priorityYes">Yes</label>
                                     </div>
                                     <div class="form-check form-check-inline">
                                         <input
@@ -199,7 +199,7 @@
                                             id="priorityNo"
                                             wire:model="interview_priority"
                                             value="0">
-                                        <label class="form-check-label" for="priorityNo">Standard</label>
+                                        <label class="form-check-label" for="priorityNo">No</label>
                                     </div>
                                     @error('interview_priority')
                                     <div class="d-block invalid-feedback">{{$message}}</div>

@@ -22,6 +22,8 @@ class Users extends Component
     public $permissions = [];
     public $archive = false;
 
+    protected $listeners = ['deleteUser'];
+
     // public function mount()
     // {
     //     $user = auth()->user();
@@ -204,11 +206,20 @@ class Users extends Component
         $this->dispatch('success', 'User updated successfully.');
     }
 
-    
-
-    
-    public function deleteUser(User $user)
+    public function confirmDelete($id)
     {
+
+        $this->dispatch('confirm-delete', 
+            message: 'This skill will be sent to archive',
+            eventName: 'deleteUser',
+            eventData: ['id' => $id]
+        );
+    }
+    
+    public function deleteUser($id)
+    {   
+        $user = User::findOrFail($id);
+
         DB::transaction(function () use ($user) {
             $originalData = [
                 'name' => $user->name,

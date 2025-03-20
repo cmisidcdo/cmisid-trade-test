@@ -15,7 +15,6 @@ return new class extends Migration
             $table->id();
             $table->string('title');
             $table->integer('salary_grade');
-            $table->enum('competency_level', ['basic', 'intermediate', 'advanced']);
             $table->boolean('interview_priority')->default(true);
             $table->softDeletes();
             $table->timestamps();

@@ -7,6 +7,9 @@ use App\Livewire\References\Offices;
 use App\Livewire\References\Positions;
 use App\Livewire\References\Skills;
 use App\Livewire\References\Venues;
+use App\Livewire\Reports\AdminReports;
+use App\Livewire\Reports\CandidateReports;
+use App\Livewire\Test\CreateSchedule;
 use Illuminate\Support\Facades\Route;
 use App\Livewire\Dashboard;
 use App\Livewire\Exam\AssessmentNotes;
@@ -56,4 +59,7 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/logs', Logs::class)->name('logs');
     Route::get('/reports', Reports::class)->name('reports');
     Route::get('/permissions', Permissions::class)->name('permissions');
+    Route::get('/reports/adminreports', AdminReports::class)->name('reports.adminreports');
+    Route::get('/reports/candidatereports', CandidateReports::class)->name('reports.candidatereports');
+    Route::get('/test/createschedule', CreateSchedule::class)->name('test.createschedule');
 });

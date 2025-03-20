@@ -13,10 +13,14 @@ class EvaluationCriterias extends Component
     use WithPagination;
     public $editMode;
 
+    public $assessmentCriteria = true, $oralCriteria = false, $practicalCriteria = false;   
+
     public $archive = false;
 
     public $search;
     public $title, $criteria_id;
+
+    protected $listeners = ['deleteCriteria'];
 
     public function mount()
     {
@@ -121,12 +125,22 @@ class EvaluationCriterias extends Component
         $this->dispatch('success', 'Criteria updated successfully.');
     }
 
+        public function confirmDelete($id)
+    {
+
+        $this->dispatch('confirm-delete', 
+            message: 'This criteria will be sent to archive',
+            eventName: 'deleteCriteria',
+            eventData: ['id' => $id]
+        );
+    }
+
     
     public function deleteCriteria(EvaluationCriteria $criteria)
     {
         $criteria->delete();
 
-        $this->dispatch('success', 'Criteria deleted successfully');
+        $this->dispatch('success', 'Criteria archived successfully');
     }
 
     public function restoreCriteria($criteria_id)
@@ -135,5 +149,18 @@ class EvaluationCriterias extends Component
         $criteria->restore();
     
         $this->dispatch('success', 'Criteria restored successfully.');
+    }
+
+    public function setCriteria($criteria)
+    {
+        $this->assessmentCriteria = $criteria === 'assessment';
+        $this->oralCriteria = $criteria === 'oral';
+        $this->practicalCriteria = $criteria === 'practical';
+    }
+
+    public function showAddEditModal()
+    {
+        $this->clear();
+        $this->dispatch('show-criteriaModal');
     }
 }

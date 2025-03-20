@@ -16,7 +16,9 @@ class Skills extends Component
     public $archive = false;
 
     public $search;
-    public $title, $skill_id;
+    public $title, $skill_id, $competency_level;
+
+    protected $listeners = ['deleteSkill'];
 
     public function mount()
     {
@@ -47,6 +49,9 @@ class Skills extends Component
                 'string',
                 Rule::unique('skills', 'title')->ignore($this->skill_id),
             ],
+            'competency_level'  => ['required', 
+                'string',
+            ],
         ];
     }
 
@@ -76,6 +81,7 @@ class Skills extends Component
         DB::transaction(function () {
             $skill = new Skill();
             $skill->title = $this->title;
+            $skill->competency_level = $this->competency_level;
             $skill->save();
         });
 
@@ -100,6 +106,7 @@ class Skills extends Component
         );
 
         $this->skill_id = $skill->id;
+        $this->competency_level = $skill->competency_level;
         $this->editMode = true;
         $this->dispatch('show-skillModal');
     }
@@ -113,6 +120,7 @@ class Skills extends Component
             $skill = Skill::withTrashed()->findOrFail($this->skill_id);
             
             $skill->title = $this->title;
+            $skill->competency_level = $this->competency_level;
             $skill->save();
         });
 
@@ -121,12 +129,22 @@ class Skills extends Component
         $this->dispatch('success', 'Skill updated successfully.');
     }
 
-    
-    public function deleteSkill(Skill $skill)
+    public function confirmDelete($id)
     {
-        $skill->delete();
 
-        $this->dispatch('success', 'Skill deleted successfully');
+        $this->dispatch('confirm-delete', 
+            message: 'This skill will be sent to archive',
+            eventName: 'deleteSkill',
+            eventData: ['id' => $id]
+        );
+    }
+
+    
+    public function deleteSkill($id)
+    {
+        Skill::findOrFail($id)->delete();
+
+        $this->dispatch('success', 'Skill archived successfully');
     }
 
     public function restoreSkill($skill_id)
@@ -135,5 +153,11 @@ class Skills extends Component
         $skill->restore();
     
         $this->dispatch('success', 'Skill restored successfully.');
+    }
+
+    public function showAddEditModal()
+    {
+        $this->clear();
+        $this->dispatch('show-skillModal');
     }
 }

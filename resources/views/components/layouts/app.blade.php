@@ -300,10 +300,10 @@
   
     @can('read reference')
       <li class="nav-item">
-        <a class="nav-link {{ Request::routeIs('references.*') ? '' : 'collapsed' }}" data-bs-target="#tables-nav" data-bs-toggle="collapse" href="#">
+        <a class="nav-link {{ Request::routeIs('references.*') ? '' : 'collapsed' }}" data-bs-target="#references-nav" data-bs-toggle="collapse" href="#">
           <i class="bi bi-layout-text-window-reverse fs-5"></i><span>References</span><i class="bi bi-chevron-down ms-auto"></i>
         </a>
-        <ul id="tables-nav" class="nav-content collapse {{ Request::routeIs('references.*') ? 'show' : '' }}" data-bs-parent="#sidebar-nav">
+        <ul id="references-nav" class="nav-content collapse {{ Request::routeIs('references.*') ? 'show' : '' }}" data-bs-parent="#sidebar-nav">
           <li>
             <a class="{{ Request::routeIs('references.skills') ? 'active' : '' }}" href="{{ route('references.skills') }}">
               <i class="bi bi-lightbulb-fill fs-5"></i><span>Skills</span>
@@ -340,10 +340,15 @@
 
     @can('assessor permission')
       <li class="nav-item">
-        <a class="nav-link {{ Request::routeIs('test.*') ? '' : 'collapsed' }}" data-bs-target="#charts-nav" data-bs-toggle="collapse" href="#">
+        <a class="nav-link {{ Request::routeIs('test.*') ? '' : 'collapsed' }}" data-bs-target="#tests-nav" data-bs-toggle="collapse" href="#">
           <i class="bi bi-clipboard-check-fill fs-5"></i><span>Tests</span><i class="bi bi-chevron-down ms-auto"></i>
         </a>
-        <ul id="charts-nav" class="nav-content collapse {{ Request::routeIs('test.*') ? 'show' : '' }}" data-bs-parent="#sidebar-nav">
+        <ul id="tests-nav" class="nav-content collapse {{ Request::routeIs('test.*') ? 'show' : '' }}" data-bs-parent="#sidebar-nav">
+          <li>
+            <a class="{{ Request::routeIs('test.createschedule') ? 'active' : '' }}" href="{{ route('test.createschedule') }}">
+              <i class="bi bi-calendar-check-fill fs-5"></i><span>Create Schedule</span>
+            </a>
+          </li>          
           <li>
             <a class="{{ Request::routeIs('test.assessment') ? 'active' : '' }}" href="{{ route('test.assessment') }}">
               <i class="bi bi-clipboard-data-fill fs-5"></i><span>Assessment Tests</span>
@@ -374,10 +379,10 @@
 
     @can('secretariat permission')
       <li class="nav-item">
-        <a class="nav-link {{ Request::routeIs('exam.*') ? '' : 'collapsed' }}" data-bs-target="#icons-nav" data-bs-toggle="collapse" href="#">
+        <a class="nav-link {{ Request::routeIs('exam.*') ? '' : 'collapsed' }}" data-bs-target="#exams-nav" data-bs-toggle="collapse" href="#">
           <i class="bi bi-arrow-clockwise fs-5"></i><span>Ongoing Exams</span><i class="bi bi-chevron-down ms-auto"></i>
         </a>
-        <ul id="icons-nav" class="nav-content collapse {{ Request::routeIs('exam.*') ? 'show' : '' }}" data-bs-parent="#sidebar-nav">
+        <ul id="exams-nav" class="nav-content collapse {{ Request::routeIs('exam.*') ? 'show' : '' }}" data-bs-parent="#sidebar-nav">
           <li>
             <a class="{{ Request::routeIs('exam.assessmentnotes') ? 'active' : '' }}" href="{{ route('exam.assessmentnotes') }}">
               <i class="bi bi-card-text fs-5"></i><span>Assessment Notes Form</span>
@@ -399,11 +404,22 @@
       {{-- <li class="nav-heading">Pages</li> --}}
 
       <li class="nav-item">
-        <a class="nav-link {{ Request::routeIs('reports') ? '' : 'collapsed' }}" href="{{ route('reports') }}">
-          <i class="bi bi-file-bar-graph-fill fs-5"></i>
-          <span>Reports</span>
+        <a class="nav-link {{ Request::routeIs('reports.*') ? '' : 'collapsed' }}" data-bs-target="#reports-nav" data-bs-toggle="collapse" href="#">
+          <i class="bi bi-file-bar-graph-fill fs-5"></i></i><span>Reports</span><i class="bi bi-chevron-down ms-auto"></i>
         </a>
-      </li><!-- End Reports Page Nav -->
+        <ul id="reports-nav" class="nav-content collapse {{ Request::routeIs('reports.*') ? 'show' : '' }}" data-bs-parent="#sidebar-nav">
+          <li>
+            <a class="{{ Request::routeIs('reports.adminreports') ? 'active' : '' }}" href="{{ route('reports.adminreports') }}">
+              <i class="bi bi-clipboard-data-fill fs-5"></i><span>Admin reports</span>
+            </a>
+          </li>
+          <li>
+            <a class="{{ Request::routeIs('reports.candidatereports') ? 'active' : '' }}" href="{{ route('reports.candidatereports') }}">
+              <i class="bi bi-person-fill-gear fs-5"></i><span>Candidate reports</span>
+            </a>
+          </li>
+        </ul>
+      </li>
 
       <li class="nav-item">
         <a class="nav-link {{ Request::routeIs('logs') ? '' : 'collapsed' }}" href="{{ route('logs') }}">
@@ -443,7 +459,6 @@
   <script src="{{asset('vendor/echarts/echarts.min.js')}}"></script>
   <script src="{{asset('vendor/quill/quill.js')}}"></script>
   <script src="{{asset('vendor/simple-datatables/simple-datatables.js')}}"></script>
-  <script src="{{asset('vendor/tinymce/tinymce.min.js')}}"></script>
   <script src="{{asset('vendor/php-email-form/validate.js')}}"></script>
   <script src="{{asset('js/main.js')}}"></script>
   <script src="{{asset('sweetalert2/sweetalert2.min.js')}}"></script>
@@ -468,6 +483,26 @@
           title: message
         });
       });
+
+      Livewire.on('confirm-delete', (data = {}) => {
+          const { message = "Are you sure?", eventName, eventData = {} } = data;
+
+          Swal.fire({
+              title: "Confirm archive?",
+              text: message,
+              icon: "warning",
+              showCancelButton: true,
+              confirmButtonColor: "#3085d6",
+              cancelButtonColor: "#d33",
+              confirmButtonText: "Yes, archive it!"
+          }).then((result) => {
+              if (result.isConfirmed && eventName) {
+                  Livewire.dispatch(eventName, eventData);
+              }
+          });
+      });
+
+
     });
   </script>
 </body>

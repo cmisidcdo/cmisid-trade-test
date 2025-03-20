@@ -3,24 +3,29 @@
         <div class="card-header text-white text-center py-3" style="background-color: #1e1b4b; border-radius: 12px 12px 0 0;">
             <h2 class="fw-bold m-0">Activity Logs</h2>
         </div>
-
+        <br>
         <div class="card-body">
-            <div class="row mb-3">
+            <div class="row mb-4 align-items-center">
                 <div class="col-md-6">
                     <div class="input-group">
-                        <span class="input-group-text bg-white border-end-0">
+                        <span class="input-group-text bg-light border-end-0">
                             <i class="bi bi-search"></i>
                         </span>
-                        <input type="text" class="form-control border-start-0" placeholder="Search logs..." wire:model.live.debounce.500ms="search">
-                        <button class="btn btn-outline-secondary border-start-0" type="button">
+                        <input type="text" class="form-control border-start-0 ps-0"
+                            placeholder="Search venues..."
+                            wire:model.live.debounce.300ms="search"
+                            aria-label="Search venues">
+                        <button class="btn btn-outline-secondary border-start-0 bg-light" type="button"
+                            wire:loading.class="d-none" wire:target="search"
+                            wire:click="$set('search', '')">
                             <i class="bi bi-x"></i>
                         </button>
+                        <span wire:loading wire:target="search" class="input-group-text bg-light border-start-0">
+                            <div class="spinner-border spinner-border-sm text-primary" role="status">
+                                <span class="visually-hidden">Searching...</span>
+                            </div>
+                        </span>
                     </div>
-                </div>
-                <div class="col-md-6 text-end">
-                    <button class="btn btn-warning">
-                        <i class="bi bi-archive-fill"></i> View Archive
-                    </button>
                 </div>
             </div>
 
@@ -69,16 +74,14 @@
                         @endforelse
                     </tbody>
                 </table>
+                {{-- <div>
+                    {{ $logs->links() }}
+                </div> --}}
             </div>
 
-            <div class="d-flex justify-content-between align-items-center">
-                <div>
-                    <p class="text-muted mb-0">Showing 1 to {{ count($logs) }} of {{ $logs->total() }} entries</p>
+            <div class="d-flex justify-content-center mt-4">
+                    {{$logs->links()}}
                 </div>
-                <div>
-                    {{ $logs->links() }}
-                </div>
-            </div>
         </div>
     </div>
 

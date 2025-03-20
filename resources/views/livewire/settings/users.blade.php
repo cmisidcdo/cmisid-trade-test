@@ -57,7 +57,7 @@
           <tbody>
             @forelse($users as $item)
             <tr>
-              <td scope="row">{{$item->id}}</td>
+              <td scope="row" class="text-center">{{$loop->iteration}}</td>
               <td>{{$item->name}}</td>
               <td>{{$item->email}}</td>
               <td>
@@ -98,8 +98,6 @@
             @endforelse
           </tbody>
         </table>
-
-
 
         <div>
           {{$users->links()}}

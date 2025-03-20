@@ -37,9 +37,7 @@
                         </button>
                         @can('create reference')
                         <button type="button" class="btn btn-primary"
-                            wire:click='clear'
-                            data-bs-toggle="modal"
-                            data-bs-target="#venueModal">
+                            wire:click='showAddEditModal'>
                             <i class="bi bi-plus-lg me-1"></i> Add Venue
                         </button>
                         @endcan
@@ -50,20 +48,19 @@
                     <table class="table table-hover table-bordered table-striped align-middle text-center">
                         <thead class="table-light">
                             <tr>
-                                <th scope="col" class="text-center">#</th>
-                                <th scope="col" class="sortable" wire:click="sortBy('title')">
-                                    Title
-                                    <i class="bi bi-arrow-down-up text-muted ms-1"></i>
-                                </th>
-                                <th scope="col" class="text-center">Status</th>
-                                <th scope="col" class="text-center">Actions</th>
+                                <th scope="col">#</th>
+                                <th scope="col">Venue</th>
+                                <th scope="col">Location</th>
+                                <th scope="col">Status</th>
+                                <th scope="col">Actions</th>
                             </tr>
                         </thead>
                         <tbody>
                             @forelse($venues as $item)
                             <tr>
-                                <td scope="row" class="text-center">{{$item->id}}</td>
-                                <td>{{$item->title}}</td>
+                                <td scope="row" class="text-center">{{$loop->iteration}}</td>
+                                <td>{{$item->name}}</td>
+                                <td>{{$item->location}}</td>
                                 <td class="text-center">
                                     <span class="badge rounded-pill {{$item->deleted_at == Null ? 'bg-success': 'bg-danger'}}">
                                         {{$item->deleted_at == Null ? 'Active': 'Inactive'}}
@@ -83,7 +80,7 @@
 
                                         @can('delete reference')
                                         <button class="btn btn-sm {{$item->deleted_at == Null ? 'btn-danger' : 'btn-outline-success'}} rounded-2 px-2 py-1"
-                                            wire:click='{{$item->deleted_at == Null ? 'deleteVenue('.$item->id.')': 'restoreVenue('.$item->id.')'}}'
+                                            wire:click='{{$item->deleted_at == Null ? 'confirmDelete('.$item->id.')': 'restoreVenue('.$item->id.')'}}'
                                             data-bs-toggle="tooltip"
                                             data-bs-title="{{$item->deleted_at == Null ? 'Move to archive': 'Restore venue'}}">
                                             <i class="bi {{$item->deleted_at == Null ? 'bi bi-archive-fill': 'bi-arrow-counterclockwise'}}"></i>
@@ -95,7 +92,7 @@
                             </tr>
                             @empty
                             <tr>
-                                <td colspan="4" class="text-center py-4 text-muted">
+                                <td colspan="5" class="text-center py-4 text-muted">
                                     <i class="bi bi-inbox fs-3 d-block mb-2"></i>
                                     No venues found
                                 </td>
@@ -103,11 +100,14 @@
                             @endforelse
                         </tbody>
                     </table>
+                    <div>
+                        {{$venues->links()}}
+                      </div>
                 </div>
 
-                <div class="d-flex justify-content-center mt-4">
+                {{-- <div class="d-flex justify-content-center mt-4">
                     {{$venues->links()}}
-                </div>
+                </div> --}}
 
             </div>
         </div>
@@ -125,13 +125,28 @@
                     <div class="modal-body p-4">
                         <form class="needs-validation" wire:submit="{{$editMode ? 'updateVenue' : 'createVenue'}}">
                             <div class="mb-4">
-                                <label for="venueTitle" class="form-label fw-medium">Venue Title</label>
-                                <input type="text" class="form-control form-control-lg {{$errors->has('title') ? 'is-invalid' : ''}}"
-                                    id="venueTitle"
-                                    wire:model="title"
-                                    placeholder="Enter venue title"
+                                <label for="venueName" class="form-label fw-medium">Venue Name</label>
+                                <input type="text" class="form-control form-control-lg {{$errors->has('name') ? 'is-invalid' : ''}}"
+                                    id="venueName"
+                                    wire:model="name"
+                                    placeholder="Enter venue name"
                                     autocomplete="off">
-                                @error('title')
+                                @error('name')
+                                <div class="invalid-feedback">
+                                    <i class="bi bi-exclamation-circle me-1"></i>
+                                    {{$message}}
+                                </div>
+                                @enderror
+                            </div>
+
+                            <div class="mb-4">
+                                <label for="venueLocation" class="form-label fw-medium">Venue Location</label>
+                                <input type="text" class="form-control form-control-lg {{$errors->has('location') ? 'is-invalid' : ''}}"
+                                    id="venueLocation"
+                                    wire:model="location"
+                                    placeholder="Enter venue location"
+                                    autocomplete="off">
+                                @error('location')
                                 <div class="invalid-feedback">
                                     <i class="bi bi-exclamation-circle me-1"></i>
                                     {{$message}}
@@ -143,13 +158,7 @@
                                     Cancel
                                 </button>
                                 <button type="submit" class="btn btn-primary px-4">
-                                    <span wire:loading.remove wire:target="{{$editMode ? 'updateVenue' : 'createVenue'}}">
-                                        {{$editMode ? 'Update' : 'Save'}}
-                                    </span>
-                                    <span wire:loading wire:target="{{$editMode ? 'updateVenue' : 'createVenue'}}">
-                                        <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
-                                        Processing...
-                                    </span>
+                                    {{ $editMode ? 'Update' : 'Save' }}
                                 </button>
                             </div>
                         </form>
@@ -222,41 +231,5 @@
         $('#venueModal').modal('show');
     });
 
-    $wire.on('venue-deleted', () => {
-        const toast = new bootstrap.Toast(document.getElementById('successToast'));
-        document.getElementById('successMessage').textContent = 'Venue deleted successfully!';
-        toast.show();
-    });
-
-    $wire.on('venue-restored', () => {
-        const toast = new bootstrap.Toast(document.getElementById('successToast'));
-        document.getElementById('successMessage').textContent = 'Venue restored successfully!';
-        toast.show();
-    });
-
-    const searchInput = document.querySelector('[wire:model\\.live\\.debounce\\.300ms="search"]');
-    const suggestionsDiv = document.getElementById('searchSuggestions');
-
-    if (searchInput && suggestionsDiv) {
-        searchInput.addEventListener('focus', function() {
-            if (this.value.length > 1) {
-                suggestionsDiv.classList.remove('d-none');
-            }
-        });
-
-        searchInput.addEventListener('blur', function() {
-            setTimeout(() => {
-                suggestionsDiv.classList.add('d-none');
-            }, 200);
-        });
-
-        searchInput.addEventListener('input', function() {
-            if (this.value.length > 1) {
-                suggestionsDiv.classList.remove('d-none');
-            } else {
-                suggestionsDiv.classList.add('d-none');
-            }
-        });
-    }
 </script>
 @endscript

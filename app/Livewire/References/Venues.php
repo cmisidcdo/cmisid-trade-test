@@ -17,7 +17,9 @@ class Venues extends Component
     public $archive = false;
 
     public $search;
-    public $title, $venue_id;
+    public $name, $location, $venue_id;
+
+    protected $listeners = ['deleteVenue'];
 
     public function mount()
     {
@@ -44,10 +46,10 @@ class Venues extends Component
     public function rules()
     {
         return [
-            'title'  => ['required', 
-                'string',
-                Rule::unique('venues', 'title')->ignore($this->venue_id),
+            'name'  => ['required', 
+                'string', Rule::unique('venues', 'name')->ignore($this->venue_id),
             ],
+            'location' => ['required', 'string'],   
         ];
     }
 
@@ -66,7 +68,8 @@ class Venues extends Component
 
         return $query
             ->when($this->search, function ($query) {
-                $query->where('title', 'like', '%' . $this->search . '%');
+                $query->where('name', 'like', '%' . $this->search . '%')
+                ->orWhere('location','like','%'. $this->search .'%');
             })
             ->paginate(10);
     }
@@ -76,15 +79,16 @@ class Venues extends Component
         $this->validate();
         DB::transaction(function () {
             $venue = new Venue();
-            $venue->title = $this->title;
+            $venue->name = $this->name;
+            $venue->location = $this->location;
             $venue->save();
         });
 
         $this->clear();
         $this->dispatch('hide-venueModal');
-        $this->dispatch('success', 'Venue Created Successfuly');
-       
+        $this->dispatch('success', 'Venue Created Successfully');
     }
+
 
     public function clear()
     {
@@ -97,14 +101,13 @@ class Venues extends Component
         $venue = Venue::withTrashed()->findOrFail($venueId);
 
         $this->fill(
-            $venue->only(['title']) 
+            $venue->only(['name', 'location'])
         );
 
         $this->venue_id = $venue->id;
         $this->editMode = true;
         $this->dispatch('show-venueModal');
     }
-
 
     public function updateVenue()
     {
@@ -113,7 +116,8 @@ class Venues extends Component
         DB::transaction(function () {  
             $venue = Venue::withTrashed()->findOrFail($this->venue_id);
             
-            $venue->title = $this->title;
+            $venue->name = $this->name;
+            $venue->location = $this->location;
             $venue->save();
         });
 
@@ -122,12 +126,23 @@ class Venues extends Component
         $this->dispatch('success', 'Venue updated successfully.');
     }
 
-    
-    public function deleteVenue(Venue $venue)
-    {
-        $venue->delete();
 
-        $this->dispatch('success', 'Venue deleted successfully');
+    public function confirmDelete($id)
+    {
+
+        $this->dispatch('confirm-delete', 
+            message: 'this venue will be sent to archive',
+            eventName: 'deleteVenue',
+            eventData: ['id' => $id]
+        );
+    }
+
+
+    public function deleteVenue($id)
+    {
+        Venue::findOrFail($id)->delete();
+         
+        $this->dispatch('success', 'Venue archived successfully');
     }
 
     public function restoreVenue($venue_id)
@@ -136,5 +151,11 @@ class Venues extends Component
         $venue->restore();
     
         $this->dispatch('success', 'Venue restored successfully.');
+    }
+
+    public function showAddEditModal()
+    {
+        $this->clear();
+        $this->dispatch('show-venueModal');
     }
 }

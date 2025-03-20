@@ -18,6 +18,8 @@ class PriorityGroups extends Component
     public $search;
     public $title, $prioritygroup_id;
 
+    protected $listeners = ['deletePriorityGroup'];
+
     public function mount()
     {
         $user = auth()->user();
@@ -121,12 +123,22 @@ class PriorityGroups extends Component
         $this->dispatch('success', 'Priority Group updated successfully.');
     }
 
-    
-    public function deletePriorityGroup(PriorityGroup $prioritygroup)
+    public function confirmDelete($id)
     {
-        $prioritygroup->delete();
 
-        $this->dispatch('success', 'Priority Group deleted successfully');
+        $this->dispatch('confirm-delete', 
+            message: 'This Priority Group will be sent to archive',
+            eventName: 'deletePriorityGroup',
+            eventData: ['id' => $id]
+        );
+    }
+
+    
+    public function deletePriorityGroup($id)
+    {
+        PriorityGroup::findOrFail($id)->delete();
+
+        $this->dispatch('success', 'Priority Group archived successfully');
     }
 
     public function restorePriorityGroup($prioritygroup_id)
@@ -135,5 +147,11 @@ class PriorityGroups extends Component
         $prioritygroup->restore();
     
         $this->dispatch('success', 'Priority Group restored successfully.');
+    }
+
+    public function showAddEditModal()
+    {
+        $this->clear();
+        $this->dispatch('show-prioritygroupModal');
     }
 }

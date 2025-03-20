@@ -19,6 +19,8 @@ class Offices extends Component
     public $search;
     public $title, $office_id;
 
+    protected $listeners = ['deleteOffice'];
+
     public function mount()
     {
         $user = auth()->user();
@@ -122,10 +124,20 @@ class Offices extends Component
         $this->dispatch('success', 'Office updated successfully.');
     }
 
-    
-    public function deleteOffice(Office $office)
+    public function confirmDelete($id)
     {
-        $office->delete();
+
+        $this->dispatch('confirm-delete', 
+            message: 'This Office will be sent to archive',
+            eventName: 'deleteOffice',
+            eventData: ['id' => $id]
+        );
+    }
+
+    
+    public function deleteOffice($id)
+    {
+        Office::findOrFail($id)->delete();
 
         $this->dispatch('success', 'Office deleted successfully');
     }
@@ -136,5 +148,11 @@ class Offices extends Component
         $office->restore();
     
         $this->dispatch('success', 'Office restored successfully.');
+    }
+
+    public function showAddEditModal()
+    {
+        $this->clear();
+        $this->dispatch('show-officeModal');
     }
 }

@@ -20,8 +20,10 @@ class Positions extends Component
 
     public $search;
     public $position_id;
-    public $title, $salary_grade, $competency_level, $interview_priority;
+    public $title, $salary_grade, $interview_priority, $competency_level;
     public $selectedskills = [];
+
+    protected $listeners = ['deletePosition'];
 
     public function mount()
     {
@@ -59,7 +61,7 @@ class Positions extends Component
             $this->selectedskills[] = [
                 'id' => $skill->id,
                 'title' => $skill->title,
-                'competency_level' => 'basic',
+                'competency_level' => $skill->competency_level,
             ];
         }
 
@@ -121,24 +123,11 @@ class Positions extends Component
         $this->selectedskills = array_values($this->selectedskills);
     }
 
-    public function updateCompetencyLevel($index, $level)
-    {
-        $updatedSkills = $this->selectedskills;
-
-        $updatedSkills[$index]['competency_level'] = $level;
-
-        $this->selectedskills = $updatedSkills;
-    }
-
-
-
-    
     public function createPosition()
     {
         $this->validate([
             'title' => 'required|string|max:255',
             'salary_grade' => 'required|integer',
-            'competency_level' => 'required|in:basic,intermediate,advanced',
             'interview_priority' => 'required|boolean',
         ]);
     
@@ -146,7 +135,6 @@ class Positions extends Component
             $position = new Position();
             $position->title = $this->title;
             $position->salary_grade = $this->salary_grade;
-            $position->competency_level = $this->competency_level;
             $position->interview_priority = $this->interview_priority;
             $position->save();
     
@@ -154,7 +142,6 @@ class Positions extends Component
                 $positionSkill = new PositionSkill();
                 $positionSkill->skill_id = $skill['id'];
                 $positionSkill->position_id = $position->id;
-                $positionSkill->competency_level = $skill['competency_level'];
                 $positionSkill->save();
             }
         });
@@ -180,7 +167,6 @@ class Positions extends Component
         $this->fill([
             'title' => $position->title,
             'salary_grade' => $position->salary_grade,
-            'competency_level' => $position->competency_level,
             'interview_priority' => $position->interview_priority,
         ]);
 
@@ -189,7 +175,7 @@ class Positions extends Component
 
         $this->selectedskills = PositionSkill::where('position_id', $positionId)
             ->join('skills', 'position_skills.skill_id', '=', 'skills.id') 
-            ->select('position_skills.skill_id as id', 'skills.title', 'position_skills.competency_level')
+            ->select('position_skills.skill_id as id', 'skills.title', 'skills.competency_level')
             ->get()
             ->toArray();
 
@@ -207,7 +193,6 @@ class Positions extends Component
             
             $position->title = $this->title;
             $position->salary_grade = $this->salary_grade;
-            $position->competency_level = $this->competency_level;
             $position->interview_priority = $this->interview_priority;
             $position->save();
     
@@ -217,16 +202,11 @@ class Positions extends Component
     
             foreach ($this->selectedskills as $skill) {
                 if (isset($existingSkills[$skill['id']])) {
-                    $existingSkill = $existingSkills[$skill['id']];
-                    if ($existingSkill->competency_level !== $skill['competency_level']) {
-                        $existingSkill->competency_level = $skill['competency_level'];
-                        $existingSkill->save();
-                    }
+                
                 } else {
                     PositionSkill::create([
                         'position_id' => $this->position_id,
                         'skill_id' => $skill['id'],
-                        'competency_level' => $skill['competency_level'],
                     ]);
                 }
             }
@@ -248,7 +228,6 @@ class Positions extends Component
         $this->fill([
             'title' => $position->title,
             'salary_grade' => $position->salary_grade,
-            'competency_level' => $position->competency_level,
             'interview_priority' => $position->interview_priority,
         ]);
 
@@ -256,18 +235,29 @@ class Positions extends Component
 
         $this->selectedskills = PositionSkill::where('position_id', $positionId)
             ->join('skills', 'position_skills.skill_id', '=', 'skills.id') 
-            ->select('position_skills.skill_id as id', 'skills.title', 'position_skills.competency_level')
+            ->select('position_skills.skill_id as id', 'skills.title', 'skills.competency_level')
             ->get()
             ->toArray();
 
         $this->dispatch('show-viewSkillsModal');
     }
     
+    public function confirmDelete($id)
+    {
+
+        $this->dispatch('confirm-delete', 
+            message: 'This Position will be sent to archive',
+            eventName: 'deletePosition',
+            eventData: ['id' => $id]
+        );
+    }
+
+
 
     
-    public function deletePosition(Position $position)
+    public function deletePosition($id)
     {
-        $position->delete();
+        Position::findOrFail($id)->delete();
 
         $this->dispatch('success', 'Position deleted successfully');
     }
@@ -278,5 +268,11 @@ class Positions extends Component
         $position->restore();
     
         $this->dispatch('success', 'Position restored successfully.');
+    }
+
+    public function showAddEditModal()
+    {
+        $this->clear();
+        $this->dispatch('show-positionModal');
     }
 }

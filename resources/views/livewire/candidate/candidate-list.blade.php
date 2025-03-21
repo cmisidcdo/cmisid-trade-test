@@ -5,18 +5,18 @@
     <section class="section dashboard">
         <div class="card shadow-sm border-0 rounded-3">
             <div class="card-body p-4">
-                
+
                 <div class="row mb-4 align-items-center">
                     <div class="col-md-6">
                         <div class="input-group">
                             <span class="input-group-text bg-light border-end-0">
                                 <i class="bi bi-search"></i>
                             </span>
-                            <input type="text" class="form-control border-start-0 ps-0" 
-                                placeholder="Search candidates..." 
+                            <input type="text" class="form-control border-start-0 ps-0"
+                                placeholder="Search candidates..."
                                 wire:model.live.debounce.300ms="search"
                                 aria-label="Search candidates">
-                            <button class="btn btn-outline-secondary border-start-0 bg-light" type="button" 
+                            <button class="btn btn-outline-secondary border-start-0 bg-light" type="button"
                                 wire:loading.class="d-none" wire:target="search"
                                 wire:click="$set('search', '')">
                                 <i class="bi bi-x"></i>
@@ -31,7 +31,7 @@
                         </div>
                     </div>
                     <div class="col-md-6 text-md-end mt-3 mt-md-0">
-                        <button type="button" class="btn btn-outline-secondary me-2" 
+                        <button type="button" class="btn btn-warning me-2"
                             wire:click="toggleArchive"
                             aria-label="{{ $archive ? 'View general candidates' : 'View archived candidates' }}">
                             <i class="bi {{ $archive ? 'bi-box-arrow-in-up' : 'bi-archive' }} me-1"></i>
@@ -41,16 +41,16 @@
                             </span>
                         </button>
                         @can('create candidate')
-                        <button type="button" class="btn btn-primary" 
-                            wire:click='clear' 
-                            data-bs-toggle="modal" 
+                        <button type="button" class="btn btn-primary"
+                            wire:click='clear'
+                            data-bs-toggle="modal"
                             data-bs-target="#candidateModal">
                             <i class="bi bi-plus-lg me-1"></i> Add Candidate
                         </button>
                         @endcan
                     </div>
                 </div>
-  
+
                 <div class="table-responsive">
                     <table class="table table-hover table-striped align-middle border-bottom">
                         <thead class="table-light">
@@ -87,27 +87,40 @@
                                 </td>
                                 <td class="text-center">
                                     <div class="btn-group" role="group" aria-label="Candidate actions">
+
+                                        <button class="btn btn-sm btn-info rounded-2 d-flex align-items-center px-2 py-1 me-2"
+                                            wire:click="({{ $item->id }})"
+                                            data-bs-toggle="modal"
+                                            data-bs-target="#viewCandidateModal"
+                                            data-bs-toggle="tooltip"
+                                            data-bs-title="View Candidate">
+                                            <i class="bi bi-eye"></i>
+                                            <span class="d-none d-md-inline ms-1">View</span>
+                                        </button>
+
+
                                         @can('update candidate')
-                                        <button class="btn btn-sm btn-outline-primary" 
+                                        <button class="btn btn-sm btn-primary rounded-2 px-2 py-1 me-2"
                                             wire:click='readCandidate({{$item->id}})'
-                                            data-bs-toggle="tooltip" 
+                                            data-bs-toggle="tooltip"
                                             data-bs-title="Edit candidate">
                                             <i class="bi bi-pencil"></i>
                                             <span class="d-none d-md-inline ms-1">Edit</span>
                                         </button>
                                         @endcan
-                                        
+
                                         @can('delete candidate')
-                                        <button class="btn btn-sm {{$item->deleted_at == Null ? 'btn-outline-danger': 'btn-outline-success'}}" 
-                                            wire:click='{{$item->deleted_at == Null ? 'deleteCandidate('.$item->id.')': 'restoreCandidate('.$item->id.')'}}'
-                                            data-bs-toggle="tooltip" 
-                                            data-bs-title="{{$item->deleted_at == Null ? 'Delete candidate': 'Restore candidate'}}">
-                                            <i class="bi {{$item->deleted_at == Null ? 'bi-trash': 'bi-arrow-counterclockwise'}}"></i>
-                                            <span class="d-none d-md-inline ms-1">{{$item->deleted_at == Null ? 'Delete': 'Restore'}}</span>
+                                        <button class="btn btn-sm rounded-2 px-2 py-1 me-2 {{$item->deleted_at == Null ? 'btn-danger' : 'btn-outline-success'}}"
+                                            wire:click='{{$item->deleted_at == Null ? 'deleteCandidate('.$item->id.')' : 'restoreCandidate('.$item->id.')'}}'
+                                            data-bs-toggle="tooltip"
+                                            data-bs-title="{{$item->deleted_at == Null ? 'Delete candidate' : 'Restore candidate'}}">
+                                            <i class="bi {{$item->deleted_at == Null ? 'bi-trash' : 'bi-arrow-counterclockwise'}}"></i>
+                                            <span class="d-none d-md-inline ms-1">{{$item->deleted_at == Null ? 'Delete' : 'Restore'}}</span>
                                         </button>
                                         @endcan
                                     </div>
                                 </td>
+
                             </tr>
                             @empty
                             <tr>
@@ -120,7 +133,7 @@
                         </tbody>
                     </table>
                 </div>
-                
+
                 <div class="d-flex justify-content-center mt-4">
                     {{$candidates->links()}}
                 </div>
@@ -129,11 +142,85 @@
                     <div id="successToast" class="toast align-items-center text-white bg-success border-0" role="alert" aria-live="assertive" aria-atomic="true">
                         <div class="d-flex">
                             <div class="toast-body">
-                                <i class="bi bi-check-circle me-2"></i> 
+                                <i class="bi bi-check-circle me-2"></i>
                                 <span id="successMessage">Operation completed successfully!</span>
                             </div>
                             <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
                         </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="modal fade" id="viewCandidateModal" tabindex="-1" aria-labelledby="viewCandidateModalLabel" aria-hidden="true" wire:ignore.self>
+            <div class="modal-dialog modal-dialog-centered modal-lg">
+                <div class="modal-content border-0 shadow-lg rounded-3">
+                   
+                    <div class="modal-header bg-primary text-white">
+                        <h5 class="modal-title fw-semibold" id="viewCandidateModalLabel">
+                            <i class="bi bi-eye me-2"></i> Candidate Details
+                        </h5>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+
+                   
+                    <div class="modal-body p-4">
+                        <div class="row mb-3">
+                            <div class="col-md-6 d-flex align-items-center gap-2">
+                                <strong>Full Name:</strong>
+                                <p class="m-0">John Doe</p>
+                            </div>
+                            <div class="col-md-6 d-flex align-items-center gap-2">
+                                <strong>Email:</strong>
+                                <p class="m-0">johndoe@example.com</p>
+                            </div>
+                        </div>
+
+                        <div class="row mb-3">
+                            <div class="col-md-6 d-flex align-items-center gap-2">
+                                <strong>Contact No:</strong>
+                                <p class="m-0">+1 234 567 8901</p>
+                            </div>
+                            <div class="col-md-6 d-flex align-items-center gap-2">
+                                <strong>Position Applied:</strong>
+                                <p class="m-0">Software Developer</p>
+                            </div>
+                        </div>
+
+                        <div class="row mb-3">
+                            <div class="col-md-6 d-flex align-items-center gap-2">
+                                <strong>Office Applied:</strong>
+                                <p class="m-0">IT Department</p>
+                            </div>
+                            <div class="col-md-6 d-flex align-items-center gap-2">
+                                <strong>Priority Group:</strong>
+                                <p class="m-0">High Priority</p>
+                            </div>
+                        </div>
+
+                        <div class="row mb-3">
+                            <div class="col-md-6 d-flex align-items-center gap-2">
+                                <strong>Endorsement Date:</strong>
+                                <p class="m-0">March 22, 2025</p>
+                            </div>
+                            <div class="col-md-6 d-flex align-items-center gap-2">
+                                <strong>Status:</strong>
+                                <p class="m-0">
+                                    <span class="badge bg-success px-3 py-2">Active</span>
+                                </p>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-12 text-center">
+                                <strong class="d-block">Remarks:</strong>
+                                <p class="m-0">Excellent candidate with strong technical skills.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                   
+                    <div class="modal-footer bg-light border-0">
+                        <button type="button" class="btn btn-outline-secondary rounded-2" data-bs-dismiss="modal">Close</button>
                     </div>
                 </div>
             </div>
@@ -163,7 +250,7 @@
                                     @error('email') <span class="text-danger">{{ $message }}</span> @enderror
                                 </div>
                             </div>
-        
+
                             <div class="row g-3 mt-1">
                                 <div class="col-md-6">
                                     <label for="contactno" class="form-label">Contact No</label>
@@ -175,20 +262,20 @@
                                     <select class="form-select" id="position_id" wire:model="position_id" required>
                                         <option value="">Select Position</option>
                                         @foreach($positions as $position)
-                                            <option value="{{ $position->id }}">{{ $position->title }}</option>
+                                        <option value="{{ $position->id }}">{{ $position->title }}</option>
                                         @endforeach
                                     </select>
                                     @error('position_id') <span class="text-danger">{{ $message }}</span> @enderror
                                 </div>
                             </div>
-        
+
                             <div class="row g-3 mt-1">
                                 <div class="col-md-6">
                                     <label for="office_id" class="form-label">Office</label>
                                     <select class="form-select" id="office_id" wire:model="office_id" required>
                                         <option value="">Select Office</option>
                                         @foreach($offices as $office)
-                                            <option value="{{ $office->id }}">{{ $office->title }}</option>
+                                        <option value="{{ $office->id }}">{{ $office->title }}</option>
                                         @endforeach
                                     </select>
                                     @error('office_id') <span class="text-danger">{{ $message }}</span> @enderror
@@ -198,13 +285,13 @@
                                     <select class="form-select" id="priority_group_id" wire:model="priority_group_id" required>
                                         <option value="">Select Priority Group</option>
                                         @foreach($priorityGroups as $priorityGroup)
-                                            <option value="{{ $priorityGroup->id }}">{{ $priorityGroup->title }}</option>
+                                        <option value="{{ $priorityGroup->id }}">{{ $priorityGroup->title }}</option>
                                         @endforeach
                                     </select>
                                     @error('priority_group_id') <span class="text-danger">{{ $message }}</span> @enderror
                                 </div>
                             </div>
-        
+
                             <div class="row g-3 mt-1">
                                 <div class="col-md-6">
                                     <label for="endorsement_date" class="form-label">Endorsement Date</label>
@@ -217,7 +304,7 @@
                                     @error('remarks') <span class="text-danger">{{ $message }}</span> @enderror
                                 </div>
                             </div>
-        
+
                             <div class="mt-4 text-end">
                                 <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal" wire:click='clear'>Cancel</button>
                                 <button type="submit" class="btn btn-primary px-4">
@@ -229,18 +316,18 @@
                                         Processing...
                                     </span>
                                 </button>
-                            </div>  
+                            </div>
                         </form>
                     </div>
                 </div>
             </div>
         </div>
-        
+
     </section>
-  </div>
-  
-  @push('styles')
-  <style>
+</div>
+
+@push('styles')
+<style>
     .custom-invalid-feedback {
         display: block;
         width: 100%;
@@ -248,35 +335,36 @@
         font-size: 0.875em;
         color: #dc3545;
     }
-    
+
     .sortable {
         cursor: pointer;
     }
-    
+
     .sortable:hover {
         background-color: rgba(0, 0, 0, 0.05);
     }
-    
+
     @media (max-width: 768px) {
         .card-title {
             font-size: 1.25rem;
         }
-        
-        .table th, .table td {
+
+        .table th,
+        .table td {
             padding: 0.5rem;
         }
     }
-  </style>
-  @endpush
-  
-  @script
-  <script>
+</style>
+@endpush
+
+@script
+<script>
     document.addEventListener('DOMContentLoaded', function() {
         const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
         const tooltipList = tooltipTriggerList.map(function(tooltipTriggerEl) {
             return new bootstrap.Tooltip(tooltipTriggerEl);
         });
-        
+
         window.addEventListener('livewire:update', function() {
             const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
             const tooltipList = tooltipTriggerList.map(function(tooltipTriggerEl) {
@@ -284,49 +372,49 @@
             });
         });
     });
-  
+
     $wire.on('hide-candidateModal', () => {
         console.log('Hiding candidate modal');
         $('#candidateModal').modal('hide');
-        
+
         const toast = new bootstrap.Toast(document.getElementById('successToast'));
         document.getElementById('successMessage').textContent = 'Candidate saved successfully!';
         toast.show();
     });
-  
+
     $wire.on('show-candidateModal', () => {
         console.log('Showing candidate modal');
         $('#candidateModal').modal('show');
     });
-    
+
     $wire.on('candidate-deleted', () => {
         const toast = new bootstrap.Toast(document.getElementById('successToast'));
         document.getElementById('successMessage').textContent = 'Candidate deleted successfully!';
         toast.show();
     });
-    
+
     $wire.on('candidate-restored', () => {
         const toast = new bootstrap.Toast(document.getElementById('successToast'));
         document.getElementById('successMessage').textContent = 'Candidate restored successfully!';
         toast.show();
     });
-    
+
     const searchInput = document.querySelector('[wire:model\\.live\\.debounce\\.300ms="search"]');
     const suggestionsDiv = document.getElementById('searchSuggestions');
-    
+
     if (searchInput && suggestionsDiv) {
         searchInput.addEventListener('focus', function() {
             if (this.value.length > 1) {
                 suggestionsDiv.classList.remove('d-none');
             }
         });
-        
+
         searchInput.addEventListener('blur', function() {
             setTimeout(() => {
                 suggestionsDiv.classList.add('d-none');
             }, 200);
         });
-        
+
         searchInput.addEventListener('input', function() {
             if (this.value.length > 1) {
                 suggestionsDiv.classList.remove('d-none');
@@ -335,5 +423,18 @@
             }
         });
     }
-  </script>
-  @endscript
+    document.addEventListener('DOMContentLoaded', function() {
+        window.addEventListener('show-candidateModal', event => {
+            var modal = new bootstrap.Modal(document.getElementById('candidateModal'));
+            modal.show();
+        });
+
+        window.addEventListener('hide-candidateModal', event => {
+            var modal = bootstrap.Modal.getInstance(document.getElementById('candidateModal'));
+            if (modal) {
+                modal.hide();
+            }
+        });
+    });
+</script>
+@endscript

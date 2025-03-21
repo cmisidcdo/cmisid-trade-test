@@ -40,7 +40,7 @@
 
   <div class="d-flex ">
   <a href="{{ route('dashboard') }}" class="logo d-flex align-items-center">
-    <img src="{{ asset('img/logo.png') }}" alt="Logo" class="img-fluid" style="height: 80px;">
+    <img src="{{ asset('img/logo.png') }}" alt="Logo" class="img-fluid" style="height: 75px;">
   </a>
   <i class="bi bi-list toggle-sidebar-btn"></i>
 </div>

@@ -3,13 +3,16 @@
 use App\Livewire\Candidate\AddCandidate;
 use App\Livewire\Candidate\CandidateList;
 use App\Livewire\Candidate\UpdateCandidate;
+use App\Livewire\Exam\Assessmentlist;
+use App\Livewire\Exam\Interviewlist;
+use App\Livewire\Exam\Practicallist;
 use App\Livewire\References\Offices;
 use App\Livewire\References\Positions;
 use App\Livewire\References\Skills;
 use App\Livewire\References\Venues;
 use App\Livewire\Reports\AdminReports;
 use App\Livewire\Reports\CandidateReports;
-use App\Livewire\Test\CreateSchedule;
+use App\Livewire\Exam\CreateSchedule;
 use Illuminate\Support\Facades\Route;
 use App\Livewire\Dashboard;
 use App\Livewire\Exam\AssessmentNotes;
@@ -61,5 +64,8 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/permissions', Permissions::class)->name('permissions');
     Route::get('/reports/adminreports', AdminReports::class)->name('reports.adminreports');
     Route::get('/reports/candidatereports', CandidateReports::class)->name('reports.candidatereports');
-    Route::get('/test/createschedule', CreateSchedule::class)->name('test.createschedule');
+    Route::get('/exam/createschedule', CreateSchedule::class)->name('exam.createschedule');
+    Route::get('/exam/assessmentlist', Assessmentlist::class)->name('exam.assessmentlist');
+    Route::get('/exam/practicallist', Practicallist::class)->name('exam.practicallist');
+    Route::get('/exam/interviewlist', Interviewlist::class)->name('exam.interviewlist');
 });

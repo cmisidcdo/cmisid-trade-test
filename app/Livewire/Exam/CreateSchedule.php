@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Livewire\Test;
+namespace App\Livewire\Exam;
 
 use Livewire\Component;
 
@@ -8,6 +8,6 @@ class CreateSchedule extends Component
 {
     public function render()
     {
-        return view('livewire.test.create-schedule');
+        return view('livewire.exam.create-schedule');
     }
 }

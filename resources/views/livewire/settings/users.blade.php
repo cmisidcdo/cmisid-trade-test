@@ -109,7 +109,7 @@
   <div class="modal fade" id="viewModal" tabindex="-1" aria-labelledby="viewModalLabel" aria-hidden="true" wire:ignore.self>
     <div class="modal-dialog modal-m"> 
       <div class="modal-content">
-        <div class="modal-header bg-info text-white">
+        <div class="modal-header  text-white">
           <h6 class="modal-title" id="viewModalLabel">
             <i class="bi bi-eye-fill me-1"></i> User Details
           </h6>

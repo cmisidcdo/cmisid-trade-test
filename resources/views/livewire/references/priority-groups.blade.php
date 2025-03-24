@@ -37,9 +37,7 @@
                         </button>
                         @can('create reference')
                         <button type="button" class="btn btn-primary"
-                            wire:click='clear'
-                            data-bs-toggle="modal"
-                            data-bs-target="#prioritygroupModal">
+                            wire:click='showAddEditModal'>
                             <i class="bi bi-plus-lg me-1"></i> Add Priority Group
                         </button>
                         @endcan
@@ -50,19 +48,16 @@
                     <table class="table table-hover table-bordered table-striped align-middle text-center">
                         <thead class="table-light">
                             <tr>
-                                <th scope="col" class="text-center">#</th>
-                                <th scope="col" class="sortable" wire:click="sortBy('title')">
-                                    Title
-                                    <i class="bi bi-arrow-down-up text-muted ms-1"></i>
-                                </th>
-                                <th scope="col" class="text-center">Status</th>
-                                <th scope="col" class="text-center">Actions</th>
+                                <th scope="col">#</th>
+                                <th scope="col">Title</th>
+                                <th scope="col">Status</th>
+                                <th scope="col">Actions</th>
                             </tr>
                         </thead>
                         <tbody>
                             @forelse($prioritygroups as $item)
                             <tr>
-                                <td scope="row" class="text-center">{{$item->id}}</td>
+                                <td scope="row" class="text-center">{{$loop->iteration}}</td>
                                 <td>{{$item->title}}</td>
                                 <td class="text-center">
                                     <span class="badge rounded-pill {{$item->deleted_at == Null ? 'bg-success': 'bg-danger'}}">
@@ -83,7 +78,7 @@
 
                                         @can('delete reference')
                                         <button class="btn btn-sm {{$item->deleted_at == Null ? 'btn-danger' : 'btn-outline-success'}} rounded-2 px-2 py-1"
-                                            wire:click='{{$item->deleted_at == Null ? 'deletePriorityGroup('.$item->id.')': 'restorePriorityGroup('.$item->id.')'}}'
+                                            wire:click='{{$item->deleted_at == Null ? 'confirmDelete('.$item->id.')': 'restorePriorityGroup('.$item->id.')'}}'
                                             data-bs-toggle="tooltip"
                                             data-bs-title="{{$item->deleted_at == Null ? 'Move to archive': 'Restore prioritygroup'}}">
                                             <i class="bi {{$item->deleted_at == Null ? 'bi bi-archive-fill': 'bi-arrow-counterclockwise'}}"></i>
@@ -103,12 +98,15 @@
                             @endforelse
                         </tbody>
                     </table>
+                    <div>
+                        {{$prioritygroups->links()}}
+                    </div>
                 </div>
 
 
-                <div class="d-flex justify-content-center mt-4">
+                {{-- <div class="d-flex justify-content-center mt-4">
                     {{$prioritygroups->links()}}
-                </div>
+                </div> --}}
 
                 
                 <div class="position-fixed bottom-0 end-0 p-3" style="z-index: 11">
@@ -156,13 +154,7 @@
                                     Cancel
                                 </button>
                                 <button type="submit" class="btn btn-primary px-4">
-                                    <span wire:loading.remove wire:target="{{$editMode ? 'updatePriorityGroup' : 'createPriorityGroup'}}">
-                                        {{$editMode ? 'Update' : 'Save'}}
-                                    </span>
-                                    <span wire:loading wire:target="{{$editMode ? 'updatePriorityGroup' : 'createPriorityGroup'}}">
-                                        <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
-                                        Processing...
-                                    </span>
+                                    {{ $editMode ? 'Update' : 'Save' }}
                                 </button>
                             </div>
                         </form>
@@ -224,26 +216,11 @@
         console.log('Hiding prioritygroup modal');
         $('#prioritygroupModal').modal('hide');
 
-        const toast = new bootstrap.Toast(document.getElementById('successToast'));
-        document.getElementById('successMessage').textContent = 'Priority Group saved successfully!';
-        toast.show();
     });
 
     $wire.on('show-prioritygroupModal', () => {
         console.log('Showing prioritygroup modal');
         $('#prioritygroupModal').modal('show');
-    });
-
-    $wire.on('prioritygroup-deleted', () => {
-        const toast = new bootstrap.Toast(document.getElementById('successToast'));
-        document.getElementById('successMessage').textContent = 'Priority Group deleted successfully!';
-        toast.show();
-    });
-
-    $wire.on('prioritygroup-restored', () => {
-        const toast = new bootstrap.Toast(document.getElementById('successToast'));
-        document.getElementById('successMessage').textContent = 'Priority Group restored successfully!';
-        toast.show();
     });
 
     const searchInput = document.querySelector('[wire:model\\.live\\.debounce\\.300ms="search"]');

@@ -56,21 +56,17 @@
                         <thead class="table-light">
                             <tr>
                                 <th scope="col" class="text-center">#</th>
-                                <th scope="col" class="sortable" wire:click="sortBy('fullname')">
+                                <th scope="col">
                                     Full Name
-                                    <i class="bi bi-arrow-down-up text-muted ms-1"></i>
                                 </th>
-                                <th scope="col" class="sortable" wire:click="sortBy('fullname')">
+                                <th scope="col">
                                     Office Applied
-                                    <i class="bi bi-arrow-down-up text-muted ms-1"></i>
                                 </th>
-                                <th scope="col" class="sortable" wire:click="sortBy('fullname')">
+                                <th scope="col">
                                     Position Applied
-                                    <i class="bi bi-arrow-down-up text-muted ms-1"></i>
                                 </th>
-                                <th scope="col" class="sortable" wire:click="sortBy('fullname')">
+                                <th scope="col">
                                     Priority Group
-                                    <i class="bi bi-arrow-down-up text-muted ms-1"></i>
                                 </th>
                                 <th scope="col" class="text-center">Status</th>
                                 <th scope="col" class="text-center">Actions</th>
@@ -79,7 +75,7 @@
                         <tbody>
                             @forelse($candidates as $item)
                             <tr>
-                                <td scope="row" class="text-center">{{$item->id}}</td>
+                                <td scope="row" class="text-center">{{$loop->iteration}}</td>
                                 <td>{{$item->fullname}}</td>
                                 <td>{{$item->office->title}}</td>
                                 <td>{{$item->position->title}}</td>

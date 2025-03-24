@@ -57,7 +57,7 @@
           <tbody>
             @forelse($users as $item)
             <tr>
-              <td scope="row">{{$item->id}}</td>
+              <td scope="row" class="text-center">{{$loop->iteration}}</td>
               <td>{{$item->name}}</td>
               <td>{{$item->email}}</td>
               <td>
@@ -83,7 +83,7 @@
                 
                 @can('delete user')
                 <button class="btn btn-sm {{$item->deleted_at == Null ? 'btn-danger' : 'btn-outline-success'}} rounded-2 px-2 py-1"
-                  wire:click='{{$item->deleted_at == Null ? 'deleteUser('.$item->id.')' : 'restoreUser('.$item->id.')'}}'
+                  wire:click='{{$item->deleted_at == Null ? 'confirmDelete('.$item->id.')' : 'restoreUser('.$item->id.')'}}'
                   >
                   <i class="bi {{$item->deleted_at == Null ? 'bi bi-archive-fill' : 'bi-arrow-counterclockwise'}}"></i>
                   <span class="d-none d-md-inline ms-1">{{$item->deleted_at == Null ? 'Archive' : 'Restore'}}</span>
@@ -98,8 +98,6 @@
             @endforelse
           </tbody>
         </table>
-
-
 
         <div>
           {{$users->links()}}

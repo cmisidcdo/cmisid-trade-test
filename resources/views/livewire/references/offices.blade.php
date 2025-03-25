@@ -16,7 +16,7 @@
                                     placeholder="Search offices..."
                                     wire:model.live.debounce.300ms="search"
                                     aria-label="Search offices">
-                                <button class="btn btn-outline-secondary border-start-0 bg-light" type="button"
+                                <button class="btn btn-secondary border-start-0 bg-light" type="button"
                                     wire:loading.class="d-none" wire:target="search"
                                     wire:click="$set('search', '')">
                                     <i class="bi bi-x"></i>
@@ -79,12 +79,12 @@
                                             @endcan
 
                                             @can('delete reference')
-                                            <button class="btn btn-sm {{$item->deleted_at == Null ? 'btn-danger' : 'btn-outline-success'}} rounded-2 px-2 py-1"
+                                            <button class="btn btn-sm {{$item->deleted_at == Null ? 'btn-danger' : 'btn-success'}} rounded-2 px-2 py-1"
                                                 wire:click='{{$item->deleted_at == Null ? 'confirmDelete('.$item->id.')': 'restoreOffice('.$item->id.')'}}'
                                                 data-bs-toggle="tooltip"
-                                                data-bs-title="{{$item->deleted_at == Null ? 'Delete office': 'Restore office'}}">
+                                                data-bs-title="{{$item->deleted_at == Null ? 'Move to Archive': 'Restore office'}}">
                                                 <i class="bi {{$item->deleted_at == Null ? 'bi bi-archive-fill': 'bi-arrow-counterclockwise'}}"></i>
-                                                <span class="d-none d-md-inline ms-1">{{$item->deleted_at == Null ? 'Delete': 'Restore'}}</span>
+                                                <span class="d-none d-md-inline ms-1">{{$item->deleted_at == Null ? 'Archive': 'Restore'}}</span>
                                             </button>
                                             @endcan
                                         </div>
@@ -150,7 +150,7 @@
                                     @enderror
                                 </div>
                                 <div class="d-grid gap-2 d-md-flex justify-content-md-end mt-4">
-                                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal" wire:click='clear'>
+                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" wire:click='clear'>
                                         Cancel
                                     </button>
                                     <button type="submit" class="btn btn-primary px-4">

@@ -171,7 +171,7 @@
                                 @enderror
                             </div>
                             <div class="d-grid gap-2 d-md-flex justify-content-md-end mt-4">
-                                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal" wire:click='clear'>
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" wire:click='clear'>
                                     Cancel
                                 </button>
                                 <button type="submit" class="btn btn-primary px-4">

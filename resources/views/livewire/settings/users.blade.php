@@ -6,43 +6,71 @@
     <div class="card">
       <div class="card-body">
         <div class="row align-items-center pt-3 pb-3">
-          <!-- Search Input -->
-          <div class="col-md-4 text-start">
-            <div class="input-group">
-              <span class="input-group-text bg-light border-end-0">
-                <i class="bi bi-search"></i>
-              </span>
-              <input type="text" class="form-control border-start-0 ps-0"
-                placeholder="Search users..."
-                wire:model.live.debounce.300ms="search"
-                aria-label="Search users">
-              <button class="btn btn-outline-secondary border-start-0 bg-light" type="button"
-                wire:loading.class="d-none" wire:target="search"
-                wire:click="$set('search', '')">
-                <i class="bi bi-x"></i>
+          <div class="d-flex justify-content-between align-items-center mb-3">
+              <button class="btn btn-primary" wire:click="showAddEditModal">
+                  <i class="bi bi-plus"></i> Add User
               </button>
-              <span wire:loading wire:target="search" class="input-group-text bg-light border-start-0">
-                <div class="spinner-border spinner-border-sm text-primary" role="status">
-                  <span class="visually-hidden">Searching...</span>
-                </div>
-              </span>
-            </div>
+      
+              <div class="d-flex gap-2">
+                  <div class="input-group">
+                      <span class="input-group-text bg-light border-end-0">
+                          <i class="bi bi-search"></i>
+                      </span>
+                      <input type="text" class="form-control border-start-0 ps-0"
+                          placeholder="Search users..."
+                          wire:model.live.debounce.300ms="search"
+                          aria-label="Search users">
+                      <button class="btn btn-outline-secondary border-start-0 bg-light" type="button"
+                          wire:loading.class="d-none" wire:target="search"
+                          wire:click="$set('search', '')">
+                          <i class="bi bi-x"></i>
+                      </button>
+                      <span wire:loading wire:target="search" class="input-group-text bg-light border-start-0">
+                          <div class="spinner-border spinner-border-sm text-primary" role="status">
+                              <span class="visually-hidden">Searching...</span>
+                          </div>
+                      </span>
+                  </div>
+      
+                  <div class="dropdown">
+                      <button class="btn btn-outline-primary dropdown-toggle" type="button" id="filterDropdown"
+                          data-bs-toggle="dropdown" aria-expanded="false">
+                          <i class="bi bi-funnel"></i> Filter
+                      </button>
+                      <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="filterDropdown">
+                          <li>
+                              <button class="dropdown-item" wire:click="$set('filterStatus', 'all')">
+                                  <i class="bi bi-list"></i> All Users
+                              </button>
+                          </li>
+                          <li>
+                              <button class="dropdown-item" wire:click="$set('filterStatus', 'yes')">
+                                  <i class="bi bi-person-check"></i> Active Users
+                              </button>
+                          </li>
+                          <li>
+                              <button class="dropdown-item" wire:click="$set('filterStatus', 'no')">
+                                  <i class="bi bi-person-x"></i> Inactive Users
+                              </button>
+                          </li>
+                      </ul>
+                  </div>
+      
+                  <div>
+                      @if($filterStatus !== 'all')
+                          <span class="badge bg-secondary">
+                              <i class="bi bi-funnel"></i> 
+                              {{ $filterStatus === 'yes' ? 'Active Users' : 'Inactive Users' }}
+                              <button class="btn btn-sm btn-outline-light border-0 ms-1" wire:click="$set('filterStatus', 'all')">
+                                  <i class="bi bi-x"></i>
+                              </button>
+                          </span>
+                      @endif
+                  </div>
+              </div>
           </div>
-
-
-          <div class="col-md-8 text-end">
-            <button type="button" class="btn {{ $archive ? 'btn-success' : 'btn-warning' }}" wire:click="toggleArchive">
-              <i class="bi {{ $archive ? 'bi-box-arrow-in-up' : 'bi-archive' }} me-1"></i>
-              {{ $archive ? 'General' : 'View Archive' }}
-            </button>
-
-            @can('create user')
-            <button type="button" class="btn btn-primary" wire:click='clear' data-bs-toggle="modal" data-bs-target="#userModal">
-              <i class="bi bi-person-plus-fill"></i> Add User
-            </button>
-            @endcan
-          </div>
-        </div>
+      </div>
+      
 
         <table class="table table-hover table-bordered table-striped text-center">
           <thead class="table-light">
@@ -81,13 +109,13 @@
                 </button>
                 @endcan
 
-                @can('delete user')
+                {{-- @can('delete user')
                 <button class="btn btn-sm {{$item->deleted_at == Null ? 'btn-danger' : 'btn-outline-success'}} rounded-2 px-2 py-1"
                   wire:click='{{$item->deleted_at == Null ? 'confirmDelete('.$item->id.')' : 'restoreUser('.$item->id.')'}}'>
                   <i class="bi {{$item->deleted_at == Null ? 'bi bi-archive-fill' : 'bi-arrow-counterclockwise'}}"></i>
                   <span class="d-none d-md-inline ms-1">{{$item->deleted_at == Null ? 'Archive' : 'Restore'}}</span>
                 </button>
-                @endcan
+                @endcan --}}
               </td>
             </tr>
             @empty
@@ -242,15 +270,14 @@
                     </select>
                   </div>
 
-
-
-                  {{-- <div class="mb-3">
-                    <label class="form-label fw-bold">Employee ID</label>
-                    <input type="text" class="form-control" wire:model="employeeid" placeholder="Employee ID">
-                    @error('employeeid') <div class="text-danger small">{{ $message }}
-                </div> @enderror
-              </div> --}}
-
+                  <div class="mb-3">
+                    <label class="form-label">Is Active?</label>
+                    <div>
+                        <input type="radio" wire:model="status" value="yes" {{ $status === 'yes' || !$editMode ? 'checked' : '' }}> Yes
+                        <input type="radio" wire:model="status" value="no" {{ $status === 'no' ? 'checked' : '' }}> No
+                    </div>
+                </div>
+ 
 
           </div>
           <div class="col-12 d-flex justify-content-center">

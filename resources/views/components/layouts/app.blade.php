@@ -343,12 +343,7 @@
         <a class="nav-link {{ Request::routeIs('test.*') ? '' : 'collapsed' }}" data-bs-target="#tests-nav" data-bs-toggle="collapse" href="#">
           <i class="bi bi-clipboard-check-fill fs-5"></i><span>Tests</span><i class="bi bi-chevron-down ms-auto"></i>
         </a>
-        <ul id="tests-nav" class="nav-content collapse {{ Request::routeIs('test.*') ? 'show' : '' }}" data-bs-parent="#sidebar-nav">
-          <li>
-            <a class="{{ Request::routeIs('test.createschedule') ? 'active' : '' }}" href="{{ route('test.createschedule') }}">
-              <i class="bi bi-calendar-check-fill fs-5"></i><span>Create Schedule</span>
-            </a>
-          </li>          
+        <ul id="tests-nav" class="nav-content collapse {{ Request::routeIs('test.*') ? 'show' : '' }}" data-bs-parent="#sidebar-nav">         
           <li>
             <a class="{{ Request::routeIs('test.assessment') ? 'active' : '' }}" href="{{ route('test.assessment') }}">
               <i class="bi bi-clipboard-data-fill fs-5"></i><span>Assessment Tests</span>
@@ -362,6 +357,36 @@
           <li>
             <a class="{{ Request::routeIs('test.interview') ? 'active' : '' }}" href="{{ route('test.interview') }}">
               <i class="bi bi-wechat fs-5"></i><span>Oral Interviews</span>
+            </a>
+          </li>
+        </ul>
+      </li><!-- End Charts Nav -->
+    @endcan
+
+    @can('assessor permission')
+      <li class="nav-item">
+        <a class="nav-link {{ Request::routeIs('exam.*') ? '' : 'collapsed' }}" data-bs-target="#exam-nav" data-bs-toggle="collapse" href="#">
+          <i class="bi bi-clipboard-check-fill fs-5"></i><span>Exam Assigning</span><i class="bi bi-chevron-down ms-auto"></i>
+        </a>
+        <ul id="exam-nav" class="nav-content collapse {{ Request::routeIs('exam.*') ? 'show' : '' }}" data-bs-parent="#sidebar-nav">
+          <li>
+            <a class="{{ Request::routeIs('exam.createschedule') ? 'active' : '' }}" href="{{ route('exam.createschedule') }}">
+              <i class="bi bi-calendar-check-fill fs-5"></i><span>Create Schedule</span>
+            </a>
+          </li>          
+          <li>
+            <a class="{{ Request::routeIs('exam.assessmentlist') ? 'active' : '' }}" href="{{ route('exam.assessmentlist') }}">
+              <i class="bi bi-clipboard-data-fill fs-5"></i><span>Assessment Test List</span>
+            </a>
+          </li>
+          <li>
+            <a class="{{ Request::routeIs('exam.practicallist') ? 'active' : '' }}" href="{{ route('exam.practicallist') }}">
+              <i class="bi bi-person-fill-gear fs-5"></i><span>Practical Exam List</span>
+            </a>
+          </li>
+          <li>
+            <a class="{{ Request::routeIs('exam.interviewlist') ? 'active' : '' }}" href="{{ route('exam.interviewlist') }}">
+              <i class="bi bi-wechat fs-5"></i><span>Oral Interview List</span>
             </a>
           </li>
         </ul>

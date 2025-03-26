@@ -247,7 +247,7 @@
                             </div>
 
                             <div class="col-12 d-flex justify-content-end gap-2 mt-4">
-                                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal" wire:click='clear'>
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" wire:click='clear'>
                                     <i class="bi bi-x-circle me-1"></i> Cancel
                                 </button>
                                 <button type="submit" class="btn btn-primary">
@@ -420,7 +420,7 @@
                         </div>
 
                         <div class="d-flex justify-content-end gap-2 mt-4">
-                            <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
                                 <i class="bi bi-x-circle me-1"></i> Close
                             </button>
                         </div>

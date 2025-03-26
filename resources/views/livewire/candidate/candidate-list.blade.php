@@ -220,7 +220,7 @@
 
                    
                     <div class="modal-footer bg-light border-0">
-                        <button type="button" class="btn btn-outline-secondary rounded-2" data-bs-dismiss="modal">Close</button>
+                        <button type="button" class="btn btn-secondary rounded-2" data-bs-dismiss="modal">Close</button>
                     </div>
                 </div>
             </div>
@@ -306,7 +306,7 @@
                             </div>
 
                             <div class="mt-4 text-end">
-                                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal" wire:click='clear'>Cancel</button>
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" wire:click='clear'>Cancel</button>
                                 <button type="submit" class="btn btn-primary px-4">
                                     <span wire:loading.remove wire:target="{{$editMode ? 'updateCandidate' : 'createCandidate'}}">
                                         {{$editMode ? 'Update' : 'Save'}}

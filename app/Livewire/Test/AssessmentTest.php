@@ -6,7 +6,7 @@ use Livewire\Component;
 use App\Models\AssessmentQuestion;
 use App\Models\Position;
 use App\Models\Skill;
-use App\Models\PositionSkill;
+use App\Models\AQChoice;
 use Illuminate\Support\Facades\DB;
 use Livewire\WithPagination;
 use Illuminate\Validation\Rule;
@@ -25,18 +25,16 @@ class AssessmentTest extends Component
 
     public $positions = [];
     public $skills = [];
-    
-    public $position_id;
-    public $skill_id;
-    public $question;
-    public $duration;
-    public $points;
 
-    public $hours = 0;
-    public $minutes = 0;
-    public $seconds = 0;
+    public $choices = [['text' => '', 'status' => '']];
+    
+    public $position_id, $skill_id, $question, $duration, $status;
+    public $points = 1;
+
+    public $hours = 0, $minutes = 0, $seconds = 0;
     public $assessmentquestion_id;
     
+    public $filterStatus = 'all'; 
 
     public $competency_levels = ['basic', 'intermediate', 'advanced'];
     
@@ -73,9 +71,27 @@ class AssessmentTest extends Component
     public function render()
     {
         return view('livewire.test.assessment-test', [
-            'assessmentquestions' => $this->getAssessmentQuestions()
+            'assessmentquestions' => $this->loadAssessmentQuestions()
         ]);
     }
+
+    public function updatingFilterStatus()
+    {
+        $this->resetPage(); 
+    }
+
+
+    public function addChoice()
+    {
+        $this->choices[] = ['text' => '', 'status' => 'incorrect'];
+    }
+
+    public function removeChoice($index)
+    {
+        unset($this->choices[$index]);
+        $this->choices = array_values($this->choices); 
+    }
+
 
     public function updatedSearch()
     {
@@ -122,41 +138,95 @@ class AssessmentTest extends Component
             });
     }
 
+    public function loadAssessmentQuestions()
+    {
+        return AssessmentQuestion::withTrashed()
+            ->with('skill')
+            ->when($this->filterStatus !== 'all', function ($query) {
+                if ($this->filterStatus === 'yes') {
+                    $query->whereNull('deleted_at');
+                } elseif ($this->filterStatus === 'no') {
+                    $query->whereNotNull('deleted_at'); 
+                }
+            })
+            ->when($this->search, function ($query) {
+                $query->where(function ($q) {
+                    $q->where('question', 'like', '%' . $this->search . '%')
+                    ->orWhere('duration','like','%'. $this->search .'%');
+                });
+            })
+            ->paginate(10)
+            ->through(function ($question) {
+                $question->formatted_duration = gmdate("H:i:s", $question->duration);
+                $question->skill_title = $question->skill->title ?? 'N/A'; 
+                $question->competency_level = $question->skill->competency_level ?? 'N/A'; 
+                return $question;
+            });
+    }
+
     public function createAssessmentQuestion()
     {
-        $this->validate();
-
-        // dd([
-        //     'question' => $this->question,
-        //     'points' => $this->points,
-        //     'skill_id' => $this->skill_id,
-        //     'hours' => $this->hours,
-        //     'minutes' => $this->minutes,
-        //     'seconds' => $this->seconds,
-        //     'totalSeconds' => ($this->hours * 3600) + ($this->minutes * 60) + $this->seconds,
-        // ]);
+        try {
+            $this->validate();
+            Log::info('Validation passed.');
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            Log::error('Validation failed.', ['errors' => $e->errors()]);
+            dd($e->errors()); 
+        }
+        
+        // $this->validate();
 
         DB::transaction(function () {
-            $assessmentquestion = new AssessmentQuestion();
-            $assessmentquestion->question = $this->question;
-            $assessmentquestion->points = $this->points;
-            $assessmentquestion->skill_id = $this->skill_id;
-            $totalSeconds = ($this->hours * 3600) + ($this->minutes * 60) + $this->seconds;
+            try {
+                Log::info('Starting transaction for question creation.');
 
-            $assessmentquestion->duration = $totalSeconds;
-            $assessmentquestion->save();
+                $assessmentquestion = new AssessmentQuestion();
+                $assessmentquestion->question = $this->question;
+                $assessmentquestion->points = $this->points;
+                $assessmentquestion->skill_id = $this->skill_id;
+                $totalSeconds = ($this->hours * 3600) + ($this->minutes * 60) + $this->seconds;
+                $assessmentquestion->duration = $totalSeconds;
+                $assessmentquestion->save();
+
+                Log::info('Question created successfully.', ['question_id' => $assessmentquestion->id]);
+
+                foreach ($this->choices as $index => $choice) {
+                    $is_answer = $choice['status'] === 'correct';
+
+                    AQChoice::create([
+                        'question_id' => $assessmentquestion->id,
+                        'choice_text' => $choice['text'],
+                        'is_answer' => $is_answer,
+                    ]);
+
+                    Log::info("Choice {$index} saved.", [
+                        'question_id' => $assessmentquestion->id,
+                        'choice_text' => $choice['text'],
+                        'is_answer' => $is_answer
+                    ]);
+                }
+
+                Log::info('All choices saved successfully.');
+            } catch (\Exception $e) {
+                Log::error('Error while creating assessment question.', ['error' => $e->getMessage()]);
+                throw $e; 
+            }
         });
 
         $this->clear();
         $this->dispatch('hide-assessmentquestionModal');
-        $this->dispatch('success', 'Venue Created Successfully');
+        $this->dispatch('success', 'Question Created Successfully');
     }
+
 
 
     public function clear()
     {
         $this->reset();
         $this->resetValidation();
+        $this->choices = [
+            ['text' => '', 'status' => 'incorrect']
+        ];
     }
 
     public function updateSkills()
@@ -170,6 +240,7 @@ class AssessmentTest extends Component
 
     public function readAssessmentQuestion($assessmentquestionId)
     {
+        $this->clear();
         $assessmentquestion = AssessmentQuestion::withTrashed()->with('skill')->findOrFail($assessmentquestionId);
     
         $this->hours = floor($assessmentquestion->duration / 3600);
@@ -183,46 +254,109 @@ class AssessmentTest extends Component
             'skill_id'       => $assessmentquestion->skill_id,
             'competency_level'  => $assessmentquestion->skill->competency_level ?? 'N/A',
         ]);
-        
+
+        $this->choices = $assessmentquestion->choices->map(function ($choice) {
+            return [
+                'text' => $choice->choice_text,
+                'status' => $choice->is_answer ? 'correct' : 'incorrect'
+            ];
+        })->toArray();
+    
+        if (empty($this->choices)) {
+            $this->choices = [
+                ['text' => '', 'status' => 'incorrect']
+            ];
+        }
+        $this->status = is_null($assessmentquestion->deleted_at) ? 'yes' : 'no';
         $this->updateSkills();
         $this->editMode = true;
         $this->dispatch('show-assessmentquestionModal');
     }
 
     public function updateAssessmentQuestion()
-{
-    Log::info('updateAssessmentQuestion called', [
-        'assessmentquestion_id' => $this->assessmentquestion_id,
-        'question' => $this->question,
-        'points' => $this->points,
-        'skill_id' => $this->skill_id,
-        'hours' => $this->hours,
-        'minutes' => $this->minutes,
-        'seconds' => $this->seconds
-    ]);
+    {
+        Log::info('updateAssessmentQuestion called', [
+            'assessmentquestion_id' => $this->assessmentquestion_id,
+            'question' => $this->question,
+            'points' => $this->points,
+            'skill_id' => $this->skill_id,
+            'hours' => $this->hours,
+            'minutes' => $this->minutes,
+            'seconds' => $this->seconds
+        ]);
 
-    $this->validate();
+        $this->validate();
 
-    DB::transaction(function () {  
-        $assessmentquestion = AssessmentQuestion::withTrashed()->findOrFail($this->assessmentquestion_id);
-        
-        Log::info('AssessmentQuestion found', ['id' => $assessmentquestion->id]);
+        DB::transaction(function () {  
+            $assessmentquestion = AssessmentQuestion::withTrashed()->findOrFail($this->assessmentquestion_id);
+            
+            Log::info('AssessmentQuestion found', ['id' => $assessmentquestion->id]);
 
-        $assessmentquestion->question = $this->question;
-        $assessmentquestion->points = $this->points;
-        $assessmentquestion->skill_id = $this->skill_id;
-        $totalSeconds = ($this->hours * 3600) + ($this->minutes * 60) + $this->seconds;
-        $assessmentquestion->duration = $totalSeconds;
+            $assessmentquestion->question = $this->question;
+            $assessmentquestion->points = $this->points;
+            $assessmentquestion->skill_id = $this->skill_id;
+            $totalSeconds = ($this->hours * 3600) + ($this->minutes * 60) + $this->seconds;
+            $assessmentquestion->duration = $totalSeconds;
 
-        $assessmentquestion->save();
+            if ($this->status === 'no' && is_null($assessmentquestion->deleted_at)) {
+                $assessmentquestion->delete();
+            } elseif ($this->status === 'yes' && !is_null($assessmentquestion->deleted_at)) {
+                $assessmentquestion->restore();
+            } else {
+                $assessmentquestion->save();
+            }
 
-        Log::info('AssessmentQuestion updated', ['id' => $assessmentquestion->id]);
-    });
+            Log::info('AssessmentQuestion updated', ['id' => $assessmentquestion->id]);
 
-    $this->clear();
-    $this->dispatch('hide-assessmentquestionModal');
-    $this->dispatch('success', 'Question updated successfully.');
-}
+            $existingChoices = AQChoice::where('question_id', $assessmentquestion->id)->get();
+
+            $updatedChoiceIds = [];
+
+            foreach ($this->choices as $choice) {
+                if (!empty($choice['id'])) {
+                    $aqChoice = AQChoice::find($choice['id']);
+                    if ($aqChoice) {
+                        $aqChoice->choice_text = $choice['text'];
+                        $aqChoice->is_answer = $choice['status'] === 'correct';
+                        $aqChoice->save();
+
+                        Log::info('Choice updated', [
+                            'id' => $aqChoice->id,
+                            'text' => $choice['text'],
+                            'is_answer' => $aqChoice->is_answer
+                        ]);
+
+                        $updatedChoiceIds[] = $aqChoice->id;
+                    }
+                } else {
+                    $newChoice = AQChoice::create([
+                        'question_id' => $assessmentquestion->id,
+                        'choice_text' => $choice['text'],
+                        'is_answer' => $choice['status'] === 'correct',
+                    ]);
+
+                    Log::info('New choice created', [
+                        'id' => $newChoice->id,
+                        'text' => $choice['text'],
+                        'is_answer' => $newChoice->is_answer
+                    ]);
+
+                    $updatedChoiceIds[] = $newChoice->id;
+                }
+            }
+
+            AQChoice::where('question_id', $assessmentquestion->id)
+                ->whereNotIn('id', $updatedChoiceIds)
+                ->delete();
+
+            Log::info('Unused choices deleted if any.');
+        });
+
+        $this->clear();
+        $this->dispatch('hide-assessmentquestionModal');
+        $this->dispatch('success', 'Question and choices updated successfully.');
+    }
+
 
     public function confirmDelete($id)
     {
@@ -253,6 +387,9 @@ class AssessmentTest extends Component
     public function showAddEditModal()
     {
         $this->clear();
+        if (!$this->editMode) { 
+            $this->status = 'yes'; 
+        }
         $this->dispatch('show-assessmentquestionModal');
     }
 }

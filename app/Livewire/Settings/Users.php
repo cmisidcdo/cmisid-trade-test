@@ -255,9 +255,7 @@ class Users extends Component
             } elseif ($this->status === 'yes' && !is_null($user->deleted_at)) {
                 $user->restore();
             } else {
-                $user->timestamps = false;
                 $user->save();
-                $user->timestamps = true;
             }
 
             $user->syncPermissions($this->permissions);

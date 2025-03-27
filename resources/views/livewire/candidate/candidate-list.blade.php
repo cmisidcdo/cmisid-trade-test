@@ -6,48 +6,69 @@
         <div class="card shadow-sm border-0 rounded-3">
             <div class="card-body p-4">
 
-                <div class="row mb-4 align-items-center">
-                    <div class="col-md-6">
-                        <div class="input-group">
-                            <span class="input-group-text bg-light border-end-0">
-                                <i class="bi bi-search"></i>
-                            </span>
-                            <input type="text" class="form-control border-start-0 ps-0"
-                                placeholder="Search candidates..."
-                                wire:model.live.debounce.300ms="search"
-                                aria-label="Search candidates">
-                            <button class="btn btn-outline-secondary border-start-0 bg-light" type="button"
-                                wire:loading.class="d-none" wire:target="search"
-                                wire:click="$set('search', '')">
-                                <i class="bi bi-x"></i>
-                            </button>
-                            <span wire:loading wire:target="search" class="input-group-text bg-light border-start-0">
-                                <div class="spinner-border spinner-border-sm text-primary" role="status">
-                                    <span class="visually-hidden">Searching...</span>
-                                </div>
-                            </span>
-                        </div>
-                        <div id="searchSuggestions" class="position-absolute bg-white shadow-sm rounded p-2 d-none">
-                        </div>
-                    </div>
-                    <div class="col-md-6 text-md-end mt-3 mt-md-0">
-                        <button type="button" class="btn btn-warning me-2"
-                            wire:click="toggleArchive"
-                            aria-label="{{ $archive ? 'View general candidates' : 'View archived candidates' }}">
-                            <i class="bi {{ $archive ? 'bi-box-arrow-in-up' : 'bi-archive' }} me-1"></i>
-                            {{ $archive ? 'View Active' : 'View Archive' }}
-                            <span class="badge bg-secondary ms-1 rounded-pill" wire:loading wire:target="toggleArchive">
-                                <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
-                            </span>
+                <div class="row align-items-center pt-3 pb-3">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <button class="btn btn-primary" wire:click="showAddEditModal">
+                            <i class="bi bi-plus"></i> Add Candidate
                         </button>
-                        @can('create candidate')
-                        <button type="button" class="btn btn-primary"
-                            wire:click='clear'
-                            data-bs-toggle="modal"
-                            data-bs-target="#candidateModal">
-                            <i class="bi bi-plus-lg me-1"></i> Add Candidate
-                        </button>
-                        @endcan
+                
+                        <div class="d-flex gap-2">
+                            <div class="input-group">
+                                <span class="input-group-text bg-light border-end-0">
+                                    <i class="bi bi-search"></i>
+                                </span>
+                                <input type="text" class="form-control border-start-0 ps-0"
+                                    placeholder="Search candidates..."
+                                    wire:model.live.debounce.300ms="search"
+                                    aria-label="Search candidates">
+                                <button class="btn btn-outline-secondary border-start-0 bg-light" type="button"
+                                    wire:loading.class="d-none" wire:target="search"
+                                    wire:click="$set('search', '')">
+                                    <i class="bi bi-x"></i>
+                                </button>
+                                <span wire:loading wire:target="search" class="input-group-text bg-light border-start-0">
+                                    <div class="spinner-border spinner-border-sm text-primary" role="status">
+                                        <span class="visually-hidden">Searching...</span>
+                                    </div>
+                                </span>
+                            </div>
+                
+                            <div class="dropdown">
+                                <button class="btn btn-outline-primary dropdown-toggle" type="button" id="filterDropdown"
+                                    data-bs-toggle="dropdown" aria-expanded="false">
+                                    <i class="bi bi-funnel"></i> Filter
+                                </button>
+                                <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="filterDropdown">
+                                    <li>
+                                        <button class="dropdown-item" wire:click="$set('filterStatus', 'all')">
+                                            <i class="bi bi-list"></i> All Candidates
+                                        </button>
+                                    </li>
+                                    <li>
+                                        <button class="dropdown-item" wire:click="$set('filterStatus', 'yes')">
+                                            <i class="bi bi-person-check"></i> Active Candidates
+                                        </button>
+                                    </li>
+                                    <li>
+                                        <button class="dropdown-item" wire:click="$set('filterStatus', 'no')">
+                                            <i class="bi bi-person-x"></i> Inactive Candidates
+                                        </button>
+                                    </li>
+                                </ul>
+                            </div>
+                
+                            <div>
+                                @if($filterStatus !== 'all')
+                                    <span class="badge bg-secondary">
+                                        <i class="bi bi-funnel"></i> 
+                                        {{ $filterStatus === 'yes' ? 'Active' : 'Inactive' }}
+                                        <button class="btn btn-sm btn-outline-light border-0 ms-1" wire:click="$set('filterStatus', 'all')">
+                                            <i class="bi bi-x"></i>
+                                        </button>
+                                    </span>
+                                @endif
+                            </div>
+                        </div>
                     </div>
                 </div>
 
@@ -89,9 +110,7 @@
                                     <div class="btn-group" role="group" aria-label="Candidate actions">
 
                                         <button class="btn btn-sm btn-info rounded-2 d-flex align-items-center px-2 py-1 me-2"
-                                            wire:click="({{ $item->id }})"
-                                            data-bs-toggle="modal"
-                                            data-bs-target="#viewCandidateModal"
+                                            wire:click='viewCandidate({{ $item->id }})'
                                             data-bs-toggle="tooltip"
                                             data-bs-title="View Candidate">
                                             <i class="bi bi-eye"></i>
@@ -109,7 +128,7 @@
                                         </button>
                                         @endcan
 
-                                        @can('delete candidate')
+                                        {{-- @can('delete candidate')
                                         <button class="btn btn-sm rounded-2 px-2 py-1 me-2 {{$item->deleted_at == Null ? 'btn-danger' : 'btn-outline-success'}}"
                                             wire:click='{{$item->deleted_at == Null ? 'deleteCandidate('.$item->id.')' : 'restoreCandidate('.$item->id.')'}}'
                                             data-bs-toggle="tooltip"
@@ -117,7 +136,7 @@
                                             <i class="bi {{$item->deleted_at == Null ? 'bi-trash' : 'bi-arrow-counterclockwise'}}"></i>
                                             <span class="d-none d-md-inline ms-1">{{$item->deleted_at == Null ? 'Delete' : 'Restore'}}</span>
                                         </button>
-                                        @endcan
+                                        @endcan --}}
                                     </div>
                                 </td>
 
@@ -151,12 +170,13 @@
                 </div>
             </div>
         </div>
-        <div class="modal fade" id="viewCandidateModal" tabindex="-1" aria-labelledby="viewCandidateModalLabel" aria-hidden="true" wire:ignore.self>
+
+        <div class="modal fade" id="viewModal" tabindex="-1" aria-labelledby="viewModalLabel" aria-hidden="true" wire:ignore.self>
             <div class="modal-dialog modal-dialog-centered modal-lg">
                 <div class="modal-content border-0 shadow-lg rounded-3">
                    
                     <div class="modal-header bg-primary text-white">
-                        <h5 class="modal-title fw-semibold" id="viewCandidateModalLabel">
+                        <h5 class="modal-title fw-semibold" id="viewModalLabel">
                             <i class="bi bi-eye me-2"></i> Candidate Details
                         </h5>
                         <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
@@ -167,53 +187,53 @@
                         <div class="row mb-3">
                             <div class="col-md-6 d-flex align-items-center gap-2">
                                 <strong>Full Name:</strong>
-                                <p class="m-0">John Doe</p>
+                                <p class="m-0">{{ $candidate?->fullname }}</p>
                             </div>
                             <div class="col-md-6 d-flex align-items-center gap-2">
                                 <strong>Email:</strong>
-                                <p class="m-0">johndoe@example.com</p>
+                                <p class="m-0">{{ $candidate?->email }}</p>
                             </div>
                         </div>
 
                         <div class="row mb-3">
                             <div class="col-md-6 d-flex align-items-center gap-2">
                                 <strong>Contact No:</strong>
-                                <p class="m-0">+1 234 567 8901</p>
+                                <p class="m-0">{{ $candidate?->contactno }}</p>
                             </div>
                             <div class="col-md-6 d-flex align-items-center gap-2">
                                 <strong>Position Applied:</strong>
-                                <p class="m-0">Software Developer</p>
+                                <p class="m-0">{{ $candidate?->position?->title ?? 'N/A' }}</p> 
                             </div>
                         </div>
 
                         <div class="row mb-3">
                             <div class="col-md-6 d-flex align-items-center gap-2">
                                 <strong>Office Applied:</strong>
-                                <p class="m-0">IT Department</p>
+                                <p class="m-0">{{ $candidate?->office?->title ?? 'N/A' }}</p>
                             </div>
                             <div class="col-md-6 d-flex align-items-center gap-2">
                                 <strong>Priority Group:</strong>
-                                <p class="m-0">High Priority</p>
+                                <p class="m-0">{{ $candidate?->priorityGroup?->title ?? 'N/A' }}</p>
                             </div>
                         </div>
 
                         <div class="row mb-3">
                             <div class="col-md-6 d-flex align-items-center gap-2">
                                 <strong>Endorsement Date:</strong>
-                                <p class="m-0">March 22, 2025</p>
+                                <p class="m-0">{{ $candidate?->endorsement_date }}</p>
                             </div>
                             <div class="col-md-6 d-flex align-items-center gap-2">
                                 <strong>Status:</strong>
-                                <p class="m-0">
-                                    <span class="badge bg-success px-3 py-2">Active</span>
-                                </p>
+                                <span class="badge rounded-pill {{$candidate?->deleted_at == Null ? 'bg-success': 'bg-danger'}}">
+                                    {{$candidate?->deleted_at == Null ? 'Active': 'Inactive'}}
+                                </span>
                             </div>
                         </div>
 
                         <div class="row">
                             <div class="col-12 text-center">
                                 <strong class="d-block">Remarks:</strong>
-                                <p class="m-0">Excellent candidate with strong technical skills.</p>
+                                <p class="m-0">{{ $candidate?->remarks }}</p>
                             </div>
                         </div>
                     </div>
@@ -294,11 +314,22 @@
 
                             <div class="row g-3 mt-1">
                                 <div class="col-md-6">
+                                    <label class="form-label">Is Active?</label>
+                                    <div>
+                                        <input type="radio" wire:model="status" value="yes" {{ $status === 'yes' || !$editMode ? 'checked' : '' }}> Yes
+                                        <input type="radio" wire:model="status" value="no" {{ $status === 'no' ? 'checked' : '' }}> No
+                                    </div>
+                                </div>
+
+                                <div class="col-md-6">
                                     <label for="endorsement_date" class="form-label">Endorsement Date</label>
                                     <input type="date" class="form-control" id="endorsement_date" wire:model="endorsement_date" required>
                                     @error('endorsement_date') <span class="text-danger">{{ $message }}</span> @enderror
                                 </div>
-                                <div class="col-md-6">
+                            </div>
+
+                            <div class="row g-3 mt-1">
+                                <div class="col-md-12">
                                     <label for="remarks" class="form-label">Remarks</label>
                                     <textarea class="form-control" id="remarks" wire:model="remarks" rows="3"></textarea>
                                     @error('remarks') <span class="text-danger">{{ $message }}</span> @enderror
@@ -387,54 +418,20 @@
         $('#candidateModal').modal('show');
     });
 
-    $wire.on('candidate-deleted', () => {
+    $wire.on('hide-viewModal', () => {
+        console.log('Hiding view modal');
+        $('#viewModal').modal('hide');
+
         const toast = new bootstrap.Toast(document.getElementById('successToast'));
-        document.getElementById('successMessage').textContent = 'Candidate deleted successfully!';
+        document.getElementById('successMessage').textContent = 'view saved successfully!';
         toast.show();
     });
 
-    $wire.on('candidate-restored', () => {
-        const toast = new bootstrap.Toast(document.getElementById('successToast'));
-        document.getElementById('successMessage').textContent = 'Candidate restored successfully!';
-        toast.show();
+    $wire.on('show-viewModal', () => {
+        console.log('Showing view modal');
+        $('#viewModal').modal('show');
     });
 
-    const searchInput = document.querySelector('[wire:model\\.live\\.debounce\\.300ms="search"]');
-    const suggestionsDiv = document.getElementById('searchSuggestions');
 
-    if (searchInput && suggestionsDiv) {
-        searchInput.addEventListener('focus', function() {
-            if (this.value.length > 1) {
-                suggestionsDiv.classList.remove('d-none');
-            }
-        });
-
-        searchInput.addEventListener('blur', function() {
-            setTimeout(() => {
-                suggestionsDiv.classList.add('d-none');
-            }, 200);
-        });
-
-        searchInput.addEventListener('input', function() {
-            if (this.value.length > 1) {
-                suggestionsDiv.classList.remove('d-none');
-            } else {
-                suggestionsDiv.classList.add('d-none');
-            }
-        });
-    }
-    document.addEventListener('DOMContentLoaded', function() {
-        window.addEventListener('show-candidateModal', event => {
-            var modal = new bootstrap.Modal(document.getElementById('candidateModal'));
-            modal.show();
-        });
-
-        window.addEventListener('hide-candidateModal', event => {
-            var modal = bootstrap.Modal.getInstance(document.getElementById('candidateModal'));
-            if (modal) {
-                modal.hide();
-            }
-        });
-    });
 </script>
 @endscript

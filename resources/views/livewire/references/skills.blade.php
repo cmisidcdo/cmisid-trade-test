@@ -2,9 +2,7 @@
     <div class="card-header text-white text-center py-3" style="background-color: #1a1851; border-radius: 12px 12px 0 0;">
         <h2 class="fw-bold m-0">Skills</h2>
     </div>
-    <section class="section dashboard">
-        <div class="card shadow-sm border-0 rounded-3">
-            <div class="card-body p-4">
+
 
                 <div class="row mb-4 align-items-center">
                     <div class="col-md-6">

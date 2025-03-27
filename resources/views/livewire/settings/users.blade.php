@@ -96,7 +96,7 @@
               <td class="d-flex justify-content-center">
                 <button class="btn btn-sm btn-info rounded-2 px-2 py-1 me-2"
                   wire:click="viewUser({{$item->id}})">
-                  <i class="bi bi-eye-fill"></i>
+                  <i class="bi bi-eye"></i>
                   <span class="d-none d-md-inline ms-1">View</span>
                 </button>
 

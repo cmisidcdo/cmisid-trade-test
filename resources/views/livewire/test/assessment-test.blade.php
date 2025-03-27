@@ -4,7 +4,7 @@
         <div class="card-header text-white text-center py-3" style="background-color: #1a1851; border-radius: 12px 12px 0 0;">
             <h2 class="fw-bold m-0">Assessment Tests</h2>
         </div>
-    
+
         <div class="card-body bg-white p-4">
 
             <div class="row align-items-center pt-3 pb-3">
@@ -72,10 +72,10 @@
                     </div>
                 </div>
             </div>
-                
+
             <!-- Data table -->
             <div class="table-responsive">
-                <table class="table table-hover">
+                <table class="table table-hover table-bordered table-striped text-center">
                     <thead style="background-color: #f8f9fa;">
                         <tr>
                             <th class="text-center" style="width: 5%;">#</th>
@@ -93,13 +93,14 @@
                         <tr>
                             <td scope="row" class="text-center" style="width: 5%;">{{$loop->iteration}}</td>
                             <td>{{$item->question}}</td>
-                            <td  class="text-center" >
+                            <td class="text-center">
                                 <span class="badge rounded-pill 
                                     {{ $item->competency_level == 'basic' ? 'bg-info' : 
                                     ($item->competency_level == 'intermediate' ? 'bg-primary' : 'bg-dark') }}">
                                     {{ ucfirst($item->competency_level) }}
                                 </span>
                             </td>
+
                             <td  class="text-center" >{{$item->skill_title}}</td>
                             <td  class="text-center" >{{$item->formatted_duration}}</td>
                             <td class="text-center">
@@ -107,6 +108,7 @@
                                     {{$item->deleted_at == Null ? 'Active': 'Inactive'}}
                                 </span>
                             </td>
+
                             <td class="d-flex justify-content-center">
                                 @can('update reference')
                                 <button class="btn btn-sm btn-primary rounded-2 px-2 py-1 me-2"
@@ -117,6 +119,7 @@
                                     <span class="d-none d-md-inline ms-1">Edit</span>
                                 </button>
                                 @endcan
+
                     
                                 {{-- @can('delete reference')
                                 <button class="btn btn-sm {{$item->deleted_at == null ? 'btn-danger' : 'btn-outline-success'}} rounded-2 px-2 py-1"
@@ -138,16 +141,16 @@
                         </tr>
                         @endforelse
                     </tbody>
-                    
+
                 </table>
             </div>
             <div>
                 {{$assessmentquestions->links()}}
-            </div>    
+            </div>
             <!-- Footer with pagination and record count -->
         </div>
     </div>
-    
+
     <!-- Add Assessment Question Modal -->
     <div class="modal fade" id="assessmentquestionModal" tabindex="-1" aria-labelledby="assessmentquestionModalLabel" aria-hidden="true" wire:ignore.self>
         <div class="modal-dialog modal-dialog-centered modal-lg">
@@ -166,7 +169,7 @@
                                 <select class="form-select form-select-sm fs-7" id="competency_level" wire:model.live="competency_level">
                                     <option value="" class="fs-7">Select Level</option>
                                     @foreach($competency_levels as $level)
-                                        <option value="{{ $level }}" class="fs-7">{{ ucfirst($level) }}</option>
+                                    <option value="{{ $level }}" class="fs-7">{{ ucfirst($level) }}</option>
                                     @endforeach
                                 </select>
                             </div>
@@ -175,27 +178,27 @@
                                 <select class="form-select form-select-sm fs-7" wire:model="skill_id">
                                     <option value="" class="fs-7">Select Skill</option>
                                     @foreach ($skills as $skill)
-                                        <option value="{{ $skill->id }}" class="fs-7"
-                                            @if($skill->id == $skill_id) selected @endif>
-                                            {{ $skill->title }}
-                                        </option>
+                                    <option value="{{ $skill->id }}" class="fs-7"
+                                        @if($skill->id == $skill_id) selected @endif>
+                                        {{ $skill->title }}
+                                    </option>
                                     @endforeach
                                 </select>
                             </div>
                         </div>
-    
+
                         <div class="mb-2">
                             <label for="question" class="form-label fw-bold fs-7">Question</label>
                             <textarea class="form-control form-control-sm fs-7" id="question" rows="2" wire:model="question" placeholder="Enter your question here"></textarea>
                         </div>
-    
+
                         <div class="row mb-2">
                             <div class="col-6">
                                 <label for="points" class="form-label fw-bold fs-7">Point(s)</label>
                                 <select class="form-select form-select-sm fs-7" id="points" wire:model.defer="points">
                                     @for ($i = 1; $i <= 10; $i++)
                                         <option value="{{ $i }}" class="fs-7">{{ $i }}</option>
-                                    @endfor
+                                        @endfor
                                 </select>
                                 
                             </div>
@@ -214,7 +217,7 @@
                                 </div>
                             </div>
                         </div>
-    
+
                         <div class="mb-2">
                             <label class="form-label fw-semibold">Is Active?</label>
                             <div>
@@ -317,7 +320,7 @@
                         
     
                         <div class="d-flex justify-content-between mt-3">
-                            <button type="button" class="btn btn-outline-secondary btn-sm px-3 fs-7" data-bs-dismiss="modal">
+                            <button type="button" class="btn btn-secondary btn-sm px-3 fs-7" data-bs-dismiss="modal">
                                 Go Back
                             </button>
                             <button type="submit" class="btn btn-primary btn-sm px-3 fs-7">
@@ -331,57 +334,57 @@
     </div>
 
 
-<!-- View Assessment Question Modal -->
-<div class="modal fade" id="viewAssessmentModal" tabindex="-1" aria-labelledby="viewAssessmentModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content rounded-3 shadow">
-            <div class="modal-header bg-primary text-white">
-                <h5 class="modal-title" id="viewAssessmentModalLabel">View Assessment Question</h5>
-                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body p-4">
-                <form class="needs-validation" wire:submit="{{$editMode ? 'updateAssessmentQuestion' : 'createAssessmentQuestion'}}">
-                    <div class="row mb-4">
-                        <div class="col-md-6">
-                            <label for="viewPosition" class="form-label fw-bold">Add Position</label>
-                            <div class="input-group">
-                                <select class="form-select form-select-sm" id="viewPosition" disabled>
-                                    <option value="human-resources" selected>Human Resources</option>
+    <!-- View Assessment Question Modal -->
+    <div class="modal fade" id="viewAssessmentModal" tabindex="-1" aria-labelledby="viewAssessmentModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content rounded-3 shadow">
+                <div class="modal-header bg-primary text-white">
+                    <h5 class="modal-title" id="viewAssessmentModalLabel">View Assessment Question</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body p-4">
+                    <form class="needs-validation" wire:submit="{{$editMode ? 'updateAssessmentQuestion' : 'createAssessmentQuestion'}}">
+                        <div class="row mb-4">
+                            <div class="col-md-6">
+                                <label for="viewPosition" class="form-label fw-bold">Add Position</label>
+                                <div class="input-group">
+                                    <select class="form-select form-select-sm" id="viewPosition" disabled>
+                                        <option value="human-resources" selected>Human Resources</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="viewSkill" class="form-label fw-bold">Choose Skill</label>
+                                <div class="input-group">
+                                    <select class="form-select form-select-sm" id="viewSkill" disabled>
+                                        <option value="analytical-thinking" selected>Analytical Thinking</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="mb-2">
+                            <label for="viewQuestion" class="form-label fw-bold">Question:</label>
+                            <textarea class="form-control form-control-sm" id="viewQuestion" rows="3" disabled>Can you describe your experience...</textarea>
+                        </div>
+
+                        <div class="row mb-2">
+                            <div class="col-md-6">
+                                <label for="viewPoints" class="form-label fw-bold">Point(s)</label>
+                                <select class="form-select form-select-sm" id="viewPoints" disabled>
+                                    <option value="1" selected>1</option>
                                 </select>
                             </div>
-                        </div>
-                        <div class="col-md-6">
-                            <label for="viewSkill" class="form-label fw-bold">Choose Skill</label>
-                            <div class="input-group">
-                                <select class="form-select form-select-sm" id="viewSkill" disabled>
-                                    <option value="analytical-thinking" selected>Analytical Thinking</option>
-                                </select>
+                            <div class="col-md-6">
+                                <label for="viewTimeDuration" class="form-label fw-bold">Time Duration</label>
+                                <div class="input-group">
+                                    <input type="text" class="form-control form-control-sm" id="viewTimeDuration" value="00:03:00" disabled>
+                                    <span class="input-group-text bg-light">
+                                        <i class="far fa-clock"></i>
+                                    </span>
+                                </div>
                             </div>
                         </div>
-                    </div>
-
-                    <div class="mb-2">
-                        <label for="viewQuestion" class="form-label fw-bold">Question:</label>
-                        <textarea class="form-control form-control-sm" id="viewQuestion" rows="3" disabled>Can you describe your experience...</textarea>
-                    </div>
-
-                    <div class="row mb-2">
-                        <div class="col-md-6">
-                            <label for="viewPoints" class="form-label fw-bold">Point(s)</label>
-                            <select class="form-select form-select-sm" id="viewPoints" disabled>
-                                <option value="1" selected>1</option>
-                            </select>
-                        </div>
-                        <div class="col-md-6">
-                            <label for="viewTimeDuration" class="form-label fw-bold">Time Duration</label>
-                            <div class="input-group">
-                                <input type="text" class="form-control form-control-sm" id="viewTimeDuration" value="00:03:00" disabled>
-                                <span class="input-group-text bg-light">
-                                    <i class="far fa-clock"></i>
-                                </span>
-                            </div>
-                        </div>
-                    </div>
 
                     <div class="mb-2">
                         <label class="form-label fw-semibold">Is Active?</label>
@@ -389,50 +392,48 @@
                             <input type="radio" wire:model="status" value="yes" {{ $status === 'yes' || !$editMode ? 'checked' : '' }}> Yes
                             <input type="radio" wire:model="status" value="no" {{ $status === 'no' ? 'checked' : '' }}> No
                         </div>
-                    </div>
 
-                    <div class="mb-2">
-                        <p class="fw-bold mb-1">Choices:</p>
-                        <div class="input-group mb-2">
-                            <div class="input-group-text">
-                                <input class="form-check-input mt-0" type="radio" name="viewCorrectAnswer" value="1" checked disabled>
+                        <div class="mb-2">
+                            <p class="fw-bold mb-1">Choices:</p>
+                            <div class="input-group mb-2">
+                                <div class="input-group-text">
+                                    <input class="form-check-input mt-0" type="radio" name="viewCorrectAnswer" value="1" checked disabled>
+                                </div>
+                                <input type="text" class="form-control form-control-sm" value="Option 1" disabled>
                             </div>
-                            <input type="text" class="form-control form-control-sm" value="Option 1" disabled>
-                        </div>
-                        <div class="input-group mb-2">
-                            <div class="input-group-text">
-                                <input class="form-check-input mt-0" type="radio" name="viewCorrectAnswer" value="2" disabled>
+                            <div class="input-group mb-2">
+                                <div class="input-group-text">
+                                    <input class="form-check-input mt-0" type="radio" name="viewCorrectAnswer" value="2" disabled>
+                                </div>
+                                <input type="text" class="form-control form-control-sm" value="Option 2" disabled>
                             </div>
-                            <input type="text" class="form-control form-control-sm" value="Option 2" disabled>
                         </div>
-                    </div>
 
-                    <div class="d-flex justify-content-between mt-4">
-                        <button type="button" class="btn btn-outline-secondary rounded-pill px-4" data-bs-dismiss="modal">
-                            <i class="fas fa-arrow-left me-1"></i> Go Back
-                        </button>
-                    </div>
-                </form>
+                        <div class="d-flex justify-content-between mt-4">
+                            <button type="button" class="btn btn-outline-secondary rounded-pill px-4" data-bs-dismiss="modal">
+                                <i class="fas fa-arrow-left me-1"></i> Go Back
+                            </button>
+                        </div>
+                    </form>
+                </div>
             </div>
         </div>
     </div>
-</div>
 
-@script
-<script>
-    $wire.on('hide-assessmentquestionModal', () => {
-        console.log('Hiding assessmentquestion modal');
-        $('#assessmentquestionModal').modal('hide');
+    @script
+    <script>
+        $wire.on('hide-assessmentquestionModal', () => {
+            console.log('Hiding assessmentquestion modal');
+            $('#assessmentquestionModal').modal('hide');
 
-        const toast = new bootstrap.Toast(document.getElementById('successToast'));
-        document.getElementById('successMessage').textContent = 'assessmentquestion saved successfully!';
-        toast.show();
-    });
+            const toast = new bootstrap.Toast(document.getElementById('successToast'));
+            document.getElementById('successMessage').textContent = 'assessmentquestion saved successfully!';
+            toast.show();
+        });
 
-    $wire.on('show-assessmentquestionModal', () => {
-        console.log('Showing assessmentquestion modal');
-        $('#assessmentquestionModal').modal('show');
-    });
-
-</script>
-@endscript
+        $wire.on('show-assessmentquestionModal', () => {
+            console.log('Showing assessmentquestion modal');
+            $('#assessmentquestionModal').modal('show');
+        });
+    </script>
+    @endscript

@@ -1,8 +1,6 @@
 <?php
 
-use App\Livewire\Candidate\AddCandidate;
 use App\Livewire\Candidate\CandidateList;
-use App\Livewire\Candidate\UpdateCandidate;
 use App\Livewire\Exam\Assessmentlist;
 use App\Livewire\Exam\Interviewlist;
 use App\Livewire\Exam\Practicallist;
@@ -50,8 +48,6 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/references/criterias', EvaluationCriterias::class)->name('references.criterias');
     Route::get('/references/prioritygroups', PriorityGroups::class)->name('references.prioritygroups');
     Route::get('/candidate/list', CandidateList::class)->name('candidate.list');
-    Route::get('/candidate/add', AddCandidate::class)->name('candidate.add');
-    Route::get('/candidate/update', UpdateCandidate::class)->name('candidate.update');
     Route::get('/test/assessmenttests', AssessmentTest::class)->name('test.assessment');
     Route::get('/test/practicalexams', PracticalExam::class)->name('test.practical');
     Route::get('/test/oralinterveiws', OralInterview::class)->name('test.interview');

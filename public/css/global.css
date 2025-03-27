@@ -46,6 +46,6 @@
 }
 
 .modal-header {
-    background-color: #007bff !important; /* Bootstrap primary blue */
-    color: white !important;
+    background-color: #ffffff !important; /* Bootstrap primary blue */
+    color: rgb(0, 0, 0) !important;
 }

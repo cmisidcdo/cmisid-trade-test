@@ -20,9 +20,10 @@ class CandidateList extends Component
     public $archive = false;
 
     public $search;
+    public $filterStatus = 'all'; 
     public $title, $candidate_id;
     public $positions = [], $offices = [], $priorityGroups = [];
-    public $fullname, $email, $contactno, $remarks, $position_id, $office_id, $priority_group_id;
+    public $candidate, $fullname, $email, $contactno, $remarks, $position_id, $office_id, $priority_group_id, $status;
     public $endorsement_date;
 
     public function mount()
@@ -32,15 +33,24 @@ class CandidateList extends Component
         if(!$user->can('read candidate')){
             abort(403);
         }
+
+        $this->positions = Position::all();
+        $this->offices = Office::all();
+        $this->priorityGroups = PriorityGroup::all();
     }
 
     public function render()
     {
         return view('livewire.candidate.candidate-list', [
-            'candidates' => $this->getCandidates()
+            'candidates' => $this->loadCandidates()
         ]);
     }
-    
+
+    public function updatingFilterStatus()
+    {
+        $this->resetPage(); 
+    }
+
 
     public function updatedSearch()
     {
@@ -76,6 +86,30 @@ class CandidateList extends Component
             ->paginate(10);
     }
 
+    public function loadCandidates()
+    {
+        return Candidate::withTrashed()
+            ->with(['office', 'position', 'priorityGroup'])
+            ->when($this->filterStatus !== 'all', function ($query) {
+                if ($this->filterStatus === 'yes') {
+                    $query->whereNull('deleted_at');
+                } elseif ($this->filterStatus === 'no') {
+                    $query->whereNotNull('deleted_at'); 
+                }
+            })
+            ->when($this->search, function ($query) {
+                $query->where(function ($q) {
+                    $q->where('fullname', 'like', '%' . $this->search . '%')
+                    ->orWhereHas('office', function ($subQuery) { 
+                        $subQuery->where('title', 'like', '%' . $this->search . '%');
+                    });
+                });
+            })
+            ->paginate(10);
+    }
+
+
+
 
     public function createCandidate()
     {
@@ -100,6 +134,7 @@ class CandidateList extends Component
             $candidate->priority_group_id = $this->priority_group_id;
             $candidate->endorsement_date = $this->endorsement_date;
             $candidate->remarks = $this->remarks;
+            $candidate->deleted_at = $this->status === 'no' ? now() : null;
             $candidate->save();
         });
     
@@ -131,12 +166,13 @@ class CandidateList extends Component
             'priority_group_id' => $candidate->priority_group_id,
             'endorsement_date' => $candidate->endorsement_date 
                 ? Carbon::parse($candidate->endorsement_date)->format('Y-m-d') 
-                : null,  // ✅ Convert only if not null
+                : null, 
             'remarks' => $candidate->remarks,
         ]);
         
 
         $this->candidate_id = $candidate->id;
+        $this->status = is_null($candidate->deleted_at) ? 'yes' : 'no';
         $this->editMode = true;
         $this->dispatch('show-candidateModal');
     }
@@ -175,7 +211,13 @@ class CandidateList extends Component
             $candidate->endorsement_date = $this->endorsement_date;
             $candidate->remarks = $this->remarks;
             
-            $candidate->save();
+            if ($this->status === 'no' && is_null($candidate->deleted_at)) {
+                $candidate->delete();
+            } elseif ($this->status === 'yes' && !is_null($candidate->deleted_at)) {
+                $candidate->restore();
+            } else {
+                $candidate->save();
+            }
         });
 
         $this->clear();
@@ -198,4 +240,23 @@ class CandidateList extends Component
     
         $this->dispatch('success', 'Candidate restored successfully.');
     }
+
+    public function showAddEditModal()
+    {
+        $this->clear();
+    
+        if (!$this->editMode) { 
+            $this->status = 'yes'; 
+        }
+    
+        $this->dispatch('show-candidateModal');
+    }
+
+    public function viewCandidate($candidateId)
+    {
+        $this->candidate = Candidate::withTrashed()->findOrFail($candidateId);
+
+        $this->dispatch('show-viewModal');
+    }
+
 }

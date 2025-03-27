@@ -16,7 +16,8 @@ class Skills extends Component
     public $archive = false;
 
     public $search;
-    public $title, $skill_id, $competency_level;
+    public $filterStatus = 'all'; 
+    public $title, $skill_id, $competency_level, $status;
 
     protected $listeners = ['deleteSkill'];
 
@@ -32,9 +33,16 @@ class Skills extends Component
     public function render()
     {
         return view('livewire.references.skills', [
-            'skills' => $this->getSkills()
+            'skills' => $this->loadSkills()
         ]);
     }
+
+    
+    public function updatingFilterStatus()
+    {
+        $this->resetPage(); 
+    }
+
     
 
     public function updatedSearch()
@@ -75,6 +83,24 @@ class Skills extends Component
             ->paginate(10);
     }
 
+    public function loadSkills()
+    {
+        return Skill::withTrashed()
+            ->when($this->filterStatus !== 'all', function ($query) {
+                if ($this->filterStatus === 'yes') {
+                    $query->whereNull('deleted_at');
+                } elseif ($this->filterStatus === 'no') {
+                    $query->whereNotNull('deleted_at'); 
+                }
+            })
+            ->when($this->search, function ($query) {
+                $query->where(function ($q) {
+                    $q->where('title', 'like', '%' . $this->search . '%');
+                });
+            })
+            ->paginate(10);
+    }
+
     public function createSkill()
     {
         $this->validate();
@@ -82,6 +108,7 @@ class Skills extends Component
             $skill = new Skill();
             $skill->title = $this->title;
             $skill->competency_level = $this->competency_level;
+            $skill->deleted_at = $this->status === 'no' ? now() : null;
             $skill->save();
         });
 
@@ -108,6 +135,7 @@ class Skills extends Component
         $this->skill_id = $skill->id;
         $this->competency_level = $skill->competency_level;
         $this->editMode = true;
+        $this->status = is_null($skill->deleted_at) ? 'yes' : 'no';
         $this->dispatch('show-skillModal');
     }
 
@@ -121,7 +149,13 @@ class Skills extends Component
             
             $skill->title = $this->title;
             $skill->competency_level = $this->competency_level;
-            $skill->save();
+            if ($this->status === 'no' && is_null($skill->deleted_at)) {
+                $skill->delete();
+            } elseif ($this->status === 'yes' && !is_null($skill->deleted_at)) {
+                $skill->restore();
+            } else {
+                $skill->save();
+            }
         });
 
         $this->clear();
@@ -158,6 +192,9 @@ class Skills extends Component
     public function showAddEditModal()
     {
         $this->clear();
+        if (!$this->editMode) { 
+            $this->status = 'yes'; 
+        }
         $this->dispatch('show-skillModal');
     }
 }

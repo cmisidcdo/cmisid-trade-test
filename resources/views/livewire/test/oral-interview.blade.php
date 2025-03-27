@@ -1,201 +1,230 @@
 <div>
     <div class="card-header text-white text-center py-3" style="background-color: #1a1851; border-radius: 12px 12px 0 0;">
-        <h2 class="fw-bold m-0">Candidates</h2>
+        <h2 class="fw-bold m-0">Oral Interviews</h2>
     </div>
     <section class="section dashboard">
         <div class="card">
-            <div class="card-body">
-                <div class="row align-items-center pt-3 pb-3">
-                    <div class="col-md-4 text-start">
-                        <div class="input-group">
-                            <span class="input-group-text bg-light border-end-0">
-                                <i class="bi bi-search"></i>
-                            </span>
-                            <input type="text" class="form-control border-start-0 ps-0" placeholder="Search candidates..." aria-label="Search candidates">
-                            <button class="btn btn-outline-secondary border-start-0 bg-light" type="button">
+            <div class="card-body p-3">
+                <div class="card-header d-flex justify-content-between align-items-center ">
+                    <button class="btn btn-primary btn-m" data-bs-toggle="modal" data-bs-target="#oralInterviewModal">
+                        <i class="bi bi-plus"></i> Add Practical Scenario
+                    </button>
+
+                    <div class="d-flex">
+                        <!-- Search Input with Icon and Clear Button -->
+                        <div class="input-group me-2" style="width: 300px; height: auto;">
+                            <span class="input-group-text"><i class="bi bi-search"></i></span>
+                            <input type="text" class="form-control" id="searchInput" placeholder="Search..." aria-label="Search">
+                            <button class="btn btn-outline-secondary" type="button" id="clearSearch">
                                 <i class="bi bi-x"></i>
                             </button>
                         </div>
-                    </div>
-                    <div class="col-md-8 text-end">
-                        <button type="button" class="btn btn-warning">
-                            <i class="bi bi-archive me-1"></i> View Archive
-                        </button>
-                        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#oralInterviewModal">
-                            <i class="bi bi-plus-circle"></i> Add Interview
+
+                        <!-- Filter Button -->
+                        <button class="btn btn-secondary btn-m">
+                            <i class="bi bi-funnel"></i> SORT
                         </button>
                     </div>
                 </div>
-                <table class="table table-hover table-bordered table-striped text-center">
-                    <thead class="table-light">
-                        <tr>
-                            <th scope="col">#</th>
-                            <th scope="col">Position</th>
-                            <th scope="col">Skill</th>
-                            <th scope="col">Question</th>
-                            <th scope="col">Notes</th>
-                            <th scope="col">Status</th>
-                            <th scope="col">Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td scope="row">1</td>
-                            <td>Software Developer</td>
-                            <td>JavaScript</td>
-                            <td>What is closure in JS?</td>
-                            <td>Explain with examples</td>
-                            <td><span class="badge rounded-3 bg-success">Active</span></td>
-                            <td>
-                                <button class="btn btn-sm btn-info rounded-2 px-2 py-1 me-2" data-bs-toggle="modal" data-bs-target="#viewInterviewModal">
-                                    <i class="bi bi-eye-fill"></i>
-                                    <span class="d-none d-md-inline ms-1">View</span>
-                                </button>
-                                <button class="btn btn-sm btn-primary rounded-2 px-2 py-1 me-2" data-bs-toggle="modal" data-bs-target="#editInterviewModal">
-                                    <i class="bi bi-pencil-square"></i>
-                                    <span class="d-none d-md-inline ms-1">Edit</span>
-                                </button>
-                                <button class="btn btn-sm btn-danger rounded-2 px-2 py-1">
-                                    <i class="bi bi-archive-fill"></i>
-                                    <span class="d-none d-md-inline ms-1">Archive</span>
-                                </button>
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
-        </div>
-
-
-        <div class="modal fade" id="oralInterviewModal" tabindex="-1" aria-labelledby="oralInterviewModalLabel" aria-hidden="true">
-            <div class="modal-dialog">
-                <div class="modal-content">
-                    <div class="modal-header bg-primary text-white">
-                        <h5 class="modal-title" id="oralInterviewModalLabel">Add Oral Interview</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                    </div>
-                    <div class="modal-body">
-                        <form>
-                            <div class="mb-3">
-                                <label class="form-label">Select Position</label>
-                                <select class="form-select">
-                                    <option>Select Position</option>
-                                    <option>Software Developer</option>
-                                    <option>Product Manager</option>
-                                </select>
-                            </div>
-                            <div class="mb-3">
-                                <label class="form-label">Select Skill</label>
-                                <select class="form-select">
-                                    <option>Select Skill</option>
-                                    <option>JavaScript</option>
-                                    <option>Python</option>
-                                </select>
-                            </div>
-                            <div class="mb-3">
-                                <label class="form-label">Question</label>
-                                <textarea class="form-control" rows="2" placeholder="Question"></textarea>
-                            </div>
-                            <div class="mb-3">
-                                <label class="form-label">Notes</label>
-                                <textarea class="form-control" rows="2" placeholder="Additional notes"></textarea>
-                            </div>
-                            <div class="mb-3">
-                                <label class="form-label">Is Active?</label>
-                                <div>
-                                    <input type="radio" name="status" value="yes" checked> Yes
-                                    <input type="radio" name="status" value="no"> No
-                                </div>
-                            </div>
-                            <div class="modal-footer bg-light border-0">
-                                <button type="button" class="btn btn-secondary rounded-2" data-bs-dismiss="modal">Close</button>
-                                <button type="submit" class=" bi bi-plus-circle btn btn-primary "> Save Oral Interview</button>
-                            </div>
-                        </form>
-                    </div>
+                <div class="table-responsive">
+                    <table class="table table-hover table-bordered table-striped text-center">
+                        <thead class="table-light">
+                            <tr>
+                                <th scope="col">Question</th>
+                                <th scope="col">Competency Level</th>
+                                <th scope="col">Skill</th>
+                                <th scope="col">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Can you describe your experience with Microsoft Office?</td>
+                                <td>Basic</td>
+                                <td>Microsoft Office Proficiency</td>
+                                <td>
+                                    <button class="btn btn-sm btn-info rounded-2 px-2 py-1 me-2" data-bs-toggle="modal" data-bs-target="#viewInterviewModal">
+                                        <i class="bi bi-eye"></i>
+                                        <span class="d-none d-md-inline ms-1">View</span>
+                                    </button>
+                                    <button class="btn btn-sm btn-primary rounded-2 px-2 py-1 me-2" data-bs-toggle="modal" data-bs-target="#editInterviewModal">
+                                        <i class="bi bi-pencil-square"></i>
+                                        <span class="d-none d-md-inline ms-1">Edit</span>
+                                    </button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
                 </div>
             </div>
         </div>
 
 
-        <div class="modal fade" id="viewInterviewModal" tabindex="-1" aria-hidden="true">
-            <div class="modal-dialog">
-                <div class="modal-content">
-                    <div class="modal-header bg-info text-white">
-                        <h5 class="modal-title">View Interview</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                    </div>
-                    <div class="modal-body">
-                        <p><strong>Position:</strong> Software Developer</p>
-                        <p><strong>Skill:</strong> JavaScript</p>
-                        <p><strong>Question:</strong> What is closure in JS?</p>
-                        <p><strong>Notes:</strong> Explain with examples</p>
-                        <p><strong>Status:</strong>
-                            <span class="badge bg-success">Active</span>
-                            
-                        </p>
-                    </div>
-                    <div class="modal-footer bg-light border-0">
-                        <button type="button" class="btn btn-secondary rounded-2" data-bs-dismiss="modal">Close</button>
+        <div>
+            <!-- Add Oral Interview Modal -->
+            <div class="modal fade" id="oralInterviewModal" tabindex="-1" aria-labelledby="oralInterviewModalLabel" aria-hidden="true">
+                <div class="modal-dialog modal-dialog-centered">
+                    <div class="modal-content">
+                        <div class="modal-header bg-primary text-white d-flex justify-content-center">
+                            <h5 class="modal-title w-100 text-center">Add Oral Interview</h5>
+                            <button type="button" class="btn-close btn-close-white position-absolute end-0 me-3" data-bs-dismiss="modal"></button>
+                        </div>
+
+                        <div class="modal-body">
+                            <form>
+                                <div class="mb-3">
+                                    <label class="fw-bold form-label">Competency Level</label>
+                                    <select class="form-select">
+                                        <option>Select Competency Level</option>
+                                        <option>Basic</option>
+                                        <option>Intermediate</option>
+                                        <option>Advanced</option>
+                                    </select>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="fw-bold form-label">Select Skill</label>
+                                    <select class="form-select">
+                                        <option>Select Skill</option>
+                                        <option>Microsoft Office Proficiency</option>
+                                        <option>Data Entry & Management</option>
+                                        <option>Communication Skills</option>
+                                        <option>Administrative Support</option>
+                                    </select>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="fw-bold form-label">Question</label>
+                                    <textarea class="form-control" rows="2" placeholder="Enter question"></textarea>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="fw-bold form-label">Notes</label>
+                                    <textarea class="form-control" rows="3" placeholder="Additional notes"></textarea>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="fw-bold form-label">Is Active?</label>
+                                    <div class="d-flex">
+                                        <div class="form-check me-3">
+                                            <input class="form-check-input" type="radio" name="isActive" id="activeYes" checked>
+                                            <label class="form-check-label" for="activeYes">Yes</label>
+                                        </div>
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="radio" name="isActive" id="activeNo">
+                                            <label class="form-check-label" for="activeNo">No</label>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="modal-footer d-flex justify-content-between">
+                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Go Back</button>
+                                    <button type="submit" class="btn btn-primary">Update Scenario</button>
+                                </div>
+                            </form>
+                        </div>
                     </div>
                 </div>
             </div>
-        </div>
 
+            <!-- Edit Oral Interview Modal -->
+            <div class="modal fade" id="editInterviewModal" tabindex="-1" aria-hidden="true">
+                <div class="modal-dialog modal-dialog-centered">
+                    <div class="modal-content">
+                        <div class="modal-header bg-primary text-white d-flex justify-content-center">
+                            <h5 class="modal-title w-100 text-center">Edit Oral Interview</h5>
+                            <button type="button" class="btn-close btn-close-white position-absolute end-0 me-3" data-bs-dismiss="modal"></button>
+                        </div>
 
-
-        <div class="modal fade" id="editInterviewModal" tabindex="-1" aria-hidden="true">
-            <div class="modal-dialog">
-                <div class="modal-content">
-                    <div class="modal-header bg-primary text-white">
-                        <h5 class="modal-title" id="oralInterviewModalLabel">Add Oral Interview</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                    </div>
-                    <div class="modal-body">
-                        <form>
-                            <div class="mb-3">
-                                <label class="form-label">Select Position</label>
-                                <select class="form-select">
-                                    <option>Select Position</option>
-                                    <option>Software Developer</option>
-                                    <option>Product Manager</option>
-                                </select>
-                            </div>
-                            <div class="mb-3">
-                                <label class="form-label">Select Skill</label>
-                                <select class="form-select">
-                                    <option>Select Skill</option>
-                                    <option>JavaScript</option>
-                                    <option>Python</option>
-                                </select>
-                            </div>
-                            <div class="mb-3">
-                                <label class="form-label">Question</label>
-                                <input type="text" class="form-control" placeholder="Enter question">
-                            </div>
-                            <div class="mb-3">
-                                <label class="form-label">Notes</label>
-                                <textarea class="form-control" rows="2" placeholder="Additional notes"></textarea>
-                            </div>
-                            <div class="mb-3">
-                                <label class="form-label">Is Active?</label>
-                                <div>
-                                    <input type="radio" name="status" value="yes" checked> Yes
-                                    <input type="radio" name="status" value="no"> No
+                        <div class="modal-body">
+                            <form>
+                                <div class="mb-3">
+                                    <label class="fw-bold form-label">Competency Level</label>
+                                    <select class="form-select">
+                                        <option>Select Competency Level</option>
+                                        <option>Basic</option>
+                                        <option>Intermediate</option>
+                                        <option>Advanced</option>
+                                    </select>
                                 </div>
-                            </div>
-                            <div class="text-end">
-
-                                <div class="modal-footer bg-light border-0">
-                                    <button type="button" class="btn btn-secondary rounded-2" data-bs-dismiss="modal">Close</button>
-                                    <button type="submit" class=" bi bi-check-circle btn btn-primary "> Update oral interview</button>
+                                <div class="mb-3">
+                                    <label class="fw-boldform-label">Select Skill</label>
+                                    <select class="form-select">
+                                        <option>Select Skill</option>
+                                        <option>Microsoft Office Proficiency</option>
+                                        <option>Data Entry & Management</option>
+                                        <option>Communication Skills</option>
+                                        <option>Administrative Support</option>
+                                    </select>
                                 </div>
-
-                            </div>
-                        </form>
+                                <div class="mb-3">
+                                    <label class="form-label">Question</label>
+                                    <textarea class="form-control" rows="2" placeholder="Enter question"></textarea>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="fw-bold form-label">Notes</label>
+                                    <textarea class="form-control" rows="3" placeholder="Additional notes"></textarea>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="fw-bold form-label">Is Active?</label>
+                                    <div class="d-flex">
+                                        <div class="form-check me-3">
+                                            <input class="form-check-input" type="radio" name="isActive" id="editActiveYes" checked>
+                                            <label class="form-check-label" for="editActiveYes">Yes</label>
+                                        </div>
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="radio" name="isActive" id="editActiveNo">
+                                            <label class="form-check-label" for="editActiveNo">No</label>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="modal-footer d-flex justify-content-between">
+                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Go Back</button>
+                                    <button type="submit" class="btn btn-primary">Update Scenario</button>
+                                </div>
+                            </form>
+                        </div>
                     </div>
                 </div>
             </div>
+
+            <!-- View Oral Interview Modal -->
+            <div class="modal fade" id="viewInterviewModal" tabindex="-1" aria-hidden="true">
+                <div class="modal-dialog modal-dialog-centered">
+                    <div class="modal-content">
+                        <div class="modal-header bg-primary text-white d-flex justify-content-center">
+                            <h5 class="modal-title w-100 text-center">View Oral Interview</h5>
+                            <button type="button" class="btn-close btn-close-white position-absolute end-0 me-3" data-bs-dismiss="modal"></button>
+                        </div>
+
+                        <div class="modal-body">
+                            <div class="mb-3">
+                                <label class="form-label fw-bold">Competency Level</label>
+                                <p class="border p-2 rounded">Intermediate</p>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label fw-bold">Select Skill</label>
+                                <p class="border p-2 rounded">Communication Skills</p>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label fw-bold">Question</label>
+                                <p class="border p-2 rounded">
+                                    Can you give an example of how you effectively communicated with a team to resolve a complex project challenge?
+                                </p>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label fw-bold">Notes</label>
+                                <p class="border p-2 rounded">
+                                    Look for specific details about team collaboration, problem-solving, and communication strategies.
+                                </p>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label fw-bold">Is Active?</label>
+                                <p class="border p-2 rounded">Yes</p>
+                            </div>
+                            <div class="text-center">
+                                <button type="button" class="btn btn-secondary px-4" data-bs-dismiss="modal">Go Back</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
         </div>
     </section>
 </div>

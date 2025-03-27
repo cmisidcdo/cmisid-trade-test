@@ -336,3 +336,9 @@
         }, 200);
     }
 })();
+
+
+ // Clear the search input when the clear button is clicked
+ document.getElementById('clearSearch').addEventListener('click', function () {
+    document.getElementById('searchInput').value = "";
+});

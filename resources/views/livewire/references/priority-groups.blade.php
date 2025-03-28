@@ -141,11 +141,10 @@
         </div>
 
         <div class="modal fade" id="prioritygroupModal" tabindex="-1" aria-labelledby="prioritygroupModalLabel" aria-hidden="true" wire:ignore.self>
-            <div class="modal-dialog modal-dialog-centered">
-                <div class="modal-content border-0 shadow">
-                    <div class="modal-header bg-light">
-                        <h5 class="modal-title" id="prioritygroupModalLabel">
-                            <i class="bi {{ $editMode ? 'bi-pencil-square' : 'bi-plus-circle' }} me-2"></i>
+            <div class="modal-dialog modal-dialog-centered modal-lg">
+                <div class="modal-content shadow">
+                    <div class="modal-header bg-primary text-white py-2">
+                        <h5 class="modal-title fw-bold text-center w-100 fs-6" id="prioritygroupModalLabel">
                             {{$editMode ? 'Update Priority Group' : 'Add New Priority Group'}}
                         </h5>
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" wire:click='clear'></button>
@@ -158,7 +157,7 @@
                                 <input type="text" class="form-control form-control-lg {{$errors->has('title') ? 'is-invalid' : ''}}"
                                     id="prioritygroupTitle"
                                     wire:model="title"
-                                    placeholder="Enter prioritygroup title"
+                                    placeholder="Enter Priority Group Title"
                                     autocomplete="off">
                                 @error('title')
                                 <div class="invalid-feedback">

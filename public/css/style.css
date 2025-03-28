@@ -1230,3 +1230,99 @@ h6 {
 }
 
 
+body {
+  font-family: "Open Sans", sans-serif;
+  font-size: 15px;
+}
+
+/* || Table */
+.custom-table th,
+.custom-table td {
+  border-bottom: 1px solid #ccc;
+  padding: 10px;
+}
+
+.custom-table th {
+  background-color: #f8f9fa;
+  font-weight: bold;
+}
+
+.custom-table td {
+  background-color: #ffffff; 
+}
+
+/* || Signature */
+.assessor {
+          margin: 60px 0 24px 0;
+      }
+
+
+/* || Input size adjustment */
+
+.row .candidate-input .column-left {
+  max-width: 81%;
+}
+
+.row .candidate-input .column-right {
+  max-width: 85%; 
+}
+
+/* || Dropdown */
+
+.dropdown-wrapper {
+      position: relative;
+      display: inline-block;
+      width: 100%;
+      max-width: 500px;
+}
+
+.dropdown-content {
+  display: none;
+  position: absolute;
+  width: 100%;
+  background-color: #fff;
+  border: 1px solid #ccc;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  z-index: 10;
+  border-radius: 4px;
+  opacity: 0;
+  transform: translateY(-10px);
+  transition: opacity 0.2s ease, transform 0.2s ease;
+}
+
+.dropdown-btn {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid black;
+  background-color: #fff;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  cursor: pointer;
+}
+
+.arrow {
+  transition: transform 0.2s ease;
+}
+
+.dropdown-wrapper.active .dropdown-content {
+  display: block;
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.dropdown-wrapper.active .arrow {
+  transform: rotate(90deg);
+}
+
+.dropdown-option {
+  padding: 10px;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.dropdown-option:hover {
+  background-color: #f0f0f0;
+}
+

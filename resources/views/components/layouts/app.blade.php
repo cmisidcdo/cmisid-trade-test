@@ -330,9 +330,21 @@
             </a>
           </li>
           <li>
-            <a class="{{ Request::routeIs('references.criterias') ? 'active' : '' }}" href="{{ route('references.criterias') }}">
-              <i class="bi bi-card-checklist fs-5"></i><span>Evaluation Criteria</span>
+            <a class="nav-link {{ Request::routeIs('references.criterias.*') ? '' : 'collapsed' }}" data-bs-target="#criteria-nav" data-bs-toggle="collapse" href="#">
+              <i class="bi bi-card-checklist fs-5"></i><span>Evaluation Criteria</span><i class="bi bi-chevron-down ms-auto fs-6"></i>
             </a>
+            <ul id="criteria-nav" class="nav-content collapse {{ Request::routeIs('references.criterias.*') ? 'show' : '' }}" data-bs-parent="#references-nav" style="padding-left: 10px;">
+              <li>
+                <a class="{{ Request::routeIs('references.criterias.practical') ? 'active' : '' }}" href="{{ route('references.criterias.practical') }}">
+                  <i class="bi bi-tools fs-5"></i><span>Practical Criteria</span>
+                </a>
+              </li>
+              <li>
+                <a class="{{ Request::routeIs('references.criterias.oral') ? 'active' : '' }}" href="{{ route('references.criterias.oral') }}">
+                  <i class="bi bi-mic-fill fs-5"></i><span>Oral Criteria</span>
+                </a>
+              </li>
+            </ul>
           </li>
         </ul>
       </li><!-- End Tables Nav -->
@@ -393,33 +405,24 @@
       </li><!-- End Charts Nav -->
     @endcan
 
-    @can('read exam')
-      <li class="nav-item">
-        <a class="nav-link {{ Request::routeIs('assign.exam') ? '' : 'collapsed' }}" href="{{ route('assign.exam') }}">
-          <i class="bi bi-person-check-fill fs-5"></i>
-          <span>Assign Exam</span>
-        </a>
-      </li>
-    @endcan
-
     @can('secretariat permission')
       <li class="nav-item">
-        <a class="nav-link {{ Request::routeIs('exam.*') ? '' : 'collapsed' }}" data-bs-target="#exams-nav" data-bs-toggle="collapse" href="#">
+        <a class="nav-link {{ Request::routeIs('eval.*') ? '' : 'collapsed' }}" data-bs-target="#eval-nav" data-bs-toggle="collapse" href="#">
           <i class="bi bi-arrow-clockwise fs-5"></i><span>Ongoing Exams</span><i class="bi bi-chevron-down ms-auto"></i>
         </a>
-        <ul id="exams-nav" class="nav-content collapse {{ Request::routeIs('exam.*') ? 'show' : '' }}" data-bs-parent="#sidebar-nav">
+        <ul id="eval-nav" class="nav-content collapse {{ Request::routeIs('eval.*') ? 'show' : '' }}" data-bs-parent="#sidebar-nav">
           <li>
-            <a class="{{ Request::routeIs('exam.assessmentnotes') ? 'active' : '' }}" href="{{ route('exam.assessmentnotes') }}">
+            <a class="{{ Request::routeIs('eval.assessmentnotes') ? 'active' : '' }}" href="{{ route('eval.assessmentnotes') }}">
               <i class="bi bi-card-text fs-5"></i><span>Assessment Notes Form</span>
             </a>
           </li>
           <li>
-            <a class="{{ Request::routeIs('exam.ptestevaluations') ? 'active' : '' }}" href="{{ route('exam.ptestevaluations') }}">
+            <a class="{{ Request::routeIs('eval.ptestevaluations') ? 'active' : '' }}" href="{{ route('eval.ptestevaluations') }}">
               <i class="bi bi-journal-medical fs-5"></i><span>Practical Test Evaluation Form</span>
             </a>
           </li>
           <li>
-            <a class="{{ Request::routeIs('exam.otestevaluations') ? 'active' : '' }}" href="{{ route('exam.otestevaluations') }}">
+            <a class="{{ Request::routeIs('eval.otestevaluations') ? 'active' : '' }}" href="{{ route('eval.otestevaluations') }}">
               <i class="bi bi-chat-text-fill fs-5"></i><span>Oral Test Evaluation Form</span>
             </a>
           </li>

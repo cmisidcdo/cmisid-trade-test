@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Livewire\Exam;
+namespace App\Livewire\Eval;
 
 use Livewire\Component;
 
@@ -8,6 +8,6 @@ class OralTestEvaluation extends Component
 {
     public function render()
     {
-        return view('livewire.exam.oral-test-evaluation');
+        return view('livewire.eval.oral-test-evaluation');
     }
 }

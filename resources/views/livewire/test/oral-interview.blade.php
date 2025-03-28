@@ -5,63 +5,141 @@
     <section class="section dashboard">
         <div class="card">
             <div class="card-body p-3">
-                <div class="card-header d-flex justify-content-between align-items-center ">
-                    <button class="btn btn-primary btn-m" data-bs-toggle="modal" data-bs-target="#oralInterviewModal">
-                        <i class="bi bi-plus"></i> Add Practical Scenario
-                    </button>
 
-                    <div class="d-flex">
-                        <!-- Search Input with Icon and Clear Button -->
-                        <div class="input-group me-2" style="width: 300px; height: auto;">
-                            <span class="input-group-text"><i class="bi bi-search"></i></span>
-                            <input type="text" class="form-control" id="searchInput" placeholder="Search..." aria-label="Search">
-                            <button class="btn btn-outline-secondary" type="button" id="clearSearch">
-                                <i class="bi bi-x"></i>
-                            </button>
-                        </div>
-
-                        <!-- Filter Button -->
-                        <button class="btn btn-secondary btn-m">
-                            <i class="bi bi-funnel"></i> SORT
+                <div class="row align-items-center pt-3 pb-3">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <button class="btn btn-primary" wire:click="showAddEditModal">
+                            <i class="bi bi-plus"></i> Oral Interview Question
                         </button>
+                
+                        <div class="d-flex gap-2">
+                            <div class="input-group">
+                                <span class="input-group-text bg-light border-end-0">
+                                    <i class="bi bi-search"></i>
+                                </span>
+                                <input type="text" class="form-control border-start-0 ps-0"
+                                    placeholder="Search question..."
+                                    wire:model.live.debounce.300ms="search"
+                                    aria-label="Search question">
+                                <button class="btn btn-outline-secondary border-start-0 bg-light" type="button"
+                                    wire:loading.class="d-none" wire:target="search"
+                                    wire:click="$set('search', '')">
+                                    <i class="bi bi-x"></i>
+                                </button>
+                                <span wire:loading wire:target="search" class="input-group-text bg-light border-start-0">
+                                    <div class="spinner-border spinner-border-sm text-primary" role="status">
+                                        <span class="visually-hidden">Searching...</span>
+                                    </div>
+                                </span>
+                            </div>
+                
+                            <div class="dropdown">
+                                <button class="btn btn-outline-primary dropdown-toggle" type="button" id="filterDropdown"
+                                    data-bs-toggle="dropdown" aria-expanded="false">
+                                    <i class="bi bi-funnel"></i> Filter
+                                </button>
+                                <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="filterDropdown">
+                                    <li>
+                                        <button class="dropdown-item" wire:click="$set('filterStatus', 'all')">
+                                            <i class="bi bi-list"></i> All
+                                        </button>
+                                    </li>
+                                    <li>
+                                        <button class="dropdown-item" wire:click="$set('filterStatus', 'yes')">
+                                            <i class="bi bi-person-check"></i> Active
+                                        </button>
+                                    </li>
+                                    <li>
+                                        <button class="dropdown-item" wire:click="$set('filterStatus', 'no')">
+                                            <i class="bi bi-person-x"></i> Inactive
+                                        </button>
+                                    </li>
+                                </ul>
+                            </div>
+                
+                            <div>
+                                @if($filterStatus !== 'all')
+                                    <span class="badge bg-secondary">
+                                        <i class="bi bi-funnel"></i> 
+                                        {{ $filterStatus === 'yes' ? 'Active' : 'Inactive' }}
+                                        <button class="btn btn-sm btn-outline-light border-0 ms-1" wire:click="$set('filterStatus', 'all')">
+                                            <i class="bi bi-x"></i>
+                                        </button>
+                                    </span>
+                                @endif
+                            </div>
+                        </div>
                     </div>
                 </div>
                 <div class="table-responsive">
                     <table class="table table-hover table-bordered table-striped text-center">
                         <thead class="table-light">
                             <tr>
+                                <th scope="col">#</th>
                                 <th scope="col">Question</th>
                                 <th scope="col">Competency Level</th>
                                 <th scope="col">Skill</th>
+                                <th scope="col">Status</th>
                                 <th scope="col">Actions</th>
                             </tr>
                         </thead>
                         <tbody>
-                            <tr>
-                                <td>Can you describe your experience with Microsoft Office?</td>
-                                <td>Basic</td>
-                                <td>Microsoft Office Proficiency</td>
-                                <td>
-                                    <button class="btn btn-sm btn-info rounded-2 px-2 py-1 me-2" data-bs-toggle="modal" data-bs-target="#viewInterviewModal">
-                                        <i class="bi bi-eye"></i>
-                                        <span class="d-none d-md-inline ms-1">View</span>
-                                    </button>
-                                    <button class="btn btn-sm btn-primary rounded-2 px-2 py-1 me-2" data-bs-toggle="modal" data-bs-target="#editInterviewModal">
-                                        <i class="bi bi-pencil-square"></i>
-                                        <span class="d-none d-md-inline ms-1">Edit</span>
-                                    </button>
-                                </td>
-                            </tr>
+                            @forelse($oralquestions as $item)
+                                <tr>
+                                    <td scope="row" class="text-center" style="width: 5%;">{{$loop->iteration}}</td>
+                                    <td>{{$item->question}}</td>
+                                    <td class="text-center">
+                                        <span class="badge rounded-pill 
+                                            {{ $item->competency_level == 'basic' ? 'bg-info' : 
+                                            ($item->competency_level == 'intermediate' ? 'bg-primary' : 'bg-dark') }}">
+                                            {{ ucfirst($item->skill->competency_level) }}
+                                        </span>
+                                    </td>
+
+                                    <td class="text-center" >{{$item->skill->title}}</td>
+                                    <td class="text-center">
+                                        <span class="badge rounded-pill {{$item->deleted_at == Null ? 'bg-success': 'bg-danger'}}">
+                                            {{$item->deleted_at == Null ? 'Active': 'Inactive'}}
+                                        </span>
+                                    </td>
+
+                                    <td class="d-flex justify-content-center">
+                                        <div class="d-flex justify-content-center gap-2">
+                                            <button class="btn btn-sm btn-info rounded-2 px-2 py-1"
+                                                data-bs-toggle="modal"
+                                                data-bs-target="#viewOralModal"
+                                                data-bs-title="View Question">
+                                                <i class="bi bi-eye"></i>
+                                                <span class="d-none d-md-inline ms-1">View</span>
+                                            </button>
+
+                                            @can('update reference')
+                                            <button class="btn btn-sm btn-primary rounded-2 px-2 py-1 me-2"
+                                                wire:click='readOralQuestion({{$item->id}})'
+                                                data-bs-toggle="tooltip"
+                                                data-bs-title="Edit Question">
+                                                <i class="bi bi-pencil-square"></i>
+                                                <span class="d-none d-md-inline ms-1">Edit</span>
+                                            </button>
+                                            @endcan
+                                    </td>
+                                </tr>
+                            @empty
+                                <tr>
+                                    <td colspan="6" class="text-center py-4 text-muted">
+                                        <i class="bi bi-inbox fs-3 d-block mb-2"></i>
+                                        No questions found
+                                    </td>
+                                </tr>
+                            @endforelse
                         </tbody>
                     </table>
                 </div>
             </div>
         </div>
 
-
-        <div>
             <!-- Add Oral Interview Modal -->
-            <div class="modal fade" id="oralInterviewModal" tabindex="-1" aria-labelledby="oralInterviewModalLabel" aria-hidden="true">
+            <div class="modal fade" id="oralQuestionModal" tabindex="-1" aria-labelledby="oralQuestionModalLabel" aria-hidden="true" wire:ignore.self>
                 <div class="modal-dialog modal-dialog-centered">
                     <div class="modal-content">
                         <div class="modal-header bg-primary text-white d-flex justify-content-center">
@@ -70,51 +148,72 @@
                         </div>
 
                         <div class="modal-body">
-                            <form>
-                                <div class="mb-3">
-                                    <label class="fw-bold form-label">Competency Level</label>
-                                    <select class="form-select">
-                                        <option>Select Competency Level</option>
-                                        <option>Basic</option>
-                                        <option>Intermediate</option>
-                                        <option>Advanced</option>
-                                    </select>
-                                </div>
-                                <div class="mb-3">
-                                    <label class="fw-bold form-label">Select Skill</label>
-                                    <select class="form-select">
-                                        <option>Select Skill</option>
-                                        <option>Microsoft Office Proficiency</option>
-                                        <option>Data Entry & Management</option>
-                                        <option>Communication Skills</option>
-                                        <option>Administrative Support</option>
-                                    </select>
+                            <form class="needs-validation" wire:submit.prevent="{{$editMode ? 'updateOralQuestion' : 'createOralQuestion'}}">
+                                <div class="row mb-3">
+                                    <div class="col-md-6">
+                                        <label for="competency_level" class="form-label fw-bold fs-7">Competency Level</label>
+                                        <select class="form-select form-select-sm fs-7" id="competency_level" wire:model.live="competency_level">
+                                            <option value="" class="fs-7">Select Level</option>
+                                            @foreach($competency_levels as $level)
+                                            <option value="{{ $level }}" class="fs-7">{{ ucfirst($level) }}</option>
+                                            @endforeach
+                                        </select>
+                                        @error('competency_level')
+                                        <div class="invalid-feedback">
+                                            <i class="bi bi-exclamation-circle me-1"></i>
+                                            {{$message}}
+                                        </div>
+                                        @enderror
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label for="skill" class="form-label fw-bold fs-7">Choose Skill</label>
+                                        <select class="form-select form-select-sm fs-7  @error('skill_id') is-invalid @enderror" wire:model="skill_id">
+                                            <option value="" class="fs-7">Select Skill</option>
+                                            @foreach ($skills as $skill)
+                                            <option value="{{ $skill->id }}" class="fs-7"
+                                                @if($skill->id == $skill_id) selected @endif>
+                                                {{ $skill->title }}
+                                            </option>
+                                            @endforeach
+                                        </select>
+                                        @error('skill_id')
+                                        <div class="invalid-feedback">
+                                            <i class="bi bi-exclamation-circle me-1"></i>
+                                            {{$message}}
+                                        </div>
+                                        @enderror
+                                    </div>
                                 </div>
                                 <div class="mb-3">
                                     <label class="fw-bold form-label">Question</label>
-                                    <textarea class="form-control" rows="2" placeholder="Enter question"></textarea>
+                                    <textarea class="form-control @error('question') is-invalid @enderror"
+                                            rows="2" wire:model="question"
+                                            placeholder="Enter question"></textarea>
+                                    @error('question')
+                                        <div class="invalid-feedback">
+                                            <i class="bi bi-exclamation-circle me-1"></i>
+                                            {{$message}}
+                                        </div>
+                                    @enderror
                                 </div>
                                 <div class="mb-3">
                                     <label class="fw-bold form-label">Notes</label>
-                                    <textarea class="form-control" rows="3" placeholder="Additional notes"></textarea>
+                                    <textarea class="form-control" rows="3" wire:model="notes" placeholder="Additional notes"></textarea>
+                                    
                                 </div>
                                 <div class="mb-3">
-                                    <label class="fw-bold form-label">Is Active?</label>
-                                    <div class="d-flex">
-                                        <div class="form-check me-3">
-                                            <input class="form-check-input" type="radio" name="isActive" id="activeYes" checked>
-                                            <label class="form-check-label" for="activeYes">Yes</label>
-                                        </div>
-                                        <div class="form-check">
-                                            <input class="form-check-input" type="radio" name="isActive" id="activeNo">
-                                            <label class="form-check-label" for="activeNo">No</label>
-                                        </div>
+                                    <label class="form-label fw-semibold">Is Active?</label>
+                                    <div>
+                                        <input type="radio" wire:model="status" value="yes" {{ $status === 'yes' || !$editMode ? 'checked' : '' }}> Yes
+                                        <input type="radio" wire:model="status" value="no" {{ $status === 'no' ? 'checked' : '' }}> No
                                     </div>
                                 </div>
 
                                 <div class="modal-footer d-flex justify-content-between">
                                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Go Back</button>
-                                    <button type="submit" class="btn btn-primary">Update Scenario</button>
+                                    <button type="submit" class="btn btn-primary btn-sm px-3 fs-7">
+                                        {{$editMode ? 'Update Question' : 'Add Question'}}
+                                    </button>
                                 </div>
                             </form>
                         </div>
@@ -122,69 +221,9 @@
                 </div>
             </div>
 
-            <!-- Edit Oral Interview Modal -->
-            <div class="modal fade" id="editInterviewModal" tabindex="-1" aria-hidden="true">
-                <div class="modal-dialog modal-dialog-centered">
-                    <div class="modal-content">
-                        <div class="modal-header bg-primary text-white d-flex justify-content-center">
-                            <h5 class="modal-title w-100 text-center">Edit Oral Interview</h5>
-                            <button type="button" class="btn-close btn-close-white position-absolute end-0 me-3" data-bs-dismiss="modal"></button>
-                        </div>
-
-                        <div class="modal-body">
-                            <form>
-                                <div class="mb-3">
-                                    <label class="fw-bold form-label">Competency Level</label>
-                                    <select class="form-select">
-                                        <option>Select Competency Level</option>
-                                        <option>Basic</option>
-                                        <option>Intermediate</option>
-                                        <option>Advanced</option>
-                                    </select>
-                                </div>
-                                <div class="mb-3">
-                                    <label class="fw-boldform-label">Select Skill</label>
-                                    <select class="form-select">
-                                        <option>Select Skill</option>
-                                        <option>Microsoft Office Proficiency</option>
-                                        <option>Data Entry & Management</option>
-                                        <option>Communication Skills</option>
-                                        <option>Administrative Support</option>
-                                    </select>
-                                </div>
-                                <div class="mb-3">
-                                    <label class="form-label">Question</label>
-                                    <textarea class="form-control" rows="2" placeholder="Enter question"></textarea>
-                                </div>
-                                <div class="mb-3">
-                                    <label class="fw-bold form-label">Notes</label>
-                                    <textarea class="form-control" rows="3" placeholder="Additional notes"></textarea>
-                                </div>
-                                <div class="mb-3">
-                                    <label class="fw-bold form-label">Is Active?</label>
-                                    <div class="d-flex">
-                                        <div class="form-check me-3">
-                                            <input class="form-check-input" type="radio" name="isActive" id="editActiveYes" checked>
-                                            <label class="form-check-label" for="editActiveYes">Yes</label>
-                                        </div>
-                                        <div class="form-check">
-                                            <input class="form-check-input" type="radio" name="isActive" id="editActiveNo">
-                                            <label class="form-check-label" for="editActiveNo">No</label>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="modal-footer d-flex justify-content-between">
-                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Go Back</button>
-                                    <button type="submit" class="btn btn-primary">Update Scenario</button>
-                                </div>
-                            </form>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
+        
             <!-- View Oral Interview Modal -->
-            <div class="modal fade" id="viewInterviewModal" tabindex="-1" aria-hidden="true">
+            <div class="modal fade" id="viewOralModal" tabindex="-1" aria-hidden="true">
                 <div class="modal-dialog modal-dialog-centered">
                     <div class="modal-content">
                         <div class="modal-header bg-primary text-white d-flex justify-content-center">
@@ -225,10 +264,26 @@
                 </div>
             </div>
 
-        </div>
     </section>
 </div>
 
+@script
+<script>
+    $wire.on('hide-oralquestionModal', () => {
+        console.log('Hiding oralQuestion modal');
+        $('#oralQuestionModal').modal('hide');
+
+        const toast = new bootstrap.Toast(document.getElementById('successToast'));
+        document.getElementById('successMessage').textContent = 'oralQuestion saved successfully!';
+        toast.show();
+    });
+
+    $wire.on('show-oralquestionModal', () => {
+        console.log('Showing oralQuestion modal');
+        $('#oralQuestionModal').modal('show');
+    });
+</script>
+@endscript
 
 @push('styles')
 <style>

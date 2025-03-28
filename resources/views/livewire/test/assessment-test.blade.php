@@ -128,16 +128,6 @@
                                         <span class="d-none d-md-inline ms-1">Edit</span>
                                     </button>
                                     @endcan
-                    
-                                    {{-- @can('delete reference')
-                                    <button class="btn btn-sm {{$item->deleted_at == null ? 'btn-danger' : 'btn-outline-success'}} rounded-2 px-2 py-1"
-                                        wire:click="{{$item->deleted_at == null ? 'confirmDelete('.$item->id.')' : 'restoreAssessmentQuestion('.$item->id.')'}}"
-                                        data-bs-toggle="tooltip"
-                                        data-bs-title="{{$item->deleted_at == null ? 'Move to archive' : 'Restore question'}}">
-                                        <i class="bi {{$item->deleted_at == null ? 'bi bi-archive-fill' : 'bi-arrow-counterclockwise'}}"></i>
-                                        <span class="d-none d-md-inline ms-1">{{$item->deleted_at == null ? 'Archive' : 'Restore'}}</span>
-                                    </button>
-                                    @endcan --}}
                             </td>
                         </tr>
                         @empty
@@ -170,7 +160,7 @@
                     <button type="button" class="btn-close btn-close-white position-absolute end-0 me-2" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body p-3 text-sm">
-                    <form class="needs-validation" wire:submit="{{$editMode ? 'updateAssessmentQuestion' : 'createAssessmentQuestion'}}">
+                    <form class="needs-validation" wire:submit.prevent="{{$editMode ? 'updateAssessmentQuestion' : 'createAssessmentQuestion'}}">
                         <div class="row mb-2">
                             <div class="col-6">
                                 <label for="competency_level" class="form-label fw-bold fs-7">Competency Level</label>
@@ -183,7 +173,7 @@
                             </div>
                             <div class="col-6">
                                 <label for="skill" class="form-label fw-bold fs-7">Choose Skill</label>
-                                <select class="form-select form-select-sm fs-7" wire:model="skill_id">
+                                <select class="form-select form-select-sm fs-7 @error('skill_id') is-invalid @enderror" wire:model="skill_id">
                                     <option value="" class="fs-7">Select Skill</option>
                                     @foreach ($skills as $skill)
                                     <option value="{{ $skill->id }}" class="fs-7"
@@ -192,12 +182,24 @@
                                     </option>
                                     @endforeach
                                 </select>
+                                @error('skill_id')
+                                    <div class="invalid-feedback">
+                                        <i class="bi bi-exclamation-circle me-1"></i>
+                                        {{$message}}
+                                    </div>
+                                @enderror
                             </div>
                         </div>
 
                         <div class="mb-2">
                             <label for="question" class="form-label fw-bold fs-7">Question</label>
-                            <textarea class="form-control form-control-sm fs-7" id="question" rows="2" wire:model="question" placeholder="Enter your question here"></textarea>
+                            <textarea class="form-control form-control-sm fs-7 @error('question') is-invalid @enderror" id="question" rows="2" wire:model="question" placeholder="Enter your question here"></textarea>
+                            @error('question')
+                                        <div class="invalid-feedback">
+                                            <i class="bi bi-exclamation-circle me-1"></i>
+                                            {{$message}}
+                                        </div>
+                            @enderror
                         </div>
 
                         <div class="row mb-2">
@@ -234,53 +236,6 @@
                             </div>
                         </div>
     
-                        {{-- <div class="mb-2">
-                            <label class="form-label fw-bold fs-7 mb-1">Choices</label>
-                            <div class="row mb-1">
-                                <div class="col-6">
-                                    <div class="d-flex align-items-center">
-                                        <input class="form-check-input me-2" type="radio" name="correctAnswer" id="option1" value="1">
-                                        <input type="text" class="form-control form-control-sm fs-7" placeholder="Option 1">
-                                    </div>
-                                </div>
-                                <div class="col-3">
-                                    <div class="form-check form-check-sm">
-                                        <input class="form-check-input" type="checkbox" id="correct1">
-                                        <label class="form-check-label fs-7" for="correct1">Correct</label>
-                                    </div>
-                                </div>
-                                <div class="col-3">
-                                    <div class="form-check form-check-sm">
-                                        <input class="form-check-input" type="checkbox" id="incorrect1">
-                                        <label class="form-check-label fs-7" for="incorrect1">Incorrect</label>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="row mb-1">
-                                <div class="col-6">
-                                    <div class="d-flex align-items-center">
-                                        <input class="form-check-input me-2" type="radio" name="correctAnswer" id="option2" value="2">
-                                        <input type="text" class="form-control form-control-sm fs-7" placeholder="Option 2">
-                                    </div>
-                                </div>
-                                <div class="col-3">
-                                    <div class="form-check form-check-sm">
-                                        <input class="form-check-input" type="checkbox" id="correct2">
-                                        <label class="form-check-label fs-7" for="correct2">Correct</label>
-                                    </div>
-                                </div>
-                                <div class="col-3">
-                                    <div class="form-check form-check-sm">
-                                        <input class="form-check-input" type="checkbox" id="incorrect2">
-                                        <label class="form-check-label fs-7" for="incorrect2">Incorrect</label>
-                                    </div>
-                                </div>
-                            </div>
-                            <button type="button" class="btn btn-link text-primary p-0 fs-7">
-                                <i class="fas fa-plus me-1"></i> Add an Option
-                            </button>
-                        </div> --}}
-
                         <div class="mb-3">
                             <label class="form-label fw-bold fs-6">Choices</label>
                         
@@ -298,7 +253,7 @@
                                         @foreach($choices as $index => $choice)
                                             <tr>
                                                 <td>
-                                                    <input type="text" class="form-control form-control-sm fs-7" 
+                                                    <input type="text" class="form-control form-control-sm fs-7 @error('choices.' . $index . '.text') is-invalid @enderror"
                                                         placeholder="Option {{ $index + 1 }}" wire:model="choices.{{ $index }}.text">
                                                 </td>
                                                 <td class="text-center">
@@ -342,8 +297,85 @@
     </div>
 
 
+    <div class="modal fade" id="viewSkillsModal" tabindex="-1" aria-labelledby="viewSkillsModalLabel" aria-hidden="true" wire:ignore.self>
+        <div class="modal-dialog modal-dialog-centered modal-lg">
+            <div class="modal-content shadow">
+                <div class="modal-header bg-primary text-white py-2">
+                    <h5 class="modal-title fw-bold text-center w-100 fs-6" id="viewSkillsModalLabel">
+                        View Assessment Question
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-4">
+                        <h6 class="fw-bold mb-3">Question Details</h6>
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <p class="mb-1"><span class="fw-medium">Competency Level:</span> {{$this->skill->competency_level}}</p>
+                                <p class="mb-1"><span class="fw-medium">Skill:</span> {{$this->skill->title}}</p>
+                            </div>
+                            <div class="col-md-6">
+                                <p class="mb-1">
+                                    <span class="fw-medium">Status:</span>
+                                    <span class="badge rounded-pill bg-success">
+                                        Active
+                                    </span>
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="border-top pt-3">
+                        <h6 class="fw-bold mb-3">Options</h6>
+
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th class="fw-semibold">#</th>
+                                        <th class="fw-semibold">Detail</th>
+                                        <th class="fw-semibold">is Answer?</th>
+                                    </tr>
+                                </thead>
+
+                                <tbody>
+                                    {{-- @forelse($selectedskills as $index => $selectedskill)
+                                    <tr>
+                                        <td>{{ $index + 1 }}</td>
+                                        <td class="fw-medium">{{ $selectedskill['title'] }}</td>
+                                        <td class="fw-medium">
+                                            <span class="badge rounded-pill 
+                                                {{ $selectedskill['competency_level'] == 'Basic' ? 'bg-info' : 
+                                                ($selectedskill['competency_level'] == 'Intermediate' ? 'bg-primary' : 'bg-dark') }}">
+                                                {{ $selectedskill['competency_level'] }}
+                                            </span>
+                                        </td>
+                                    </tr>
+                                    @empty
+                                    <tr>
+                                        <td colspan="4" class="text-center py-3 text-muted">
+                                            <i class="bi bi-info-circle me-1"></i> No skills added yet.
+                                        </td>
+                                    </tr>
+                                    @endforelse --}}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <div class="d-flex justify-content-end gap-2 mt-4">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                            <i class="bi bi-x-circle me-1"></i> Close
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
     <!-- View Assessment Question Modal -->
-    <div class="modal fade" id="viewAssessmentModal" tabindex="-1" aria-labelledby="viewAssessmentModalLabel" aria-hidden="true">
+    {{-- <div class="modal fade" id="viewAssessmentModal" tabindex="-1" aria-labelledby="viewAssessmentModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content rounded-3 shadow">
                 <div class="modal-header bg-primary text-white">
@@ -351,7 +383,7 @@
                     <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body p-4">
-                    <form class="needs-validation" wire:submit="{{$editMode ? 'updateAssessmentQuestion' : 'createAssessmentQuestion'}}">
+                    <form wire:submit="{{$editMode ? 'updateAssessmentQuestion' : 'createAssessmentQuestion'}}">
                         <div class="row mb-4">
                             <div class="col-md-6">
                                 <label for="viewPosition" class="form-label fw-bold">Add Position</label>
@@ -426,7 +458,7 @@
                 </div>
             </div>
         </div>
-    </div>
+    </div> --}}
 
     @script
     <script>

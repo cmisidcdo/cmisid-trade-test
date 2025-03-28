@@ -112,8 +112,7 @@
                             <td class="d-flex justify-content-center">
                                 <div class="d-flex justify-content-center gap-2">
                                     <button class="btn btn-sm btn-info rounded-2 px-2 py-1"
-                                        data-bs-toggle="modal"
-                                        data-bs-target="#viewAssessmentModal"
+                                        wire:click='showViewModal({{$item->id}})'
                                         data-bs-title="View Question">
                                         <i class="bi bi-eye"></i>
                                         <span class="d-none d-md-inline ms-1">View</span>
@@ -132,7 +131,7 @@
                         </tr>
                         @empty
                         <tr>
-                            <td colspan="6" class="text-center py-4 text-muted">
+                            <td colspan="7" class="text-center py-4 text-muted">
                                 <i class="bi bi-inbox fs-3 d-block mb-2"></i>
                                 No questions found
                             </td>
@@ -297,74 +296,89 @@
     </div>
 
 
-    <div class="modal fade" id="viewSkillsModal" tabindex="-1" aria-labelledby="viewSkillsModalLabel" aria-hidden="true" wire:ignore.self>
+    <div class="modal fade" id="viewModal" tabindex="-1" aria-labelledby="viewModalLabel" aria-hidden="true" wire:ignore.self>
         <div class="modal-dialog modal-dialog-centered modal-lg">
-            <div class="modal-content shadow">
-                <div class="modal-header bg-primary text-white py-2">
-                    <h5 class="modal-title fw-bold text-center w-100 fs-6" id="viewSkillsModalLabel">
+            <div class="modal-content shadow-lg">
+                <div class="modal-header bg-primary text-white py-3">
+                    <h5 class="modal-title fw-bold text-center w-100 fs-5" id="viewModalLabel">
                         View Assessment Question
                     </h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    <button type="button" class="btn-close text-white" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
-                <div class="modal-body">
+                <div class="modal-body px-4">
+                    <!-- Question Details -->
                     <div class="mb-4">
-                        <h6 class="fw-bold mb-3">Question Details</h6>
+                        <h6 class="fw-bold border-bottom pb-2">Question Details</h6>
                         <div class="row g-3">
                             <div class="col-md-6">
-                                <p class="mb-1"><span class="fw-medium">Competency Level:</span> {{$this->skill->competency_level}}</p>
-                                <p class="mb-1"><span class="fw-medium">Skill:</span> {{$this->skill->title}}</p>
+                                <p class="mb-2"><span class="fw-semibold">Skill:</span> {{$title}}</p>
+                                <p class="mb-2"><span class="fw-semibold">Points:</span> {{$points}}</p>
+                                <p class="mb-2"><span class="fw-semibold">Duration:</span> {{$vduration}}</p>
                             </div>
                             <div class="col-md-6">
-                                <p class="mb-1">
-                                    <span class="fw-medium">Status:</span>
-                                    <span class="badge rounded-pill bg-success">
-                                        Active
+                                <p class="mb-2">
+                                    <span class="fw-semibold">Competency Level:</span>
+                                    <span class="badge rounded-pill 
+                                        {{ strtolower($competency_level) == 'basic' ? 'bg-info' : 
+                                        (strtolower($competency_level) == 'intermediate' ? 'bg-primary' : 'bg-dark') }}">
+                                        {{ $competency_level }}
+                                    </span>
+                                </p>
+                    
+                                <p class="mb-2">
+                                    <span class="fw-semibold">Status:</span>
+                                    <span class="badge rounded-pill {{ $status === 'yes' ? 'bg-success' : 'bg-danger' }}">
+                                        {{ $status === 'yes' ? 'Active' : 'Inactive' }}
                                     </span>
                                 </p>
                             </div>
                         </div>
                     </div>
-
+    
+                    <!-- Question -->
+                    <div class="mb-4">
+                        <h6 class="fw-bold border-bottom pb-2">Question</h6>
+                        <p class="mb-0">{{$this->question}}</p>
+                    </div>
+    
+                    <!-- Options Table -->
                     <div class="border-top pt-3">
                         <h6 class="fw-bold mb-3">Options</h6>
-
                         <div class="table-responsive">
-                            <table class="table table-hover">
+                            <table class="table table-bordered align-middle">
                                 <thead class="table-light">
                                     <tr>
-                                        <th class="fw-semibold">#</th>
+                                        <th class="fw-semibold text-center" style="width: 5%;">#</th>
                                         <th class="fw-semibold">Detail</th>
-                                        <th class="fw-semibold">is Answer?</th>
+                                        <th class="fw-semibold text-center" style="width: 15%;">Correct</th>
                                     </tr>
                                 </thead>
-
                                 <tbody>
-                                    {{-- @forelse($selectedskills as $index => $selectedskill)
+                                    @forelse($choices as $index => $choice)
                                     <tr>
-                                        <td>{{ $index + 1 }}</td>
-                                        <td class="fw-medium">{{ $selectedskill['title'] }}</td>
-                                        <td class="fw-medium">
-                                            <span class="badge rounded-pill 
-                                                {{ $selectedskill['competency_level'] == 'Basic' ? 'bg-info' : 
-                                                ($selectedskill['competency_level'] == 'Intermediate' ? 'bg-primary' : 'bg-dark') }}">
-                                                {{ $selectedskill['competency_level'] }}
+                                        <td class="text-center">{{ $index + 1 }}</td>
+                                        <td class="fw-medium">{{ $choice['text'] }}</td>
+                                        <td class="text-center">
+                                            <span class="badge rounded-pill {{ $choice['status'] ? 'bg-success' : 'bg-danger' }}">
+                                                {{ $choice['status'] ? 'Yes' : 'No' }}
                                             </span>
                                         </td>
                                     </tr>
                                     @empty
-                                    <tr>
-                                        <td colspan="4" class="text-center py-3 text-muted">
-                                            <i class="bi bi-info-circle me-1"></i> No skills added yet.
-                                        </td>
-                                    </tr>
-                                    @endforelse --}}
+                                        <tr>
+                                            <td colspan="3" class="text-center py-3 text-muted">
+                                                <i class="bi bi-info-circle me-1"></i> No choices available.
+                                            </td>
+                                        </tr>
+                                    @endforelse
                                 </tbody>
                             </table>
                         </div>
                     </div>
-
+    
+                    <!-- Action Buttons -->
                     <div class="d-flex justify-content-end gap-2 mt-4">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                        <button type="button" class="btn btn-secondary px-4" data-bs-dismiss="modal">
                             <i class="bi bi-x-circle me-1"></i> Close
                         </button>
                     </div>
@@ -372,94 +386,7 @@
             </div>
         </div>
     </div>
-
-
-    <!-- View Assessment Question Modal -->
-    {{-- <div class="modal fade" id="viewAssessmentModal" tabindex="-1" aria-labelledby="viewAssessmentModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered">
-            <div class="modal-content rounded-3 shadow">
-                <div class="modal-header bg-primary text-white">
-                    <h5 class="modal-title" id="viewAssessmentModalLabel">View Assessment Question</h5>
-                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body p-4">
-                    <form wire:submit="{{$editMode ? 'updateAssessmentQuestion' : 'createAssessmentQuestion'}}">
-                        <div class="row mb-4">
-                            <div class="col-md-6">
-                                <label for="viewPosition" class="form-label fw-bold">Add Position</label>
-                                <div class="input-group">
-                                    <select class="form-select form-select-sm" id="viewPosition" disabled>
-                                        <option value="human-resources" selected>Human Resources</option>
-                                    </select>
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <label for="viewSkill" class="form-label fw-bold">Choose Skill</label>
-                                <div class="input-group">
-                                    <select class="form-select form-select-sm" id="viewSkill" disabled>
-                                        <option value="analytical-thinking" selected>Analytical Thinking</option>
-                                    </select>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="mb-2">
-                            <label for="viewQuestion" class="form-label fw-bold">Question:</label>
-                            <textarea class="form-control form-control-sm" id="viewQuestion" rows="3" disabled>Can you describe your experience...</textarea>
-                        </div>
-
-                        <div class="row mb-2">
-                            <div class="col-md-6">
-                                <label for="viewPoints" class="form-label fw-bold">Point(s)</label>
-                                <select class="form-select form-select-sm" id="viewPoints" disabled>
-                                    <option value="1" selected>1</option>
-                                </select>
-                            </div>
-                            <div class="col-md-6">
-                                <label for="viewTimeDuration" class="form-label fw-bold">Time Duration</label>
-                                <div class="input-group">
-                                    <input type="text" class="form-control form-control-sm" id="viewTimeDuration" value="00:03:00" disabled>
-                                    <span class="input-group-text bg-light">
-                                        <i class="far fa-clock"></i>
-                                    </span>
-                                </div>
-                            </div>
-                        </div>
-
-                    <div class="mb-2">
-                        <label class="form-label fw-semibold">Is Active?</label>
-                        <div>
-                            <input type="radio" wire:model="status" value="yes" {{ $status === 'yes' || !$editMode ? 'checked' : '' }}> Yes
-                            <input type="radio" wire:model="status" value="no" {{ $status === 'no' ? 'checked' : '' }}> No
-                        </div>
-
-                        <div class="mb-2">
-                            <p class="fw-bold mb-1">Choices:</p>
-                            <div class="input-group mb-2">
-                                <div class="input-group-text">
-                                    <input class="form-check-input mt-0" type="radio" name="viewCorrectAnswer" value="1" checked disabled>
-                                </div>
-                                <input type="text" class="form-control form-control-sm" value="Option 1" disabled>
-                            </div>
-                            <div class="input-group mb-2">
-                                <div class="input-group-text">
-                                    <input class="form-check-input mt-0" type="radio" name="viewCorrectAnswer" value="2" disabled>
-                                </div>
-                                <input type="text" class="form-control form-control-sm" value="Option 2" disabled>
-                            </div>
-                        </div>
-
-                        <div class="d-flex justify-content-between mt-4">
-                            <button type="button" class="btn btn-outline-secondary rounded-pill px-4" data-bs-dismiss="modal">
-                                <i class="fas fa-arrow-left me-1"></i> Go Back
-                            </button>
-                        </div>
-                    </form>
-                </div>
-            </div>
-        </div>
-    </div> --}}
-
+    
     @script
     <script>
         $wire.on('hide-assessmentquestionModal', () => {
@@ -474,6 +401,20 @@
         $wire.on('show-assessmentquestionModal', () => {
             console.log('Showing assessmentquestion modal');
             $('#assessmentquestionModal').modal('show');
+        });
+
+        $wire.on('hide-viewModal', () => {
+            console.log('Hiding view modal');
+            $('#viewModal').modal('hide');
+
+            const toast = new bootstrap.Toast(document.getElementById('successToast'));
+            document.getElementById('successMessage').textContent = 'view saved successfully!';
+            toast.show();
+        });
+
+        $wire.on('show-viewModal', () => {
+            console.log('Showing view modal');
+            $('#viewModal').modal('show');
         });
     </script>
     @endscript

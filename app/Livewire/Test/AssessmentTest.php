@@ -21,14 +21,14 @@ class AssessmentTest extends Component
     public $archive = false;
 
     public $search;
-    public $name, $location, $venue_id;
+    public $title, $location, $venue_id;
 
     public $positions = [];
     public $skills = [];
 
     public $choices = [['text' => '', 'status' => '']];
     
-    public $position_id, $skill_id, $question, $duration = 0, $status;
+    public $position_id, $skill_id, $question, $duration = 0, $status, $vduration;
     public $points = 1;
 
     public $hours = 0, $minutes = 0, $seconds = 0;
@@ -383,4 +383,38 @@ class AssessmentTest extends Component
         }
         $this->dispatch('show-assessmentquestionModal');
     }
+
+    
+    public function showViewModal($questionId)
+    {
+        $this->clear();
+    
+        $question = AssessmentQuestion::withTrashed()
+            ->with('skill') 
+            ->findOrFail($questionId);
+    
+        $hours = floor($question->duration / 3600);
+        $minutes = floor(($question->duration % 3600) / 60);
+        $seconds = $question->duration % 60;
+    
+        $this->fill([
+            'title' => optional($question->skill)->title, 
+            'competency_level' => optional($question->skill)->competency_level,
+            'vduration' => sprintf('%02d:%02d:%02d', $hours, $minutes, $seconds), 
+            'status' => is_null($question->deleted_at) ? 'yes' : 'no',
+            'question' =>$question->question,
+            'choices' => $question->choices->map(function ($choice) {
+            return [
+                'text' => $choice->choice_text,
+                'status' => $choice->is_answer,
+            ];
+        })->toArray(),
+        ]);
+    
+        $this->question_id = $question->id;
+    
+        $this->dispatch('show-viewModal');
+    }
+    
+
 }

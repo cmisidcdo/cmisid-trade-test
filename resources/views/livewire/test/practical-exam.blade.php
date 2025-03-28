@@ -4,25 +4,69 @@
     </div>
 
     <div class="card p-3">
-        <div class="card-header d-flex justify-content-between align-items-center">
-            <button class="btn btn-primary btn-m" data-bs-toggle="modal" data-bs-target="#addPracticalScenarioModal">
-                <i class="bi bi-plus"></i> Add Practical Scenario
-            </button>
-
-            <div class="d-flex">
-                <!-- Search Input with Icon and Clear Button -->
-                <div class="input-group me-2" style="width: 300px; height: auto;">
-                    <span class="input-group-text"><i class="bi bi-search"></i></span>
-                    <input type="text" class="form-control" id="searchInput" placeholder="Search..." aria-label="Search">
-                    <button class="btn btn-outline-secondary" type="button" id="clearSearch">
-                        <i class="bi bi-x"></i>
-                    </button>
-                </div>
-
-                <!-- Filter Button -->
-                <button class="btn btn-secondary btn-m">
-                    <i class="bi bi-funnel"></i> SORT
+        <div class="row align-items-center pt-3 pb-3">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <button class="btn btn-primary" wire:click="showAddEditModal">
+                    <i class="bi bi-plus"></i> Add Practical Scenario
                 </button>
+        
+                <div class="d-flex gap-2">
+                    <div class="input-group">
+                        <span class="input-group-text bg-light border-end-0">
+                            <i class="bi bi-search"></i>
+                        </span>
+                        <input type="text" class="form-control border-start-0 ps-0"
+                            placeholder="Search question..."
+                            wire:model.live.debounce.300ms="search"
+                            aria-label="Search question">
+                        <button class="btn btn-outline-secondary border-start-0 bg-light" type="button"
+                            wire:loading.class="d-none" wire:target="search"
+                            wire:click="$set('search', '')">
+                            <i class="bi bi-x"></i>
+                        </button>
+                        <span wire:loading wire:target="search" class="input-group-text bg-light border-start-0">
+                            <div class="spinner-border spinner-border-sm text-primary" role="status">
+                                <span class="visually-hidden">Searching...</span>
+                            </div>
+                        </span>
+                    </div>
+        
+                    <div class="dropdown">
+                        <button class="btn btn-outline-primary dropdown-toggle" type="button" id="filterDropdown"
+                            data-bs-toggle="dropdown" aria-expanded="false">
+                            <i class="bi bi-funnel"></i> Filter
+                        </button>
+                        <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="filterDropdown">
+                            <li>
+                                <button class="dropdown-item" wire:click="$set('filterStatus', 'all')">
+                                    <i class="bi bi-list"></i> All
+                                </button>
+                            </li>
+                            <li>
+                                <button class="dropdown-item" wire:click="$set('filterStatus', 'yes')">
+                                    <i class="bi bi-person-check"></i> Active
+                                </button>
+                            </li>
+                            <li>
+                                <button class="dropdown-item" wire:click="$set('filterStatus', 'no')">
+                                    <i class="bi bi-person-x"></i> Inactive
+                                </button>
+                            </li>
+                        </ul>
+                    </div>
+        
+                    <div>
+                        @if($filterStatus !== 'all')
+                            <span class="badge bg-secondary">
+                                <i class="bi bi-funnel"></i> 
+                                {{ $filterStatus === 'yes' ? 'Active' : 'Inactive' }}
+                                <button class="btn btn-sm btn-outline-light border-0 ms-1" wire:click="$set('filterStatus', 'all')">
+                                    <i class="bi bi-x"></i>
+                                </button>
+                            </span>
+                        @endif
+                    </div>
+                </div>
             </div>
         </div>
 

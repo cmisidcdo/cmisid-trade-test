@@ -400,8 +400,6 @@ class AssessmentTest extends Component
         $this->fill([
             'title' => optional($question->skill)->title, 
             'competency_level' => optional($question->skill)->competency_level,
-            'salary_grade' => $question->salary_grade,
-            'interview_priority' => $question->interview_priority,
             'vduration' => sprintf('%02d:%02d:%02d', $hours, $minutes, $seconds), 
             'status' => is_null($question->deleted_at) ? 'yes' : 'no',
             'question' =>$question->question,

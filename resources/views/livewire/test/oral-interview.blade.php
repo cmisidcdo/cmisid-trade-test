@@ -90,8 +90,8 @@
                                     <td>{{$item->question}}</td>
                                     <td class="text-center">
                                         <span class="badge rounded-pill 
-                                            {{ $item->competency_level == 'basic' ? 'bg-info' : 
-                                            ($item->competency_level == 'intermediate' ? 'bg-primary' : 'bg-dark') }}">
+                                            {{ $item->skill->competency_level == 'basic' ? 'bg-info' : 
+                                            ($item->skill->competency_level == 'intermediate' ? 'bg-primary' : 'bg-dark') }}">
                                             {{ ucfirst($item->skill->competency_level) }}
                                         </span>
                                     </td>
@@ -106,8 +106,7 @@
                                     <td class="d-flex justify-content-center">
                                         <div class="d-flex justify-content-center gap-2">
                                             <button class="btn btn-sm btn-info rounded-2 px-2 py-1"
-                                                data-bs-toggle="modal"
-                                                data-bs-target="#viewOralModal"
+                                                wire:click='showViewModal({{$item->id}})'
                                                 data-bs-title="View Question">
                                                 <i class="bi bi-eye"></i>
                                                 <span class="d-none d-md-inline ms-1">View</span>
@@ -221,6 +220,59 @@
                 </div>
             </div>
 
+            <div class="modal fade" id="viewModal" tabindex="-1" aria-labelledby="viewModalLabel" aria-hidden="true" wire:ignore.self>
+                <div class="modal-dialog modal-dialog-centered modal-lg">
+                    <div class="modal-content shadow-lg">
+                        <div class="modal-header bg-primary text-white py-3">
+                            <h5 class="modal-title fw-bold text-center w-100 fs-5" id="viewModalLabel">
+                                View Interview Question
+                            </h5>
+                            <button type="button" class="btn-close text-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body px-4">
+                            <div class="mb-4">
+                                <h6 class="fw-bold border-bottom pb-2">Question Details</h6>
+                                <div class="row g-3">
+                                    <div class="col-md-6">
+                                        <p class="mb-2"><span class="fw-semibold">Skill:</span> {{$title}}</p>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <p class="mb-2">
+                                            <span class="fw-semibold">Competency Level:</span>
+                                            <span class="badge rounded-pill 
+                                                {{ strtolower($competency_level) == 'basic' ? 'bg-info' : 
+                                                (strtolower($competency_level) == 'intermediate' ? 'bg-primary' : 'bg-dark') }}">
+                                                {{ $competency_level }}
+                                            </span>
+                                        </p>
+                            
+                                        <p class="mb-2">
+                                            <span class="fw-semibold">Status:</span>
+                                            <span class="badge rounded-pill {{ $status === 'yes' ? 'bg-success' : 'bg-danger' }}">
+                                                {{ $status === 'yes' ? 'Active' : 'Inactive' }}
+                                            </span>
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+            
+                            <div class="mb-4">
+                                <h6 class="fw-bold border-bottom pb-2">Question</h6>
+                                <p class="mb-0">{{$this->question}}</p>
+                            </div>
+            
+            
+                            <!-- Action Buttons -->
+                            <div class="d-flex justify-content-end gap-2 mt-4">
+                                <button type="button" class="btn btn-secondary px-4" data-bs-dismiss="modal">
+                                    <i class="bi bi-x-circle me-1"></i> Close
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
         
             <!-- View Oral Interview Modal -->
             <div class="modal fade" id="viewOralModal" tabindex="-1" aria-hidden="true">
@@ -282,6 +334,20 @@
         console.log('Showing oralQuestion modal');
         $('#oralQuestionModal').modal('show');
     });
+
+    $wire.on('hide-viewModal', () => {
+            console.log('Hiding view modal');
+            $('#viewModal').modal('hide');
+
+            const toast = new bootstrap.Toast(document.getElementById('successToast'));
+            document.getElementById('successMessage').textContent = 'view saved successfully!';
+            toast.show();
+        });
+
+        $wire.on('show-viewModal', () => {
+            console.log('Showing view modal');
+            $('#viewModal').modal('show');
+        });
 </script>
 @endscript
 

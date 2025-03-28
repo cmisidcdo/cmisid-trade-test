@@ -131,7 +131,7 @@
                         </tr>
                         @empty
                         <tr>
-                            <td colspan="6" class="text-center py-4 text-muted">
+                            <td colspan="7" class="text-center py-4 text-muted">
                                 <i class="bi bi-inbox fs-3 d-block mb-2"></i>
                                 No questions found
                             </td>
@@ -311,24 +311,24 @@
                         <h6 class="fw-bold border-bottom pb-2">Question Details</h6>
                         <div class="row g-3">
                             <div class="col-md-6">
-                                <p class="mb-2"><span class="fw-semibold">Skill:</span> {{$this->title}}</p>
-                                <p class="mb-2"><span class="fw-semibold">Points:</span> {{$this->points}}</p>
-                                <p class="mb-2"><span class="fw-semibold">Duration:</span> {{$this->vduration}}</p>
+                                <p class="mb-2"><span class="fw-semibold">Skill:</span> {{$title}}</p>
+                                <p class="mb-2"><span class="fw-semibold">Points:</span> {{$points}}</p>
+                                <p class="mb-2"><span class="fw-semibold">Duration:</span> {{$vduration}}</p>
                             </div>
                             <div class="col-md-6">
                                 <p class="mb-2">
                                     <span class="fw-semibold">Competency Level:</span>
                                     <span class="badge rounded-pill 
-                                        {{ strtolower($this->competency_level) == 'basic' ? 'bg-info' : 
-                                        (strtolower($this->competency_level) == 'intermediate' ? 'bg-primary' : 'bg-dark') }}">
-                                        {{ $this->competency_level }}
+                                        {{ strtolower($competency_level) == 'basic' ? 'bg-info' : 
+                                        (strtolower($competency_level) == 'intermediate' ? 'bg-primary' : 'bg-dark') }}">
+                                        {{ $competency_level }}
                                     </span>
                                 </p>
                     
                                 <p class="mb-2">
                                     <span class="fw-semibold">Status:</span>
-                                    <span class="badge rounded-pill {{ $this->status === 'yes' ? 'bg-success' : 'bg-danger' }}">
-                                        {{ $this->status === 'yes' ? 'Active' : 'Inactive' }}
+                                    <span class="badge rounded-pill {{ $status === 'yes' ? 'bg-success' : 'bg-danger' }}">
+                                        {{ $status === 'yes' ? 'Active' : 'Inactive' }}
                                     </span>
                                 </p>
                             </div>
@@ -387,94 +387,6 @@
         </div>
     </div>
     
-
-
-    <!-- View Assessment Question Modal -->
-    {{-- <div class="modal fade" id="viewAssessmentModal" tabindex="-1" aria-labelledby="viewAssessmentModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered">
-            <div class="modal-content rounded-3 shadow">
-                <div class="modal-header bg-primary text-white">
-                    <h5 class="modal-title" id="viewAssessmentModalLabel">View Assessment Question</h5>
-                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body p-4">
-                    <form wire:submit="{{$editMode ? 'updateAssessmentQuestion' : 'createAssessmentQuestion'}}">
-                        <div class="row mb-4">
-                            <div class="col-md-6">
-                                <label for="viewPosition" class="form-label fw-bold">Add Position</label>
-                                <div class="input-group">
-                                    <select class="form-select form-select-sm" id="viewPosition" disabled>
-                                        <option value="human-resources" selected>Human Resources</option>
-                                    </select>
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <label for="viewSkill" class="form-label fw-bold">Choose Skill</label>
-                                <div class="input-group">
-                                    <select class="form-select form-select-sm" id="viewSkill" disabled>
-                                        <option value="analytical-thinking" selected>Analytical Thinking</option>
-                                    </select>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="mb-2">
-                            <label for="viewQuestion" class="form-label fw-bold">Question:</label>
-                            <textarea class="form-control form-control-sm" id="viewQuestion" rows="3" disabled>Can you describe your experience...</textarea>
-                        </div>
-
-                        <div class="row mb-2">
-                            <div class="col-md-6">
-                                <label for="viewPoints" class="form-label fw-bold">Point(s)</label>
-                                <select class="form-select form-select-sm" id="viewPoints" disabled>
-                                    <option value="1" selected>1</option>
-                                </select>
-                            </div>
-                            <div class="col-md-6">
-                                <label for="viewTimeDuration" class="form-label fw-bold">Time Duration</label>
-                                <div class="input-group">
-                                    <input type="text" class="form-control form-control-sm" id="viewTimeDuration" value="00:03:00" disabled>
-                                    <span class="input-group-text bg-light">
-                                        <i class="far fa-clock"></i>
-                                    </span>
-                                </div>
-                            </div>
-                        </div>
-
-                    <div class="mb-2">
-                        <label class="form-label fw-semibold">Is Active?</label>
-                        <div>
-                            <input type="radio" wire:model="status" value="yes" {{ $status === 'yes' || !$editMode ? 'checked' : '' }}> Yes
-                            <input type="radio" wire:model="status" value="no" {{ $status === 'no' ? 'checked' : '' }}> No
-                        </div>
-
-                        <div class="mb-2">
-                            <p class="fw-bold mb-1">Choices:</p>
-                            <div class="input-group mb-2">
-                                <div class="input-group-text">
-                                    <input class="form-check-input mt-0" type="radio" name="viewCorrectAnswer" value="1" checked disabled>
-                                </div>
-                                <input type="text" class="form-control form-control-sm" value="Option 1" disabled>
-                            </div>
-                            <div class="input-group mb-2">
-                                <div class="input-group-text">
-                                    <input class="form-check-input mt-0" type="radio" name="viewCorrectAnswer" value="2" disabled>
-                                </div>
-                                <input type="text" class="form-control form-control-sm" value="Option 2" disabled>
-                            </div>
-                        </div>
-
-                        <div class="d-flex justify-content-between mt-4">
-                            <button type="button" class="btn btn-outline-secondary rounded-pill px-4" data-bs-dismiss="modal">
-                                <i class="fas fa-arrow-left me-1"></i> Go Back
-                            </button>
-                        </div>
-                    </form>
-                </div>
-            </div>
-        </div>
-    </div> --}}
-
     @script
     <script>
         $wire.on('hide-assessmentquestionModal', () => {

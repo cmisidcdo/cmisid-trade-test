@@ -102,13 +102,19 @@
                                 <label class="fw-bold form-label">Description</label>
                                 <textarea class="form-control" rows="2"></textarea>
                             </div>
-                            <!-- Attachment Section -->
+                            <!-- In the Add Practical Test Scenario Modal -->
                             <div class="col-md-12 mt-2">
                                 <label class="fw-bold form-label">Attachment</label>
-                                <input type="file" class="form-control mb-1">
-                                <div class="mt-1">
-                                    <button class="btn btn-outline-secondary btn-sm"><i class="bi bi-upload"></i> Upload</button>
-                                    <button class="btn btn-outline-primary btn-sm"><i class="bi bi-download"></i> Download</button>
+                                <input type="file" class="form-control mb-1" id="addScenarioFileInput">
+                                <div class="mt-1 d-flex align-items-center">
+                                    <button class="btn btn-outline-secondary btn-sm me-2"><i class="bi bi-upload"></i> Upload</button>
+                                    <a href="#" id="addScenarioDownloadBtn" class="btn btn-outline-primary btn-sm me-2 d-none">
+                                        <i class="bi bi-download"></i> Download
+                                    </a>
+                                    <button id="addScenarioClearBtn" class="btn btn-outline-danger btn-sm me-2 d-none">
+                                        <i class="bi bi-x-circle"></i> Clear
+                                    </button>
+                                    <span id="addScenarioFileName" class="text-muted d-none"></span>
                                 </div>
                             </div>
                         </div>
@@ -131,7 +137,7 @@
     <div class="modal fade" id="viewScenarioModal" tabindex="-1">
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content">
-            <div class="modal-header bg-primary text-white">
+                <div class="modal-header bg-primary text-white">
                     <h5 class="modal-title  w-100 text-center">View Practical Test Scenario</h5>
                     <button type="button" class="btn-close btn-close-white position-absolute end-0 me-3" data-bs-dismiss="modal"></button>
                 </div>
@@ -181,12 +187,12 @@
 
 
 
-    <!-- Edit Practical Scenario Modal -->
-    <div class="modal fade" id="addPracticalScenarioModal" tabindex="-1">
+    <!-- Fix for Edit Practical Scenario Modal -->
+    <div class="modal fade" id="editScenarioModal" tabindex="-1">
         <div class="modal-dialog modal-lg modal-dialog-centered">
             <div class="modal-content">
                 <div class="modal-header bg-primary text-white">
-                    <h5 class="modal-title  w-100 text-center">Edit Practical Test Scenario</h5>
+                    <h5 class="modal-title w-100 text-center">Edit Practical Test Scenario</h5>
                     <button type="button" class="btn-close btn-close-white position-absolute end-0 me-3" data-bs-dismiss="modal"></button>
                 </div>
                 <div class="modal-body">
@@ -225,19 +231,25 @@
                                 <label class="fw-bold form-label">Description</label>
                                 <textarea class="form-control" rows="2"></textarea>
                             </div>
-                            <!-- Attachment Section -->
+                            <!-- In the Edit Practical Scenario Modal -->
                             <div class="col-md-12 mt-2">
                                 <label class="fw-bold form-label">Attachment</label>
-                                <input type="file" class="form-control mb-1">
-                                <div class="mt-1">
-                                    <button class="btn btn-outline-secondary btn-sm"><i class="bi bi-upload"></i> Upload</button>
-                                    <button class="btn btn-outline-primary btn-sm"><i class="bi bi-download"></i> Download</button>
+                                <input type="file" class="form-control mb-1" id="editScenarioFileInput">
+                                <div class="mt-1 d-flex align-items-center">
+                                    <button class="btn btn-outline-secondary btn-sm me-2"><i class="bi bi-upload"></i> Upload</button>
+                                    <a href="#" id="editScenarioDownloadBtn" class="btn btn-outline-primary btn-sm me-2 d-none">
+                                        <i class="bi bi-download"></i> Download
+                                    </a>
+                                    <button id="editScenarioClearBtn" class="btn btn-outline-danger btn-sm me-2 d-none">
+                                        <i class="bi bi-x-circle"></i> Clear
+                                    </button>
+                                    <span id="editScenarioFileName" class="text-muted d-none"></span>
                                 </div>
                             </div>
                         </div>
                         <div class="modal-footer d-flex justify-content-between mt-2">
                             <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Go Back</button>
-                            <button type="submit" class="btn btn-primary">Add Scenario</button>
+                            <button type="submit" class="btn btn-primary">Update Scenario</button>
                         </div>
                     </form>
                 </div>
@@ -248,3 +260,68 @@
 
 
 </div>
+<script>
+   document.addEventListener('DOMContentLoaded', function() {
+    // Function to handle file input changes
+    function handleFileUpload(fileInputId, fileDisplayId, downloadBtnId, clearBtnId) {
+        const fileInput = document.getElementById(fileInputId);
+        const fileDisplay = document.getElementById(fileDisplayId);
+        const downloadBtn = document.getElementById(downloadBtnId);
+        const clearBtn = document.getElementById(clearBtnId);
+
+        fileInput.addEventListener('change', function(event) {
+            const file = event.target.files[0];
+            
+            if (file) {
+                // Show file name
+                fileDisplay.textContent = file.name;
+                fileDisplay.classList.remove('d-none');
+
+                // Show download button and create download link
+                downloadBtn.classList.remove('d-none');
+                downloadBtn.href = URL.createObjectURL(file);
+                downloadBtn.download = file.name;
+
+                // Show clear button
+                clearBtn.classList.remove('d-none');
+            } else {
+                resetFileInput();
+            }
+        });
+
+        // Clear button functionality
+        clearBtn.addEventListener('click', function(event) {
+            // Prevent form submission or modal closure
+            event.preventDefault();
+            event.stopPropagation();
+            
+            resetFileInput();
+        });
+
+        // Reset function
+        function resetFileInput() {
+            fileInput.value = ''; // Clear the file input
+            fileDisplay.textContent = '';
+            fileDisplay.classList.add('d-none');
+            downloadBtn.classList.add('d-none');
+            clearBtn.classList.add('d-none');
+        }
+    }
+
+    // Initialize for Add Modal
+    handleFileUpload(
+        'addScenarioFileInput', 
+        'addScenarioFileName', 
+        'addScenarioDownloadBtn',
+        'addScenarioClearBtn'
+    );
+
+    // Initialize for Edit Modal
+    handleFileUpload(
+        'editScenarioFileInput', 
+        'editScenarioFileName', 
+        'editScenarioDownloadBtn',
+        'editScenarioClearBtn'
+    );
+});
+</script>

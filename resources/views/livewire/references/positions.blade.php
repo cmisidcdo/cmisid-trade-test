@@ -127,11 +127,10 @@
         </div>
 
         <div class="modal fade" id="positionModal" tabindex="-1" aria-labelledby="positionModalLabel" aria-hidden="true" wire:ignore.self>
-            <div class="modal-dialog modal-lg">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title" id="positionModalLabel">
-                            <i class="bi {{ $editMode ? 'bi-pencil-square' : 'bi-plus-circle' }} me-1"></i>
+            <div class="modal-dialog modal-dialog-centered modal-lg">
+                <div class="modal-content shadow">
+                    <div class="modal-header bg-primary text-white py-2">
+                        <h5 class="modal-title fw-bold text-center w-100 fs-6" id="positionModalLabel">
                             {{$editMode ? 'Update Position' : 'Add Position'}}
                         </h5>
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" wire:click='clear'></button>
@@ -220,8 +219,8 @@
                                                 <td class="fw-medium">{{ $selectedskill['title'] }}</td>
                                                 <td>
                                                     <span class="badge rounded-pill 
-                                                        {{ $selectedskill['competency_level'] == 'basic' ? 'bg-info' : 
-                                                        ($selectedskill['competency_level'] == 'intermediate' ? 'bg-primary' : 'bg-dark') }}">
+                                                        {{ $selectedskill['competency_level'] == 'Basic' ? 'bg-info' : 
+                                                        ($selectedskill['competency_level'] == 'Intermediate' ? 'bg-primary' : 'bg-dark') }}">
                                                         {{ucfirst($selectedskill['competency_level'])}}
                                                     </span>
                                                 </td>
@@ -262,10 +261,10 @@
         </div>
 
         <div class="modal fade" id="skillsModal" tabindex="-1" aria-labelledby="skillsModalLabel" aria-hidden="true" wire:ignore.self>
-            <div class="modal-dialog modal-lg">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title" id="skillsModalLabel">
+            <div class="modal-dialog modal-dialog-centered modal-lg">
+                <div class="modal-content shadow">
+                    <div class="modal-header bg-primary text-white py-2">
+                        <h5 class="modal-title fw-bold text-center w-100 fs-6" id="skillsModalLabel">
                             <i class="bi bi-list-check me-1"></i> Select Skills
                         </h5>
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" wire:click='clear'></button>
@@ -307,8 +306,8 @@
                                         <td class="fw-medium">{{$item->title}}</td>
                                         <td>
                                             <span class="badge rounded-pill 
-                                                {{ $item->competency_level == 'basic' ? 'bg-info' : 
-                                                ($item->competency_level == 'intermediate' ? 'bg-primary' : 'bg-dark') }}">
+                                                {{ $item->competency_level == 'Basic' ? 'bg-info' : 
+                                                ($item->competency_level == 'Intermediate' ? 'bg-primary' : 'bg-dark') }}">
                                                 {{ucfirst($item->competency_level)}}
                                             </span>
                                         </td>
@@ -354,11 +353,11 @@
         </div>
 
         <div class="modal fade" id="viewSkillsModal" tabindex="-1" aria-labelledby="viewSkillsModalLabel" aria-hidden="true" wire:ignore.self>
-            <div class="modal-dialog modal-lg">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title" id="viewSkillsModalLabel">
-                            <i class="bi bi-eye me-1"></i> Position: {{$this->title}}
+            <div class="modal-dialog modal-dialog-centered modal-lg">
+                <div class="modal-content shadow">
+                    <div class="modal-header bg-primary text-white py-2">
+                        <h5 class="modal-title fw-bold text-center w-100 fs-6" id="viewSkillsModalLabel">
+                            View Position
                         </h5>
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
@@ -401,8 +400,8 @@
                                             <td class="fw-medium">{{ $selectedskill['title'] }}</td>
                                             <td class="fw-medium">
                                                 <span class="badge rounded-pill 
-                                                    {{ $selectedskill['competency_level'] == 'basic' ? 'bg-info' : 
-                                                    ($selectedskill['competency_level'] == 'intermediate' ? 'bg-primary' : 'bg-dark') }}">
+                                                    {{ $selectedskill['competency_level'] == 'Basic' ? 'bg-info' : 
+                                                    ($selectedskill['competency_level'] == 'Intermediate' ? 'bg-primary' : 'bg-dark') }}">
                                                     {{ $selectedskill['competency_level'] }}
                                                 </span>
                                             </td>

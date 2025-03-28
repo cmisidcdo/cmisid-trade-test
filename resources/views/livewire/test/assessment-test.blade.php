@@ -110,26 +110,34 @@
                             </td>
 
                             <td class="d-flex justify-content-center">
-                                @can('update reference')
-                                <button class="btn btn-sm btn-primary rounded-2 px-2 py-1 me-2"
-                                    wire:click='readAssessmentQuestion({{$item->id}})'
-                                    data-bs-toggle="tooltip"
-                                    data-bs-title="Edit Question">
-                                    <i class="bi bi-pencil-square"></i>
-                                    <span class="d-none d-md-inline ms-1">Edit</span>
-                                </button>
-                                @endcan
+                                <div class="d-flex justify-content-center gap-2">
+                                    <button class="btn btn-sm btn-info rounded-2 px-2 py-1"
+                                        data-bs-toggle="modal"
+                                        data-bs-target="#viewAssessmentModal"
+                                        data-bs-title="View Question">
+                                        <i class="bi bi-eye"></i>
+                                        <span class="d-none d-md-inline ms-1">View</span>
+                                    </button>
 
+                                    @can('update reference')
+                                    <button class="btn btn-sm btn-primary rounded-2 px-2 py-1 me-2"
+                                        wire:click='readAssessmentQuestion({{$item->id}})'
+                                        data-bs-toggle="tooltip"
+                                        data-bs-title="Edit Question">
+                                        <i class="bi bi-pencil-square"></i>
+                                        <span class="d-none d-md-inline ms-1">Edit</span>
+                                    </button>
+                                    @endcan
                     
-                                {{-- @can('delete reference')
-                                <button class="btn btn-sm {{$item->deleted_at == null ? 'btn-danger' : 'btn-outline-success'}} rounded-2 px-2 py-1"
-                                    wire:click="{{$item->deleted_at == null ? 'confirmDelete('.$item->id.')' : 'restoreAssessmentQuestion('.$item->id.')'}}"
-                                    data-bs-toggle="tooltip"
-                                    data-bs-title="{{$item->deleted_at == null ? 'Move to archive' : 'Restore question'}}">
-                                    <i class="bi {{$item->deleted_at == null ? 'bi bi-archive-fill' : 'bi-arrow-counterclockwise'}}"></i>
-                                    <span class="d-none d-md-inline ms-1">{{$item->deleted_at == null ? 'Archive' : 'Restore'}}</span>
-                                </button>
-                                @endcan --}}
+                                    {{-- @can('delete reference')
+                                    <button class="btn btn-sm {{$item->deleted_at == null ? 'btn-danger' : 'btn-outline-success'}} rounded-2 px-2 py-1"
+                                        wire:click="{{$item->deleted_at == null ? 'confirmDelete('.$item->id.')' : 'restoreAssessmentQuestion('.$item->id.')'}}"
+                                        data-bs-toggle="tooltip"
+                                        data-bs-title="{{$item->deleted_at == null ? 'Move to archive' : 'Restore question'}}">
+                                        <i class="bi {{$item->deleted_at == null ? 'bi bi-archive-fill' : 'bi-arrow-counterclockwise'}}"></i>
+                                        <span class="d-none d-md-inline ms-1">{{$item->deleted_at == null ? 'Archive' : 'Restore'}}</span>
+                                    </button>
+                                    @endcan --}}
                             </td>
                         </tr>
                         @empty

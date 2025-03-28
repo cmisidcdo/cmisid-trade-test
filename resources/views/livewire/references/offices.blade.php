@@ -153,12 +153,12 @@
             </div>
 
             <div class="modal fade" id="officeModal" tabindex="-1" aria-labelledby="officeModalLabel" aria-hidden="true" wire:ignore.self>
-                <div class="modal-dialog modal-dialog-centered">
-                    <div class="modal-content border-0 shadow">
-                        <div class="modal-header bg-light">
-                            <h5 class="modal-title" id="officeModalLabel">
-                                <i class="bi {{ $editMode ? 'bi-pencil-square' : 'bi-plus-circle' }} me-2"></i>
-                                {{$editMode ? 'Update Office' : 'Add New Office'}}
+                <div class="modal-dialog modal-dialog-centered modal-lg">
+                    <div class="modal-content shadow">
+                        <div class="modal-header bg-primary text-white py-2">
+                                <h5 class="modal-title fw-bold text-center w-100 fs-6" id="officeModalLabel">
+                                    {{$editMode ? 'Update Office' : 'Add Office'}}
+                                </h5>
                             </h5>
                             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" wire:click='clear'></button>
                         </div>

@@ -28,7 +28,7 @@ class AssessmentTest extends Component
 
     public $choices = [['text' => '', 'status' => '']];
     
-    public $position_id, $skill_id, $question, $duration, $status;
+    public $position_id, $skill_id, $question, $duration = 0, $status;
     public $points = 1;
 
     public $hours = 0, $minutes = 0, $seconds = 0;
@@ -49,17 +49,6 @@ class AssessmentTest extends Component
         // if(!$user->can('read reference')){
         //     abort(403);
         // }
-
-        $this->positions = Position::all();
-    }
-
-    public function updatedPositionId()
-    {
-        $this->skills = Skill::whereIn('id', function ($query) {
-            $query->select('skill_id')
-                  ->from('position_skills')
-                  ->where('position_id', $this->position_id);
-        })->get();
     }
 
     public function updatedCompetencyLevel()
@@ -104,12 +93,21 @@ class AssessmentTest extends Component
             'question'  => ['required', 
                 'string', Rule::unique('assessmentquestions', 'question')->ignore($this->assessmentquestion_id),
             ], 
-            'points' => ['required', 'integer', 'min:1'],    
+            'points' => ['required', 'integer', 'min:1'],
+            'skill_id' => ['required', 'integer', 'min:1'],        
             'hours' => 'required|integer|min:0|max:23',
             'minutes' => 'required|integer|min:0|max:59',
             'seconds' => 'required|integer|min:0|max:59',
+            'duration' => 'required|integer|min:0|max:86400',
+            'choices.*.text' => 'required|string|min:1',
         ];
     }
+
+    public function updated($property)
+    {
+        $this->duration = ($this->hours * 3600) + ($this->minutes * 60) + $this->seconds;
+    }
+
 
     public function toggleArchive()
     {
@@ -166,15 +164,8 @@ class AssessmentTest extends Component
 
     public function createAssessmentQuestion()
     {
-        try {
-            $this->validate();
-            Log::info('Validation passed.');
-        } catch (\Illuminate\Validation\ValidationException $e) {
-            Log::error('Validation failed.', ['errors' => $e->errors()]);
-            dd($e->errors()); 
-        }
-        
-        // $this->validate();
+
+        $this->validate();
 
         DB::transaction(function () {
             try {

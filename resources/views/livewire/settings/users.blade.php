@@ -60,7 +60,7 @@
                       @if($filterStatus !== 'all')
                           <span class="badge bg-secondary">
                               <i class="bi bi-funnel"></i> 
-                              {{ $filterStatus === 'yes' ? 'Active Users' : 'Inactive Users' }}
+                              {{ $filterStatus === 'yes' ? 'Active' : 'Inactive' }}
                               <button class="btn btn-sm btn-outline-light border-0 ms-1" wire:click="$set('filterStatus', 'all')">
                                   <i class="bi bi-x"></i>
                               </button>
@@ -96,7 +96,7 @@
               <td class="d-flex justify-content-center">
                 <button class="btn btn-sm btn-info rounded-2 px-2 py-1 me-2"
                   wire:click="viewUser({{$item->id}})">
-                  <i class="bi bi-eye-fill"></i>
+                  <i class="bi bi-eye"></i>
                   <span class="d-none d-md-inline ms-1">View</span>
                 </button>
 

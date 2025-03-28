@@ -6,41 +6,70 @@
         <section class="section dashboard">
             <div class="card shadow-sm border-0 rounded-3">
                 <div class="card-body p-4">
-                    <div class="row mb-4 align-items-center">
-                        <div class="col-md-6">
-                            <div class="input-group">
-                                <span class="input-group-text bg-light border-end-0">
-                                    <i class="bi bi-search"></i>
-                                </span>
-                                <input type="text" class="form-control border-start-0 ps-0"
-                                    placeholder="Search offices..."
-                                    wire:model.live.debounce.300ms="search"
-                                    aria-label="Search offices">
-                                <button class="btn btn-secondary border-start-0 bg-light" type="button"
-                                    wire:loading.class="d-none" wire:target="search"
-                                    wire:click="$set('search', '')">
-                                    <i class="bi bi-x"></i>
-                                </button>
-                                <span wire:loading wire:target="search" class="input-group-text bg-light border-start-0">
-                                    <div class="spinner-border spinner-border-sm text-primary" role="status">
-                                        <span class="visually-hidden">Searching...</span>
-                                    </div>
-                                </span>
-                            </div>
-                            <div id="searchSuggestions" class="position-absolute bg-white shadow-sm rounded p-2 d-none">
-                            </div>
-                        </div>
-                        <div class="col-md-6 text-md-end mt-3 mt-md-0">
-                            <button type="button" class="btn {{ $archive ? 'btn-success' : 'btn-warning' }}" wire:click="toggleArchive">
-                                <i class="bi {{ $archive ? 'bi-box-arrow-in-up' : 'bi-archive' }} me-1"></i>
-                                {{ $archive ? 'General' : 'View Archive' }}
+                    
+                    <div class="row align-items-center pt-3 pb-3">
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <button class="btn btn-primary" wire:click="showAddEditModal">
+                                <i class="bi bi-plus"></i> Add Office
                             </button>
-                            @can('create reference')
-                            <button type="button" class="btn btn-primary"
-                                wire:click='showAddEditModal'>
-                                <i class="bi bi-plus-lg me-1"></i> Add Office
-                            </button>
-                            @endcan
+                    
+                            <div class="d-flex gap-2">
+                                <div class="input-group">
+                                    <span class="input-group-text bg-light border-end-0">
+                                        <i class="bi bi-search"></i>
+                                    </span>
+                                    <input type="text" class="form-control border-start-0 ps-0"
+                                        placeholder="Search offices..."
+                                        wire:model.live.debounce.300ms="search"
+                                        aria-label="Search offices">
+                                    <button class="btn btn-outline-secondary border-start-0 bg-light" type="button"
+                                        wire:loading.class="d-none" wire:target="search"
+                                        wire:click="$set('search', '')">
+                                        <i class="bi bi-x"></i>
+                                    </button>
+                                    <span wire:loading wire:target="search" class="input-group-text bg-light border-start-0">
+                                        <div class="spinner-border spinner-border-sm text-primary" role="status">
+                                            <span class="visually-hidden">Searching...</span>
+                                        </div>
+                                    </span>
+                                </div>
+                    
+                                <div class="dropdown">
+                                    <button class="btn btn-outline-primary dropdown-toggle" type="button" id="filterDropdown"
+                                        data-bs-toggle="dropdown" aria-expanded="false">
+                                        <i class="bi bi-funnel"></i> Filter
+                                    </button>
+                                    <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="filterDropdown">
+                                        <li>
+                                            <button class="dropdown-item" wire:click="$set('filterStatus', 'all')">
+                                                <i class="bi bi-list"></i> All Offices
+                                            </button>
+                                        </li>
+                                        <li>
+                                            <button class="dropdown-item" wire:click="$set('filterStatus', 'yes')">
+                                                <i class="bi bi-person-check"></i> Active Offices
+                                            </button>
+                                        </li>
+                                        <li>
+                                            <button class="dropdown-item" wire:click="$set('filterStatus', 'no')">
+                                                <i class="bi bi-person-x"></i> Inactive Offices
+                                            </button>
+                                        </li>
+                                    </ul>
+                                </div>
+                    
+                                <div>
+                                    @if($filterStatus !== 'all')
+                                        <span class="badge bg-secondary">
+                                            <i class="bi bi-funnel"></i> 
+                                            {{ $filterStatus === 'yes' ? 'Active' : 'Inactive' }}
+                                            <button class="btn btn-sm btn-outline-light border-0 ms-1" wire:click="$set('filterStatus', 'all')">
+                                                <i class="bi bi-x"></i>
+                                            </button>
+                                        </span>
+                                    @endif
+                                </div>
+                            </div>
                         </div>
                     </div>
 
@@ -78,7 +107,7 @@
                                             </button>
                                             @endcan
 
-                                            @can('delete reference')
+                                            {{-- @can('delete reference')
                                             <button class="btn btn-sm {{$item->deleted_at == Null ? 'btn-danger' : 'btn-success'}} rounded-2 px-2 py-1"
                                                 wire:click='{{$item->deleted_at == Null ? 'confirmDelete('.$item->id.')': 'restoreOffice('.$item->id.')'}}'
                                                 data-bs-toggle="tooltip"
@@ -86,7 +115,7 @@
                                                 <i class="bi {{$item->deleted_at == Null ? 'bi bi-archive-fill': 'bi-arrow-counterclockwise'}}"></i>
                                                 <span class="d-none d-md-inline ms-1">{{$item->deleted_at == Null ? 'Archive': 'Restore'}}</span>
                                             </button>
-                                            @endcan
+                                            @endcan --}}
                                         </div>
                                     </td>
                                 </tr>
@@ -124,12 +153,12 @@
             </div>
 
             <div class="modal fade" id="officeModal" tabindex="-1" aria-labelledby="officeModalLabel" aria-hidden="true" wire:ignore.self>
-                <div class="modal-dialog modal-dialog-centered">
-                    <div class="modal-content border-0 shadow">
-                        <div class="modal-header bg-light">
-                            <h5 class="modal-title" id="officeModalLabel">
-                                <i class="bi {{ $editMode ? 'bi-pencil-square' : 'bi-plus-circle' }} me-2"></i>
-                                {{$editMode ? 'Update Office' : 'Add New Office'}}
+                <div class="modal-dialog modal-dialog-centered modal-lg">
+                    <div class="modal-content shadow">
+                        <div class="modal-header bg-primary text-white py-2">
+                                <h5 class="modal-title fw-bold text-center w-100 fs-6" id="officeModalLabel">
+                                    {{$editMode ? 'Update Office' : 'Add Office'}}
+                                </h5>
                             </h5>
                             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" wire:click='clear'></button>
                         </div>
@@ -149,6 +178,15 @@
                                     </div>
                                     @enderror
                                 </div>
+
+                                <div class="mb-4">
+                                    <label class="form-label fw-semibold">Is Active?</label>
+                                    <div>
+                                        <input type="radio" wire:model="status" value="yes" {{ $status === 'yes' || !$editMode ? 'checked' : '' }}> Yes
+                                        <input type="radio" wire:model="status" value="no" {{ $status === 'no' ? 'checked' : '' }}> No
+                                    </div>
+                                </div>
+
                                 <div class="d-grid gap-2 d-md-flex justify-content-md-end mt-4">
                                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" wire:click='clear'>
                                         Cancel

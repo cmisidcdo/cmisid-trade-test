@@ -17,7 +17,8 @@ class Offices extends Component
     public $archive = false;
 
     public $search;
-    public $title, $office_id;
+    public $title, $office_id, $status;
+    public $filterStatus = 'all'; 
 
     protected $listeners = ['deleteOffice'];
 
@@ -33,9 +34,15 @@ class Offices extends Component
     public function render()
     {
         return view('livewire.references.offices', [
-            'offices' => $this->getOffices()
+            'offices' => $this->loadOffices()
         ]);
     }
+
+    public function updatingFilterStatus()
+    {
+        $this->resetPage(); 
+    }
+
     
 
     public function updatedSearch()
@@ -73,12 +80,31 @@ class Offices extends Component
             ->paginate(10);
     }
 
+    public function loadOffices()
+    {
+        return Office::withTrashed()
+            ->when($this->filterStatus !== 'all', function ($query) {
+                if ($this->filterStatus === 'yes') {
+                    $query->whereNull('deleted_at');
+                } elseif ($this->filterStatus === 'no') {
+                    $query->whereNotNull('deleted_at'); 
+                }
+            })
+            ->when($this->search, function ($query) {
+                $query->where(function ($q) {
+                    $q->where('title', 'like', '%' . $this->search . '%');
+                });
+            })
+            ->paginate(10);
+    }
+
     public function createOffice()
     {
         $this->validate();
         DB::transaction(function () {
             $office = new Office();
             $office->title = $this->title;
+            $office->deleted_at = $this->status === 'no' ? now() : null;
             $office->save();
         });
 
@@ -103,6 +129,7 @@ class Offices extends Component
         );
 
         $this->office_id = $office->id;
+        $this->status = is_null($office->deleted_at) ? 'yes' : 'no';
         $this->editMode = true;
         $this->dispatch('show-officeModal');
     }
@@ -116,7 +143,13 @@ class Offices extends Component
             $office = Office::withTrashed()->findOrFail($this->office_id);
             
             $office->title = $this->title;
-            $office->save();
+            if ($this->status === 'no' && is_null($office->deleted_at)) {
+                $office->delete();
+            } elseif ($this->status === 'yes' && !is_null($office->deleted_at)) {
+                $office->restore();
+            } else {
+                $office->save();
+            }
         });
 
         $this->clear();
@@ -153,6 +186,9 @@ class Offices extends Component
     public function showAddEditModal()
     {
         $this->clear();
+        if (!$this->editMode) { 
+            $this->status = 'yes'; 
+        }
         $this->dispatch('show-officeModal');
     }
 }

@@ -177,6 +177,7 @@ class AssessmentTest extends Component
                 $assessmentquestion->skill_id = $this->skill_id;
                 $totalSeconds = ($this->hours * 3600) + ($this->minutes * 60) + $this->seconds;
                 $assessmentquestion->duration = $totalSeconds;
+                $assessmentquestion->deleted_at = $this->status === 'no' ? now() : null;
                 $assessmentquestion->save();
 
                 Log::info('Question created successfully.', ['question_id' => $assessmentquestion->id]);

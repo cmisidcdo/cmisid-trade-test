@@ -25,7 +25,7 @@ class OralInterview extends Component
 
     public $choices = [['text' => '', 'status' => '']];
     
-    public $position_id, $skill_id, $question, $status, $notes, $skill;
+    public $position_id, $skill_id, $question, $status, $notes, $skill, $vduration, $title;
 
     public $oralquestion_id;
     
@@ -188,6 +188,26 @@ class OralInterview extends Component
         $this->clear();
         $this->dispatch('hide-oralquestionModal');
         $this->dispatch('success', 'Question and choices updated successfully.');
+    }
+
+    public function showViewModal($questionId)
+    {
+        $this->clear();
+    
+        $question = OralQuestion::withTrashed()
+            ->with('skill') 
+            ->findOrFail($questionId);
+    
+        $this->fill([
+            'title' => optional($question->skill)->title, 
+            'competency_level' => optional($question->skill)->competency_level,
+            'status' => is_null($question->deleted_at) ? 'yes' : 'no',
+            'question' =>$question->question,
+        ]);
+    
+        $this->question_id = $question->id;
+    
+        $this->dispatch('show-viewModal');
     }
 
 }

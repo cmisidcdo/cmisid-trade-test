@@ -1,6 +1,12 @@
 <?php
 
-use App\Livewire\Candidate\CandidateList;
+use App\Livewire\Candidate\Exam\Assessment;
+use App\Livewire\Candidate\Exam\CandidateAssessment;
+use App\Livewire\Candidate\Exam\CandidateOral;
+use App\Livewire\Candidate\Exam\CandidatePractical;
+use App\Livewire\Candidate\Home;
+use App\Livewire\Candidate\Login;
+use App\Livewire\Settings\CandidateList;
 use App\Livewire\Exam\Assessmentlist;
 use App\Livewire\Exam\Interviewlist;
 use App\Livewire\Exam\Practicallist;
@@ -29,7 +35,7 @@ use App\Livewire\Test\AssessmentTest;
 use App\Livewire\Test\OralInterview;
 use App\Livewire\Test\PracticalExam;
 use Illuminate\Support\Facades\Auth;
-
+use Illuminate\Http\Request;
 
 Route::get('/', function () {
     return view('auth.login');
@@ -69,3 +75,14 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/references/criterias/practical', Practical::class)->name('references.criterias.practical');
     Route::get('/references/criterias/oral', Oral:: class)->name('references.criterias.oral');
 });
+
+Route::get('/candidate/login', Login::class)->name('candidate.login');
+Route::get('/candidate/home', Home::class)->name('candidate.home');
+Route::get('/candidate/exam/assessment', CandidateAssessment::class)->name('candidate.exam.assessment');
+Route::get('/candidate/exam/practical', CandidatePractical::class)->name('candidate.exam.practical');
+Route::get('/candidate/exam/oral', CandidateOral::class)->name('candidate.exam.oral');
+
+Route::post('/candidate-logout', function (Request $request) {
+    $request->session()->forget(['candidate_id', 'candidate_name']); 
+    return redirect()->route('candidate.login'); 
+})->name('candidate.logout');

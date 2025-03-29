@@ -178,7 +178,7 @@
                     <div class="modal-dialog modal-dialog-centered modal-lg">
                             <div class="modal-content" style="border-radius: 12px;">
                                 <div class="modal-body p-4">
-                                    <h5 class="text-center mb-4 fw-bold" style="color: black;">Create Schedule for Practical Exam</h5>
+                                    <h5 class="text-center mb-4 fw-bold" style="color: black;">Schedule for Practical Exam</h5>
                                     <form>
                                         <div class="row g-3">
                                             <!-- Select Candidate -->

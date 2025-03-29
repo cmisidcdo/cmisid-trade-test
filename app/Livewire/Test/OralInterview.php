@@ -151,6 +151,7 @@ class OralInterview extends Component
             $oralquestion = new OralQuestion();
             $oralquestion->question = $this->question;
             $oralquestion->skill_id = $this->skill_id;
+            $oralquestion->deleted_at = $this->status === 'no' ? now() : null;
             $oralquestion->save();
 
         });
@@ -187,7 +188,7 @@ class OralInterview extends Component
 
         $this->clear();
         $this->dispatch('hide-oralquestionModal');
-        $this->dispatch('success', 'Question and choices updated successfully.');
+        $this->dispatch('success', 'Question updated successfully.');
     }
 
     public function showViewModal($questionId)

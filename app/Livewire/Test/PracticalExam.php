@@ -2,18 +2,21 @@
 
 namespace App\Livewire\Test;
 
+use App\Models\PracticalScenario;
 use Livewire\Component;
 use App\Models\OralQuestion;
 use App\Models\Position;
 use App\Models\Skill;
 use Illuminate\Support\Facades\DB;
+use Livewire\WithFileUploads;
 use Livewire\WithPagination;
 use Illuminate\Validation\Rule;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Storage;
 
 class PracticalExam extends Component
 {
-    use WithPagination;
+    use WithPagination, WithFileUploads ;
     public $editMode;
 
     public $archive = false;
@@ -24,12 +27,15 @@ class PracticalExam extends Component
 
     public $choices = [['text' => '', 'status' => '']];
     
-    public $position_id, $skill_id, $question, $status, $notes, $skill, $vduration, $title;
+    public $skill_id, $status, $skill, $vduration, $title, $scenario, $description, $file_path, $file, $newFilePath;
 
-    public $oralquestion_id;
+    public $practicalscenario_id;
     
     public $filterStatus = 'all'; 
 
+    public $points = 1;
+
+    public $hours = 0, $minutes = 0, $seconds = 0;
     public $competency_levels = ['basic', 'intermediate', 'advanced'];
     
     public $competency_level;
@@ -50,10 +56,26 @@ class PracticalExam extends Component
         $this->skill_id = null;
     }
 
+    public function removeFile($id)
+    {
+        $scenario = PracticalScenario::find($id);
+
+        if ($scenario && $scenario->file_path) {
+
+            Storage::delete('public/' . $scenario->file_path); 
+
+            $scenario->update(['file_path' => null]);
+
+            $this->file_path = null;
+
+            $this->dispatch('success', 'File removed successfully');
+        }
+    }
+
     public function render()
     {
         return view('livewire.test.practical-exam', [
-            'oralquestions' => $this->loadOralQuestions()
+            'practicalscenarios' => $this->loadPracticalScenarios()
         ]);
     }
     
@@ -61,7 +83,7 @@ class PracticalExam extends Component
     {
         return [
             'skill_id' => ['required'],
-            'question' => ['required', 'string', 'max:255'],
+            'scenario' => ['required', 'string', 'max:255'],
         ];
     }
 
@@ -76,9 +98,9 @@ class PracticalExam extends Component
         $this->resetPage();
     }
 
-    public function loadOralQuestions()
+    public function loadPracticalScenarios()
     {
-        return OralQuestion::withTrashed()
+        return PracticalScenario::withTrashed()
             ->with('skill')
             ->when($this->filterStatus !== 'all', function ($query) {
                 if ($this->filterStatus === 'yes') {
@@ -92,7 +114,13 @@ class PracticalExam extends Component
                     $q->where('question', 'like', '%' . $this->search . '%');
                 });
             })
-            ->paginate(10);
+            ->paginate(10)
+            ->through(function ($question) {
+                $question->formatted_duration = gmdate("H:i:s", $question->duration);
+                $question->skill_title = $question->skill->title ?? 'N/A'; 
+                $question->competency_level = $question->skill->competency_level ?? 'N/A'; 
+                return $question;
+            });
     }
 
     public function clear()
@@ -119,74 +147,112 @@ class PracticalExam extends Component
         if (!$this->editMode) { 
             $this->status = 'yes'; 
         }
-        $this->dispatch('show-oralquestionModal');
+        $this->dispatch('show-practicalscenarioModal');
     }
 
-    public function readOralQuestion($oralquestionId)
+    public function readPracticalScenario($practicalscenarioId)
     {
         $this->clear();
-        $oralquestion = OralQuestion::withTrashed()->with('skill')->findOrFail($oralquestionId);
-    
+        $practicalscenario = PracticalScenario::withTrashed()->with('skill')->findOrFail($practicalscenarioId);
+        
+        $this->hours = floor($practicalscenario->duration / 3600);
+        $this->minutes = floor(($practicalscenario->duration % 3600) / 60);
+        $this->seconds = $practicalscenario->duration % 60;
+
         $this->fill([
-            'oralquestion_id' => $oralquestion->id,
-            'question'          => $oralquestion->question,
-            'skill_id'       => $oralquestion->skill_id,
-            'competency_level'  => $oralquestion->skill->competency_level ?? 'N/A',
+            'practicalscenario_id' => $practicalscenario->id,
+            'scenario'          => $practicalscenario->scenario,
+            'description'          => $practicalscenario->description,
+            'points'            => $practicalscenario->points,
+            'file_path'          => $practicalscenario->file_path,
+            'skill_id'       => $practicalscenario->skill_id,
+            'competency_level'  => $practicalscenario->skill->competency_level ?? 'N/A',
         ]);
 
-        $this->status = is_null($oralquestion->deleted_at) ? 'yes' : 'no';
+        $this->status = is_null($practicalscenario->deleted_at) ? 'yes' : 'no';
         $this->updateSkills();
         $this->editMode = true;
-        $this->dispatch('show-oralquestionModal');
+        $this->dispatch('show-practicalscenarioModal');
     }
 
-    public function createOralQuestion()
+    public function createPracticalScenario()
     {
         
         $this->validate();
 
         DB::transaction(function () {
 
-            $oralquestion = new OralQuestion();
-            $oralquestion->question = $this->question;
-            $oralquestion->skill_id = $this->skill_id;
-            $oralquestion->save();
+            $practicalscenario = new PracticalScenario();
+            $practicalscenario->scenario = $this->scenario; 
+            $practicalscenario->description = $this->description; 
+            $practicalscenario->points = $this->points;
+            $practicalscenario->skill_id = $this->skill_id;
+            $practicalscenario->duration = ($this->hours * 3600) + ($this->minutes * 60) + $this->seconds;
+            $practicalscenario->deleted_at = $this->status === 'no' ? now() : null;
+
+            if ($this->file) {
+                // Delete old file if it exists
+                if ($practicalscenario->file_path) {
+                    Storage::delete('public/' . $practicalscenario->file_path);
+                }
+            
+                // ✅ Save file using the same logic as in create
+                $filePath = $this->file->store('practical_scenarios', 'public');
+                $practicalscenario->file_path = $filePath;
+            }
+            
+            $practicalscenario->save();
 
         });
 
         $this->clear();
-        $this->dispatch('hide-oralquestionModal');
-        $this->dispatch('success', 'Question Created Successfully');
+        $this->dispatch('hide-practicalscenarioModal');
+        $this->dispatch('success', 'Scenario Created Successfully');
     }
 
-    public function updateOralQuestion()
+    public function updatePracticalScenario()
     {
 
         $this->validate();
 
 
         DB::transaction(function () {  
-            $oralquestion = OralQuestion::withTrashed()->findOrFail($this->oralquestion_id);
+            $practicalscenario = PracticalScenario::withTrashed()->findOrFail($this->practicalscenario_id);
             
-            Log::info('oralQuestion found', ['id' => $oralquestion->id]);
+            Log::info('practicalscenario found', ['id' => $practicalscenario->id]);
 
-            $oralquestion->question = $this->question;
-            $oralquestion->notes = $this->notes;
-            $oralquestion->skill_id = $this->skill_id;
+            $practicalscenario->scenario = $this->scenario;
+            $practicalscenario->description = $this->description;
+            $practicalscenario->points = $this->points;
+            $practicalscenario->skill_id = $this->skill_id;
+            $totalSeconds = ($this->hours * 3600) + ($this->minutes * 60) + $this->seconds;
+            $practicalscenario->duration = $totalSeconds;
 
-            if ($this->status === 'no' && is_null($oralquestion->deleted_at)) {
-                $oralquestion->delete();
-            } elseif ($this->status === 'yes' && !is_null($oralquestion->deleted_at)) {
-                $oralquestion->restore();
+            if ($this->file) {
+                if ($practicalscenario->file_path) {
+                    Storage::delete('public/' . $practicalscenario->file_path);
+                }
+            
+                $filePath = $this->file->store('practical_scenarios', 'public');
+                Log::info('File stored', ['path' => $filePath]);
+            
+                $practicalscenario->file_path = $filePath;
+            }
+            
+
+            if ($this->status === 'no' && is_null($practicalscenario->deleted_at)) {
+                $practicalscenario->delete();
+            } elseif ($this->status === 'yes' && !is_null($practicalscenario->deleted_at)) {
+                $practicalscenario->restore();
             } else {
-                $oralquestion->save();
+                $practicalscenario->save();
             }
 
         });
 
         $this->clear();
-        $this->dispatch('hide-oralquestionModal');
-        $this->dispatch('success', 'Question and choices updated successfully.');
+        $this->dispatch('hide-practicalscenarioModal');
+        $this->dispatch('success', 'Scenario updated successfully.');
     }
 
     public function showViewModal($questionId)
@@ -210,3 +276,5 @@ class PracticalExam extends Component
     }
 
 }
+
+

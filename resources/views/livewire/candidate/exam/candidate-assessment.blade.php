@@ -2,8 +2,9 @@
     <div class="card-header text-white text-center py-3" style="background-color: #1a1851; border-radius: 12px 12px 0 0;">
         <h2 class="fw-bold m-0">Assessment Test</h2>
     </div>
-    <div class="assesment-container py-4" style="background: linear-gradient(180deg, rgb(81, 166, 219) 0%, rgba(0, 51, 102, 1) 100%); min-height: 80vh;">
-        <div class="card mx-auto" style="max-width: 600px; border-radius: 12px;">
+    <div class="assesment-container py-4" style="min-height: 85vh; background: linear-gradient(180deg, rgb(81, 166, 219) 0%, rgba(0, 51, 102, 1) 100%);">
+
+        <div class="card mx-auto" style="max-width: 600px; border-radius: 12px; border: 2px solid #007BFF">
             <div class="card-body">
                 <h3 class="text-center card-title fw-bold" style="font-size: 22px;">Test Instructions</h3>
                 <ul class="card-text" style="font-size: 18px;">
@@ -24,12 +25,12 @@
     </div>
 
 
-   
+
     <div class="modal fade" id="warningModal" tabindex="-1" aria-labelledby="warningModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered">
-            <div class="modal-content" style="border-radius: 12px;">
+            <div class="modal-content" style="border-radius: 12px;border: 2px solid #007BFF">
                 <div class="modal-header d-flex justify-content-center">
-                    <h5 class="modal-title fw-bold text-center" id="warningModalLabel">Warning before taking the Test!</h5>
+                    <h5 class="modal-title fw-bold text-center" id="warningModalLabel">⚠️Warning before taking the Test!</h5>
                 </div>
 
                 <div class="modal-body">
@@ -50,17 +51,17 @@
         </div>
     </div>
 
-   
+
     <div class="modal fade" id="testModal" tabindex="-1" aria-labelledby="testModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered modal-m">
-            <div class="modal-content" style="border-radius: 12px; background-color: #f8f9fa;">
+            <div class="modal-content" style="border-radius: 12px; background-color: #f8f9fa;border: 2px solid #007BFF">
                 <div class="modal-header text-center">
                     <h5 class="modal-title fw-bold w-100" id="testModalLabel">Assessment Test - Page 1</h5>
                 </div>
                 <div class="modal-body px-3 py-3">
                     <p class="fw-bold text-center">Time Left: <span>HH:mm</span></p>
 
-                  
+
                     <div class="p-1 bg-light rounded">
                         <p><strong>Question 1:</strong> Lorem Ipsum Lorem Ipsum Lorem Ipsum</p>
                         <div>
@@ -80,7 +81,7 @@
                             <input type="radio" name="q2" id="q2o4"> <label for="q2o4">Option 4</label>
                         </div>
                     </div>
-                    
+
                     <div class="p-1 bg-light rounded">
                         <p><strong>Question 3:</strong> Lorem Ipsum Lorem Ipsum Lorem Ipsum</p>
                         <div>
@@ -100,14 +101,14 @@
 
     <div class="modal fade" id="testModalPage2" tabindex="-1" aria-labelledby="testModalPage2Label" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered modal-m">
-            <div class="modal-content" style="border-radius: 12px; background-color: #f8f9fa;">
+            <div class="modal-content" style="border-radius: 12px; background-color: #f8f9fa;border: 2px solid #007BFF">
                 <div class="modal-header text-center">
                     <h5 class="modal-title fw-bold w-100" id="testModalPage2Label">Assessment Test - Page 2</h5>
                 </div>
                 <div class="modal-body px-3 py-3">
                     <p class="fw-bold text-center">Time Left: <span>HH:mm</span></p>
 
-                    
+
                     <div class="p-1 bg-light rounded">
                         <p><strong>Question 4:</strong> Lorem Ipsum Lorem Ipsum Lorem Ipsum</p>
                         <div>
@@ -117,7 +118,7 @@
                             <input type="radio" name="q3" id="q3o4"> <label for="q3o4">Option 4</label>
                         </div>
                     </div>
-                   
+
                     <div class="p-1 bg-light rounded">
                         <p><strong>Question 5:</strong> Lorem Ipsum Lorem Ipsum Lorem Ipsum</p>
                         <div>
@@ -127,8 +128,8 @@
                             <input type="radio" name="q3" id="q3o4"> <label for="q3o4">Option 4</label>
                         </div>
                     </div>
-            
-                     <div class="p-1 bg-light rounded">
+
+                    <div class="p-1 bg-light rounded">
                         <p><strong>Question 6:</strong> Lorem Ipsum Lorem Ipsum Lorem Ipsum</p>
                         <div>
                             <input type="radio" name="q3" id="q3o1"> <label for="q3o1">Option 1</label><br>
@@ -138,7 +139,7 @@
                         </div>
                     </div>
                 </div>
-                <div class="modal-footer text-center">
+                <div class="modal-footer d-flex justify-content-between mt-2">
                     <button type="button" class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#testModal">Back</button>
                     <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#submitconfirmationModal">Submit</button>
                 </div>
@@ -147,10 +148,10 @@
     </div>
 
 
-    
+
     <div class="modal fade" id="submitconfirmationModal" tabindex="-1" aria-labelledby="submitconfirmationModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered">
-            <div class="modal-content" style="border-radius: 12px;">
+            <div class="modal-content" style="border-radius: 12px;border: 2px solid #007BFF">
                 <div class="modal-header">
                     <h5 class=" text-center w-100 modal-title fw-bold" id="submitconfirmationModalLabel">Warning!</h5>
                 </div>
@@ -171,7 +172,8 @@
 
     <div class="modal fade" id="successModal" tabindex="-1" aria-labelledby="successModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered">
-            <div class="modal-content text-center border-0">
+            <div class="modal-content text-center" style="border-radius: 12px; border: 2px solid #007BFF;">
+
                 <div class="modal-body py-5">
                     <h3 class="fw-bold">Answers Submitted Successfully!</h3>
                     <p class="text-muted">Redirecting to the Homepage. Please wait.</p>

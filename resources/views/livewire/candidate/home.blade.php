@@ -33,7 +33,7 @@
 
 
                     <!-- About Us Section -->
-                    <div class="text-center about-section">
+                    <div class="text-center about-section" style="border: 2px solid #007BFF; border-radius: 12px; padding: 15px;">
                         <div class="about-text">
                             <h4 class="text-center fw-bold" style="color:#1a1851;">About Us!</h4>
                             <p class="fw-normal">

@@ -173,12 +173,10 @@
 
         <div class="modal fade" id="viewModal" tabindex="-1" aria-labelledby="viewModalLabel" aria-hidden="true" wire:ignore.self>
             <div class="modal-dialog modal-dialog-centered modal-lg">
-                <div class="modal-content border-0 shadow-lg rounded-3">
+                <div class="modal-content shadow">
                    
-                    <div class="modal-header bg-primary text-white">
-                        <h5 class="modal-title fw-semibold" id="viewModalLabel">
-                            <i class="bi bi-eye me-2"></i> Candidate Details
-                        </h5>
+                    <div class="modal-header bg-primary text-white py-2">
+                        <h5 class="modal-title fw-bold text-center w-100 fs-6" id="viewModalLabel">Candidate Details</h5>
                         <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
 
@@ -248,10 +246,9 @@
 
         <div class="modal fade" id="candidateModal" tabindex="-1" aria-labelledby="candidateModalLabel" aria-hidden="true" wire:ignore.self>
             <div class="modal-dialog modal-dialog-centered modal-lg">
-                <div class="modal-content border-0 shadow">
+                <div class="modal-content shadow">
                     <div class="modal-header bg-light">
-                        <h5 class="modal-title" id="candidateModalLabel">
-                            <i class="bi {{ $editMode ? 'bi-pencil-square' : 'bi-plus-circle' }} me-2"></i>
+                        <h5 class="modal-title fw-bold text-center w-100 fs-6" id="candidateModalLabel">
                             {{$editMode ? 'Update Candidate' : 'Add New Candidate'}}
                         </h5>
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" wire:click='clear'></button>

@@ -134,12 +134,10 @@
 
 
     <div class="modal fade" id="viewModal" tabindex="-1" aria-labelledby="viewModalLabel" aria-hidden="true" wire:ignore.self>
-      <div class="modal-dialog modal-m">
-        <div class="modal-content">
-          <div class="modal-header  text-white">
-            <h6 class="modal-title" id="viewModalLabel">
-              <i class="bi bi-eye-fill me-1"></i> User Details
-            </h6>
+      <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content shadow">
+          <div class="modal-header bg-light">
+            <h6 class="modal-title fw-bold text-center w-100 fs-6" id="viewModalLabel">User Details</h6>
             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
           </div>
           <div class="modal-body p-3">
@@ -225,11 +223,11 @@
 
 
     <div class="modal fade" id="userModal" tabindex="-1" aria-labelledby="userModalLabel" aria-hidden="true" wire:ignore.self>
-      <div class="modal-dialog modal-m">
-        <div class="modal-content">
-          <div class="modal-header bg-primary text-white">
-            <h5 class="modal-title" id="userModalLabel">
-              <i class="bi bi-person-circle me-2"></i> {{ $editMode ? 'Update User' : 'Add User' }}
+      <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content shadow">
+          <div class="modal-header bg-light">
+            <h5 class="modal-title fw-bold text-center w-100 fs-6" id="userModalLabel">
+              {{ $editMode ? 'Update User' : 'Add User' }}
             </h5>
             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" wire:click='clear'></button>
           </div>

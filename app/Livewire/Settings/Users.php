@@ -16,27 +16,34 @@ class Users extends Component
     use WithPagination;
     public $editMode;
     public $search;
+    public $filterStatus = 'all'; 
     public $user; 
-    public $name, $email, $password, $type = '', $user_id;
+    public $name, $email, $password, $type = '', $user_id, $status;
     public $permission;
     public $permissions = [];
     public $archive = false;
 
-    // public function mount()
-    // {
-    //     $user = auth()->user();
+    protected $listeners = ['deleteUser'];
 
-    //     if(!$user->can('read user')){
-    //         abort(403);
-    //     }
-    // }
+    public function mount()
+    {
+        $user = auth()->user();
+        if(!$user->can('read user')){
+            abort(403);
+        }
+    }
 
     public function render()
     {
         return view('livewire.settings.users',
     [
-        'users'=> $this->getUsers()
+        'users'=> $this->loadUsers()
     ]);
+    }
+
+    public function updatingFilterStatus()
+    {
+        $this->resetPage(); 
     }
 
     public function toggleArchive()
@@ -82,14 +89,25 @@ class Users extends Component
 
     public function loadUsers()
     {
-        // return User::all();
         return User::withTrashed()
-        ->when($this->search, function ($query){
-            $query->where('name','like','%'. $this->search .'%')
-            ->orWhere('email','like','%'. $this->search .'%');
-        })
-        ->paginate(10);
+            ->when($this->filterStatus !== 'all', function ($query) {
+                if ($this->filterStatus === 'yes') {
+                    $query->whereNull('deleted_at');
+                } elseif ($this->filterStatus === 'no') {
+                    $query->whereNotNull('deleted_at'); 
+                }
+            })
+            ->when($this->search, function ($query) {
+                $query->where(function ($q) {
+                    $q->where('name', 'like', '%' . $this->search . '%')
+                    ->orWhere('email', 'like', '%' . $this->search . '%');
+                });
+            })
+            ->paginate(10);
     }
+
+    
+
 
     public function createUser()
     {
@@ -100,6 +118,7 @@ class Users extends Component
             $user->name = $this->name;
             $user->email = $this->email;
             $user->type = $this->type;
+            $user->deleted_at = $this->status === 'no' ? now() : null;
             if (!empty($this->password)) {
                 $user->password = Hash::make($this->password);
             } else {
@@ -119,6 +138,7 @@ class Users extends Component
                     'name' => $user->name,
                     'email' => $user->email,
                     'type' => $user->type,
+                    'deleted_at' => $user->deleted_at,
                     'permissions' => $user->permissions->pluck('name')->toArray(),
                 ])
                 ->log('Created a new user');
@@ -147,10 +167,63 @@ class Users extends Component
     
         $this->user_id = $user->id;
         $this->editMode = true;
+        $this->status = is_null($user->deleted_at) ? 'yes' : 'no';
         $this->permissions = $user->getPermissionNames()->toArray();
         $this->dispatch('show-userModal');
     }
     
+
+    // public function updateUser()
+    // {
+    //     $this->validate();
+
+    //     DB::transaction(function () {  
+    //         $user = User::withTrashed()->findOrFail($this->user_id);
+            
+    //         $originalData = [
+    //             'name' => $user->name,
+    //             'type' => $user->type,
+    //             'email' => $user->email,
+    //             'permissions' => $user->permissions->pluck('name')->toArray(),
+    //         ];
+
+    //         $user->name = $this->name;
+    //         $user->type = $this->type;
+    //         $user->email = $this->email;
+    //         if (!empty($this->password)) {
+    //             $user->password = Hash::make($this->password);
+    //         }
+    //         $user->save();
+
+    //         $user->syncPermissions($this->permissions);
+
+    //         $updatedData = [
+    //             'name' => $user->name,
+    //             'type' => $user->type,
+    //             'email' => $user->email,
+    //             'permissions' => $user->permissions->pluck('name')->toArray(),
+    //         ];
+
+    //         if ($user instanceof User) {
+    //             activity('user_management')
+    //                 ->event('update')
+    //                 ->performedOn($user)
+    //                 ->causedBy(auth()->user())
+    //                 ->withProperties([
+    //                     'old' => $originalData,
+    //                     'new' => $updatedData,
+    //                 ])
+    //                 ->log('updated');
+    //         } else {
+    //             \Log::warning('Activity log skipped: Expected User model but got ' . gettype($user));
+    //         }
+            
+    //     });
+
+    //     $this->clear();
+    //     $this->dispatch('hide-userModal');
+    //     $this->dispatch('success', 'User updated successfully.');
+    // }
 
     public function updateUser()
     {
@@ -164,15 +237,26 @@ class Users extends Component
                 'type' => $user->type,
                 'email' => $user->email,
                 'permissions' => $user->permissions->pluck('name')->toArray(),
+                'deleted_at' => $user->deleted_at,
             ];
 
-            $user->name = $this->name;
-            $user->type = $this->type;
-            $user->email = $this->email;
+            $user->fill([
+                'name' => $this->name,
+                'type' => $this->type,
+                'email' => $this->email,
+            ]);
+
             if (!empty($this->password)) {
                 $user->password = Hash::make($this->password);
             }
-            $user->save();
+
+            if ($this->status === 'no' && is_null($user->deleted_at)) {
+                $user->delete();
+            } elseif ($this->status === 'yes' && !is_null($user->deleted_at)) {
+                $user->restore();
+            } else {
+                $user->save();
+            }
 
             $user->syncPermissions($this->permissions);
 
@@ -181,6 +265,7 @@ class Users extends Component
                 'type' => $user->type,
                 'email' => $user->email,
                 'permissions' => $user->permissions->pluck('name')->toArray(),
+                'deleted_at' => $user->deleted_at,
             ];
 
             if ($user instanceof User) {
@@ -204,11 +289,21 @@ class Users extends Component
         $this->dispatch('success', 'User updated successfully.');
     }
 
-    
 
-    
-    public function deleteUser(User $user)
+    public function confirmDelete($id)
     {
+
+        $this->dispatch('confirm-delete', 
+            message: 'This skill will be sent to archive',
+            eventName: 'deleteUser',
+            eventData: ['id' => $id]
+        );
+    }
+    
+    public function deleteUser($id)
+    {   
+        $user = User::findOrFail($id);
+
         DB::transaction(function () use ($user) {
             $originalData = [
                 'name' => $user->name,
@@ -218,8 +313,9 @@ class Users extends Component
             ];
     
             $user->delete();
-    
-            activity('user_management')
+            
+            if($user instanceof User){
+                activity('user_management')
                 ->event('deleted')
                 ->performedOn($user)
                 ->causedBy(auth()->user())
@@ -228,6 +324,8 @@ class Users extends Component
                     'deleted_at' => now(),
                 ])
                 ->log('deleted');
+            }
+
         });
     
         $this->dispatch('success', 'User deleted successfully');
@@ -301,5 +399,15 @@ class Users extends Component
         $this->dispatch('show-viewModal');
     }
 
-
+    public function showAddEditModal()
+    {
+        $this->clear();
+    
+        if (!$this->editMode) { 
+            $this->status = 'yes'; 
+        }
+    
+        $this->dispatch('show-userModal');
+    }
+    
 }

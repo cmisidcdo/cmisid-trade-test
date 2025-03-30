@@ -4,10 +4,10 @@ namespace App\Livewire\Exam;
 
 use Livewire\Component;
 
-class OralTestEvaluation extends Component
+class Practicallist extends Component
 {
     public function render()
     {
-        return view('livewire.exam.oral-test-evaluation');
+        return view('livewire.exam.practicallist');
     }
 }

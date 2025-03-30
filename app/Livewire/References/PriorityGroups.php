@@ -16,7 +16,11 @@ class PriorityGroups extends Component
     public $archive = false;
 
     public $search;
-    public $title, $prioritygroup_id;
+    public $title, $prioritygroup_id, $status;
+    
+    public $filterStatus = 'all'; 
+
+    protected $listeners = ['deletePriorityGroup'];
 
     public function mount()
     {
@@ -30,10 +34,15 @@ class PriorityGroups extends Component
     public function render()
     {
         return view('livewire.references.priority-groups', [
-            'prioritygroups' => $this->getPriorityGroups()
+            'prioritygroups' => $this->loadPriorityGroups()
         ]);
     }
     
+    public function updatingFilterStatus()
+    {
+        $this->resetPage(); 
+    }
+
 
     public function updatedSearch()
     {
@@ -70,12 +79,31 @@ class PriorityGroups extends Component
             ->paginate(10);
     }
 
+    public function loadPriorityGroups()
+    {
+        return PriorityGroup::withTrashed()
+            ->when($this->filterStatus !== 'all', function ($query) {
+                if ($this->filterStatus === 'yes') {
+                    $query->whereNull('deleted_at');
+                } elseif ($this->filterStatus === 'no') {
+                    $query->whereNotNull('deleted_at'); 
+                }
+            })
+            ->when($this->search, function ($query) {
+                $query->where(function ($q) {
+                    $q->where('title', 'like', '%' . $this->search . '%');
+                });
+            })
+            ->paginate(10);
+    }
+
     public function createPriorityGroup()
     {
         $this->validate();
         DB::transaction(function () {
             $prioritygroup = new PriorityGroup();
             $prioritygroup->title = $this->title;
+            $prioritygroup->deleted_at = $this->status === 'no' ? now() : null;
             $prioritygroup->save();
         });
 
@@ -100,6 +128,7 @@ class PriorityGroups extends Component
         );
 
         $this->prioritygroup_id = $prioritygroup->id;
+        $this->status = is_null($prioritygroup->deleted_at) ? 'yes' : 'no';
         $this->editMode = true;
         $this->dispatch('show-prioritygroupModal');
     }
@@ -113,7 +142,13 @@ class PriorityGroups extends Component
             $prioritygroup = PriorityGroup::withTrashed()->findOrFail($this->prioritygroup_id);
             
             $prioritygroup->title = $this->title;
-            $prioritygroup->save();
+            if ($this->status === 'no' && is_null($prioritygroup->deleted_at)) {
+                $prioritygroup->delete();
+            } elseif ($this->status === 'yes' && !is_null($prioritygroup->deleted_at)) {
+                $prioritygroup->restore();
+            } else {
+                $prioritygroup->save();
+            }
         });
 
         $this->clear();
@@ -121,12 +156,22 @@ class PriorityGroups extends Component
         $this->dispatch('success', 'Priority Group updated successfully.');
     }
 
-    
-    public function deletePriorityGroup(PriorityGroup $prioritygroup)
+    public function confirmDelete($id)
     {
-        $prioritygroup->delete();
 
-        $this->dispatch('success', 'Priority Group deleted successfully');
+        $this->dispatch('confirm-delete', 
+            message: 'This Priority Group will be sent to archive',
+            eventName: 'deletePriorityGroup',
+            eventData: ['id' => $id]
+        );
+    }
+
+    
+    public function deletePriorityGroup($id)
+    {
+        PriorityGroup::findOrFail($id)->delete();
+
+        $this->dispatch('success', 'Priority Group archived successfully');
     }
 
     public function restorePriorityGroup($prioritygroup_id)
@@ -135,5 +180,14 @@ class PriorityGroups extends Component
         $prioritygroup->restore();
     
         $this->dispatch('success', 'Priority Group restored successfully.');
+    }
+
+    public function showAddEditModal()
+    {
+        $this->clear();
+        if (!$this->editMode) { 
+            $this->status = 'yes'; 
+        }
+        $this->dispatch('show-prioritygroupModal');
     }
 }

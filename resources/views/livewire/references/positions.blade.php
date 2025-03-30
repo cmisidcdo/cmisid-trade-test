@@ -38,9 +38,7 @@
                         <button
                             type="button"
                             class="btn btn-primary d-flex align-items-center"
-                            wire:click='clear'
-                            data-bs-toggle="modal"
-                            data-bs-target="#positionModal"
+                            wire:click='showAddEditModal'
                             title="Add new position">
                             <i class="bi bi-plus-circle me-1"></i> Add Position
                         </button>
@@ -54,7 +52,6 @@
                                 <th scope="col" class="fw-semibold">#</th>
                                 <th scope="col" class="fw-semibold">Title</th>
                                 <th scope="col" class="fw-semibold">Salary Grade</th>
-                                <th scope="col" class="fw-semibold">Competency Level</th>
                                 <th scope="col" class="fw-semibold">Status</th>
                                 <th scope="col" class="fw-semibold">Priority</th>
                                 <th scope="col" class="fw-semibold text-center">Actions</th>
@@ -67,20 +64,13 @@
                                 <td class="fw-medium">{{$item->title}}</td>
                                 <td>{{$item->salary_grade}}</td>
                                 <td>
-                                    <span class="badge rounded-pill 
-                        {{ $item->competency_level == 'basic' ? 'bg-info' : 
-                          ($item->competency_level == 'intermediate' ? 'bg-primary' : 'bg-dark') }}">
-                                        {{ucfirst($item->competency_level)}}
-                                    </span>
-                                </td>
-                                <td>
                                     <span class="badge rounded-pill {{$item->deleted_at == Null ? 'bg-success': 'bg-danger'}}">
                                         {{$item->deleted_at == Null ? 'Active': 'Inactive'}}
                                     </span>
                                 </td>
                                 <td>
                                     <span class="badge rounded-pill {{$item->interview_priority == True ? 'bg-success': 'bg-secondary'}}">
-                                        {{$item->interview_priority == True ? 'Priority': 'Standard'}}
+                                        {{$item->interview_priority == True ? 'Yes': 'No    '}}
                                     </span>
                                 </td>
                                 <td>
@@ -104,7 +94,7 @@
                                         @can('delete reference')
                                         <button
                                             class="btn btn-sm {{$item->deleted_at == Null ? 'btn-danger': 'btn-outline-success'}}"
-                                            wire:click='{{$item->deleted_at == Null ? 'deletePosition('.$item->id.')': 'restorePosition('.$item->id.')'}}'
+                                            wire:click='{{$item->deleted_at == Null ? 'confirmDelete('.$item->id.')': 'restorePosition('.$item->id.')'}}'
                                             title="{{$item->deleted_at == Null ? 'Move to archive' : 'Restore position'}}">
                                             <i class="bi {{$item->deleted_at == Null ? 'bi-archive' : 'bi-arrow-counterclockwise'}} me-1"></i>
                                             {{$item->deleted_at == Null ? 'Archive': 'Restore'}}
@@ -130,23 +120,17 @@
                     </table>
                 </div>
 
-                <div class="mt-4">
-                    <div class="d-flex justify-content-between align-items-center">
-                        <div class="pagination-info text-muted small">
-                            Showing {{ $positions->firstItem() ?? 0 }} to {{ $positions->lastItem() ?? 0 }} of {{ $positions->total() ?? 0 }} entries
-                        </div>
-                        {{$positions->links()}}
-                    </div>
+                <div class="d-flex justify-content-center mt-4 gap-3">
+                    {{ $positions->links() }}
                 </div>
             </div>
         </div>
 
         <div class="modal fade" id="positionModal" tabindex="-1" aria-labelledby="positionModalLabel" aria-hidden="true" wire:ignore.self>
-            <div class="modal-dialog modal-lg">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title" id="positionModalLabel">
-                            <i class="bi {{ $editMode ? 'bi-pencil-square' : 'bi-plus-circle' }} me-1"></i>
+            <div class="modal-dialog modal-dialog-centered modal-lg">
+                <div class="modal-content shadow">
+                    <div class="modal-header bg-primary text-white py-2">
+                        <h5 class="modal-title fw-bold text-center w-100 fs-6" id="positionModalLabel">
                             {{$editMode ? 'Update Position' : 'Add Position'}}
                         </h5>
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" wire:click='clear'></button>
@@ -190,7 +174,7 @@
                                             id="priorityYes"
                                             wire:model="interview_priority"
                                             value="1">
-                                        <label class="form-check-label" for="priorityYes">Priority</label>
+                                        <label class="form-check-label" for="priorityYes">Yes</label>
                                     </div>
                                     <div class="form-check form-check-inline">
                                         <input
@@ -199,28 +183,12 @@
                                             id="priorityNo"
                                             wire:model="interview_priority"
                                             value="0">
-                                        <label class="form-check-label" for="priorityNo">Standard</label>
+                                        <label class="form-check-label" for="priorityNo">No</label>
                                     </div>
                                     @error('interview_priority')
                                     <div class="d-block invalid-feedback">{{$message}}</div>
                                     @enderror
                                 </div>
-                            </div>
-
-                            <div class="col-12">
-                                <label for="competency_level" class="form-label fw-semibold">Competency Level <span class="text-danger">*</span></label>
-                                <select
-                                    class="form-select @error('competency_level') is-invalid @enderror"
-                                    id="competency_level"
-                                    wire:model="competency_level">
-                                    <option value="">Select Level</option>
-                                    <option value="basic">Basic</option>
-                                    <option value="intermediate">Intermediate</option>
-                                    <option value="advanced">Advanced</option>
-                                </select>
-                                @error('competency_level')
-                                <div class="invalid-feedback">{{$message}}</div>
-                                @enderror
                             </div>
 
                             <div class="col-12">
@@ -250,14 +218,11 @@
                                                 <td>{{ $index + 1 }}</td>
                                                 <td class="fw-medium">{{ $selectedskill['title'] }}</td>
                                                 <td>
-                                                    <select
-                                                        class="form-select form-select-sm"
-                                                        wire:change="updateCompetencyLevel({{ $index }}, $event.target.value)"
-                                                        aria-label="Select competency level">
-                                                        <option value="basic" {{ $selectedskill['competency_level'] == 'basic' ? 'selected' : '' }}>Basic</option>
-                                                        <option value="intermediate" {{ $selectedskill['competency_level'] == 'intermediate' ? 'selected' : '' }}>Intermediate</option>
-                                                        <option value="advanced" {{ $selectedskill['competency_level'] == 'advanced' ? 'selected' : '' }}>Advanced</option>
-                                                    </select>
+                                                    <span class="badge rounded-pill 
+                                                        {{ $selectedskill['competency_level'] == 'Basic' ? 'bg-info' : 
+                                                        ($selectedskill['competency_level'] == 'Intermediate' ? 'bg-primary' : 'bg-dark') }}">
+                                                        {{ucfirst($selectedskill['competency_level'])}}
+                                                    </span>
                                                 </td>
                                                 <td class="text-center">
                                                     <button
@@ -281,7 +246,7 @@
                             </div>
 
                             <div class="col-12 d-flex justify-content-end gap-2 mt-4">
-                                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal" wire:click='clear'>
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" wire:click='clear'>
                                     <i class="bi bi-x-circle me-1"></i> Cancel
                                 </button>
                                 <button type="submit" class="btn btn-primary">
@@ -296,10 +261,10 @@
         </div>
 
         <div class="modal fade" id="skillsModal" tabindex="-1" aria-labelledby="skillsModalLabel" aria-hidden="true" wire:ignore.self>
-            <div class="modal-dialog modal-lg">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title" id="skillsModalLabel">
+            <div class="modal-dialog modal-dialog-centered modal-lg">
+                <div class="modal-content shadow">
+                    <div class="modal-header bg-primary text-white py-2">
+                        <h5 class="modal-title fw-bold text-center w-100 fs-6" id="skillsModalLabel">
                             <i class="bi bi-list-check me-1"></i> Select Skills
                         </h5>
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" wire:click='clear'></button>
@@ -330,6 +295,7 @@
                                     <tr>
                                         <th class="fw-semibold">#</th>
                                         <th class="fw-semibold">Skill Title</th>
+                                        <th class="fw-semibold">Competency Level</th>
                                         <th class="fw-semibold text-center">Actions</th>
                                     </tr>
                                 </thead>
@@ -338,6 +304,13 @@
                                     <tr>
                                         <td scope="row">{{$item->id}}</td>
                                         <td class="fw-medium">{{$item->title}}</td>
+                                        <td>
+                                            <span class="badge rounded-pill 
+                                                {{ $item->competency_level == 'Basic' ? 'bg-info' : 
+                                                ($item->competency_level == 'Intermediate' ? 'bg-primary' : 'bg-dark') }}">
+                                                {{ucfirst($item->competency_level)}}
+                                            </span>
+                                        </td>
                                         <td class="text-center">
                                             <button
                                                 class="btn btn-success btn-sm"
@@ -353,7 +326,7 @@
                                     </tr>
                                     @empty
                                     <tr>
-                                        <td colspan="3" class="text-center py-4 text-muted">
+                                        <td colspan="4" class="text-center py-4 text-muted">
                                             <i class="bi bi-info-circle me-1"></i> No skills available.
                                         </td>
                                     </tr>
@@ -380,11 +353,11 @@
         </div>
 
         <div class="modal fade" id="viewSkillsModal" tabindex="-1" aria-labelledby="viewSkillsModalLabel" aria-hidden="true" wire:ignore.self>
-            <div class="modal-dialog modal-lg">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title" id="viewSkillsModalLabel">
-                            <i class="bi bi-eye me-1"></i> Position: HR Manager
+            <div class="modal-dialog modal-dialog-centered modal-lg">
+                <div class="modal-content shadow">
+                    <div class="modal-header bg-primary text-white py-2">
+                        <h5 class="modal-title fw-bold text-center w-100 fs-6" id="viewSkillsModalLabel">
+                            View Position
                         </h5>
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
@@ -397,12 +370,6 @@
                                     <p class="mb-1"><span class="fw-medium">Salary Grade:</span> {{$this->salary_grade}}</p>
                                 </div>
                                 <div class="col-md-6">
-                                    <p class="mb-1">
-                                        <span class="fw-medium">Competency Level:</span>
-                                        <span class="badge rounded-pill bg-primary">
-                                            {{$this->competency_level}}
-                                        </span>
-                                    </p>
                                     <p class="mb-1">
                                         <span class="fw-medium">Priority:</span>
                                         <span class="badge rounded-pill bg-success">
@@ -433,8 +400,8 @@
                                             <td class="fw-medium">{{ $selectedskill['title'] }}</td>
                                             <td class="fw-medium">
                                                 <span class="badge rounded-pill 
-                                                    {{ $selectedskill['competency_level'] == 'basic' ? 'bg-info' : 
-                                                    ($selectedskill['competency_level'] == 'intermediate' ? 'bg-primary' : 'bg-dark') }}">
+                                                    {{ $selectedskill['competency_level'] == 'Basic' ? 'bg-info' : 
+                                                    ($selectedskill['competency_level'] == 'Intermediate' ? 'bg-primary' : 'bg-dark') }}">
                                                     {{ $selectedskill['competency_level'] }}
                                                 </span>
                                             </td>
@@ -452,7 +419,7 @@
                         </div>
 
                         <div class="d-flex justify-content-end gap-2 mt-4">
-                            <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
                                 <i class="bi bi-x-circle me-1"></i> Close
                             </button>
                         </div>

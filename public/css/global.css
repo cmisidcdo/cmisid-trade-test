@@ -44,3 +44,8 @@
         width: 100%;
     }
 }
+
+.modal-header {
+    background-color: #ffffff !important; /* Bootstrap primary blue */
+    color: rgb(0, 0, 0) !important;
+}

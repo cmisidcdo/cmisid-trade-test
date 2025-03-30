@@ -16,7 +16,10 @@ class Skills extends Component
     public $archive = false;
 
     public $search;
-    public $title, $skill_id;
+    public $filterStatus = 'all'; 
+    public $title, $skill_id, $competency_level, $status;
+
+    protected $listeners = ['deleteSkill'];
 
     public function mount()
     {
@@ -30,9 +33,16 @@ class Skills extends Component
     public function render()
     {
         return view('livewire.references.skills', [
-            'skills' => $this->getSkills()
+            'skills' => $this->loadSkills()
         ]);
     }
+
+    
+    public function updatingFilterStatus()
+    {
+        $this->resetPage(); 
+    }
+
     
 
     public function updatedSearch()
@@ -46,6 +56,9 @@ class Skills extends Component
             'title'  => ['required', 
                 'string',
                 Rule::unique('skills', 'title')->ignore($this->skill_id),
+            ],
+            'competency_level'  => ['required', 
+                'string',
             ],
         ];
     }
@@ -70,12 +83,32 @@ class Skills extends Component
             ->paginate(10);
     }
 
+    public function loadSkills()
+    {
+        return Skill::withTrashed()
+            ->when($this->filterStatus !== 'all', function ($query) {
+                if ($this->filterStatus === 'yes') {
+                    $query->whereNull('deleted_at');
+                } elseif ($this->filterStatus === 'no') {
+                    $query->whereNotNull('deleted_at'); 
+                }
+            })
+            ->when($this->search, function ($query) {
+                $query->where(function ($q) {
+                    $q->where('title', 'like', '%' . $this->search . '%');
+                });
+            })
+            ->paginate(10);
+    }
+
     public function createSkill()
     {
         $this->validate();
         DB::transaction(function () {
             $skill = new Skill();
             $skill->title = $this->title;
+            $skill->competency_level = $this->competency_level;
+            $skill->deleted_at = $this->status === 'no' ? now() : null;
             $skill->save();
         });
 
@@ -100,7 +133,9 @@ class Skills extends Component
         );
 
         $this->skill_id = $skill->id;
+        $this->competency_level = $skill->competency_level;
         $this->editMode = true;
+        $this->status = is_null($skill->deleted_at) ? 'yes' : 'no';
         $this->dispatch('show-skillModal');
     }
 
@@ -113,7 +148,14 @@ class Skills extends Component
             $skill = Skill::withTrashed()->findOrFail($this->skill_id);
             
             $skill->title = $this->title;
-            $skill->save();
+            $skill->competency_level = $this->competency_level;
+            if ($this->status === 'no' && is_null($skill->deleted_at)) {
+                $skill->delete();
+            } elseif ($this->status === 'yes' && !is_null($skill->deleted_at)) {
+                $skill->restore();
+            } else {
+                $skill->save();
+            }
         });
 
         $this->clear();
@@ -121,12 +163,22 @@ class Skills extends Component
         $this->dispatch('success', 'Skill updated successfully.');
     }
 
-    
-    public function deleteSkill(Skill $skill)
+    public function confirmDelete($id)
     {
-        $skill->delete();
 
-        $this->dispatch('success', 'Skill deleted successfully');
+        $this->dispatch('confirm-delete', 
+            message: 'This skill will be sent to archive',
+            eventName: 'deleteSkill',
+            eventData: ['id' => $id]
+        );
+    }
+
+    
+    public function deleteSkill($id)
+    {
+        Skill::findOrFail($id)->delete();
+
+        $this->dispatch('success', 'Skill archived successfully');
     }
 
     public function restoreSkill($skill_id)
@@ -135,5 +187,14 @@ class Skills extends Component
         $skill->restore();
     
         $this->dispatch('success', 'Skill restored successfully.');
+    }
+
+    public function showAddEditModal()
+    {
+        $this->clear();
+        if (!$this->editMode) { 
+            $this->status = 'yes'; 
+        }
+        $this->dispatch('show-skillModal');
     }
 }

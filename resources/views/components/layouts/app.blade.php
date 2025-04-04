@@ -402,8 +402,33 @@
             </a>
           </li>
         </ul>
-      </li><!-- End Charts Nav -->
+      </li>
     @endcan
+
+    @can('assessor permission')
+    <li class="nav-item">
+      <a class="nav-link {{ Request::routeIs('scores.*') ? '' : 'collapsed' }}" data-bs-target="#scores-nav" data-bs-toggle="collapse" href="#">
+        <i class="bi bi-clipboard-check-fill fs-5"></i><span>Scores & Notes</span><i class="bi bi-chevron-down ms-auto"></i>
+      </a>
+      <ul id="scores-nav" class="nav-content collapse {{ Request::routeIs('scores.*') ? 'show' : '' }}" data-bs-parent="#sidebar-nav">      
+        <li>
+          <a class="{{ Request::routeIs('scores.assessment') ? 'active' : '' }}" href="{{ route('scores.assessment') }}">
+            <i class="bi bi-clipboard-data-fill fs-5"></i><span>Assessment Test Scores</span>
+          </a>
+        </li>
+        <li>
+          <a class="{{ Request::routeIs('scores.practical') ? 'active' : '' }}" href="{{ route('scores.practical') }}">
+            <i class="bi bi-person-fill-gear fs-5"></i><span>Practical Scores & Notes</span>
+          </a>
+        </li>
+        <li>
+          <a class="{{ Request::routeIs('scores.oral') ? 'active' : '' }}" href="{{ route('scores.oral') }}">
+            <i class="bi bi-wechat fs-5"></i><span>Oral Interview Scores & Notes</span>
+          </a>
+        </li>
+      </ul>
+    </li>
+  @endcan
 
     @can('secretariat permission')
       <li class="nav-item">
@@ -427,9 +452,9 @@
             </a>
           </li>
         </ul>
-      </li><!-- End Icons Nav -->
+      </li>
     @endcan
-      {{-- <li class="nav-heading">Pages</li> --}}
+
 
       <li class="nav-item">
         <a class="nav-link {{ Request::routeIs('reports.*') ? '' : 'collapsed' }}" data-bs-target="#reports-nav" data-bs-toggle="collapse" href="#">

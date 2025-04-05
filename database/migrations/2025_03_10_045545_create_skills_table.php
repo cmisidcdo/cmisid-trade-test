@@ -14,7 +14,6 @@ return new class extends Migration
         Schema::create('skills', function (Blueprint $table) {
             $table->id();
             $table->string('title');
-            $table->enum('competency_level', ['basic', 'intermediate', 'advanced']);
             $table->softDeletes();
             $table->timestamps();
         });

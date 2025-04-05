@@ -73,14 +73,13 @@
                 </div>
 
                 <div class="table-responsive">
-                    <table class="table table-hover table-bordered table-striped text-center">
+                    <table class="table table-hover table-bordered text-center global-table">
                         <thead class="table-light">
                             <tr>
                                 <th scope="col">#</th>
                                 <th scope="col">
                                     Title
                                 </th>
-                                <th scope="col" class="fw-semibold">Competency Level</th>
                                 <th scope="col">Status</th>
                                 <th scope="col">Actions</th>
                             </tr>
@@ -90,13 +89,6 @@
                             <tr>
                                 <td scope="row" class="text-center">{{$loop->iteration}}</td>
                                 <td>{{$item->title}}</td>
-                                <td>
-                                    <span class="badge rounded-pill 
-                                        {{ $item->competency_level == 'basic' ? 'bg-info' : 
-                                        ($item->competency_level == 'intermediate' ? 'bg-primary' : 'bg-dark') }}">
-                                        {{ucfirst($item->competency_level)}}
-                                    </span>
-                                </td>
                                 <td>
                                     <span class="badge rounded-3 {{$item->deleted_at == Null ? 'bg-success': 'bg-danger'}}">
                                         {{$item->deleted_at == Null ? 'Active': 'Inactive'}}
@@ -181,22 +173,6 @@
                                     <i class="bi bi-exclamation-circle me-1"></i>
                                     {{$message}}
                                 </div>
-                                @enderror
-                            </div>
-
-                            <div class="mb-4">
-                                <label for="competency_level" class="form-label fw-semibold">Competency Level <span class="text-danger">*</span></label>
-                                <select
-                                    class="form-select @error('competency_level') is-invalid @enderror"
-                                    id="competency_level"
-                                    wire:model="competency_level">
-                                    <option value="">Select Level</option>
-                                    <option value="basic">Basic</option>
-                                    <option value="intermediate">Intermediate</option>
-                                    <option value="advanced">Advanced</option>
-                                </select>
-                                @error('competency_level')
-                                <div class="invalid-feedback">{{$message}}</div>
                                 @enderror
                             </div>
 

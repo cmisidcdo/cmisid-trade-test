@@ -17,7 +17,7 @@ class Skills extends Component
 
     public $search;
     public $filterStatus = 'all'; 
-    public $title, $skill_id, $competency_level, $status;
+    public $title, $skill_id, $status;
 
     protected $listeners = ['deleteSkill'];
 
@@ -57,9 +57,7 @@ class Skills extends Component
                 'string',
                 Rule::unique('skills', 'title')->ignore($this->skill_id),
             ],
-            'competency_level'  => ['required', 
-                'string',
-            ],
+            
         ];
     }
 
@@ -107,7 +105,6 @@ class Skills extends Component
         DB::transaction(function () {
             $skill = new Skill();
             $skill->title = $this->title;
-            $skill->competency_level = $this->competency_level;
             $skill->deleted_at = $this->status === 'no' ? now() : null;
             $skill->save();
         });
@@ -133,7 +130,6 @@ class Skills extends Component
         );
 
         $this->skill_id = $skill->id;
-        $this->competency_level = $skill->competency_level;
         $this->editMode = true;
         $this->status = is_null($skill->deleted_at) ? 'yes' : 'no';
         $this->dispatch('show-skillModal');
@@ -148,7 +144,6 @@ class Skills extends Component
             $skill = Skill::withTrashed()->findOrFail($this->skill_id);
             
             $skill->title = $this->title;
-            $skill->competency_level = $this->competency_level;
             if ($this->status === 'no' && is_null($skill->deleted_at)) {
                 $skill->delete();
             } elseif ($this->status === 'yes' && !is_null($skill->deleted_at)) {

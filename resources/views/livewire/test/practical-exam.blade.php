@@ -71,7 +71,7 @@
         </div>
 
         <div class="table-responsive">
-            <table class="table table-hover table-bordered table-striped text-center">
+            <table class="table table-hover table-bordered text-center global-table">
                 <thead class="table-light">
                     <tr>
                         <th class="col" style="width: 5%;">#</th>

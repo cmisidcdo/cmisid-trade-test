@@ -46,14 +46,14 @@
                     </div>
                 </div>
                 <div class="table-responsive">
-                    <table class="table table-hover table-bordered table-striped text-center align-middle">
+                    <table class="table table-hover table-bordered text-center global-table">
                         <thead class="table-light">
                             <tr>
                                 <th scope="col" class="fw-semibold">#</th>
                                 <th scope="col" class="fw-semibold">Title</th>
                                 <th scope="col" class="fw-semibold">Salary Grade</th>
                                 <th scope="col" class="fw-semibold">Status</th>
-                                <th scope="col" class="fw-semibold">Priority</th>
+                                <th scope="col" class="fw-semibold">Competency Level</th>
                                 <th scope="col" class="fw-semibold text-center">Actions</th>
                             </tr>
                         </thead>
@@ -69,8 +69,10 @@
                                     </span>
                                 </td>
                                 <td>
-                                    <span class="badge rounded-pill {{$item->interview_priority == True ? 'bg-success': 'bg-secondary'}}">
-                                        {{$item->interview_priority == True ? 'Yes': 'No    '}}
+                                    <span class="badge rounded-pill 
+                                        {{ $item->competency_level == 'basic' ? 'bg-info' : 
+                                        ($item->competency_level == 'intermediate' ? 'bg-primary' : 'bg-dark') }}">
+                                        {{ucfirst($item->competency_level)}}
                                     </span>
                                 </td>
                                 <td>
@@ -166,27 +168,18 @@
                                 </div>
 
                                 <div class="col-md-6">
-                                    <label class="form-label fw-semibold d-block">Interview Priority <span class="text-danger">*</span></label>
-                                    <div class="form-check form-check-inline">
-                                        <input
-                                            class="form-check-input @error('interview_priority') is-invalid @enderror"
-                                            type="radio"
-                                            id="priorityYes"
-                                            wire:model="interview_priority"
-                                            value="1">
-                                        <label class="form-check-label" for="priorityYes">Yes</label>
-                                    </div>
-                                    <div class="form-check form-check-inline">
-                                        <input
-                                            class="form-check-input @error('interview_priority') is-invalid @enderror"
-                                            type="radio"
-                                            id="priorityNo"
-                                            wire:model="interview_priority"
-                                            value="0">
-                                        <label class="form-check-label" for="priorityNo">No</label>
-                                    </div>
-                                    @error('interview_priority')
-                                    <div class="d-block invalid-feedback">{{$message}}</div>
+                                    <label for="competency_level" class="form-label fw-semibold">Competency Level <span class="text-danger">*</span></label>
+                                    <select
+                                        class="form-select @error('competency_level') is-invalid @enderror"
+                                        id="competency_level"
+                                        wire:model="competency_level">
+                                        <option value="">Select Level</option>
+                                        <option value="basic">Basic</option>
+                                        <option value="intermediate">Intermediate</option>
+                                        <option value="advanced">Advanced</option>
+                                    </select>
+                                    @error('competency_level')
+                                    <div class="invalid-feedback">{{$message}}</div>
                                     @enderror
                                 </div>
                             </div>
@@ -203,12 +196,11 @@
                                 </div>
 
                                 <div class="table-responsive">
-                                    <table class="table table-hover">
+                                    <table class="table table-hover table-bordered text-center global-table">
                                         <thead class="table-light">
                                             <tr>
                                                 <th class="fw-semibold">#</th>
                                                 <th class="fw-semibold">Skill Title</th>
-                                                <th class="fw-semibold">Competency Level</th>
                                                 <th class="fw-semibold text-center">Actions</th>
                                             </tr>
                                         </thead>
@@ -217,13 +209,6 @@
                                             <tr>
                                                 <td>{{ $index + 1 }}</td>
                                                 <td class="fw-medium">{{ $selectedskill['title'] }}</td>
-                                                <td>
-                                                    <span class="badge rounded-pill 
-                                                        {{ $selectedskill['competency_level'] == 'Basic' ? 'bg-info' : 
-                                                        ($selectedskill['competency_level'] == 'Intermediate' ? 'bg-primary' : 'bg-dark') }}">
-                                                        {{ucfirst($selectedskill['competency_level'])}}
-                                                    </span>
-                                                </td>
                                                 <td class="text-center">
                                                     <button
                                                         class="btn btn-danger btn-sm"
@@ -290,12 +275,11 @@
                         </div>
 
                         <div class="table-responsive">
-                            <table class="table table-hover align-middle">
+                            <table class="table table-hover table-bordered text-center global-table">
                                 <thead class="table-light">
                                     <tr>
                                         <th class="fw-semibold">#</th>
                                         <th class="fw-semibold">Skill Title</th>
-                                        <th class="fw-semibold">Competency Level</th>
                                         <th class="fw-semibold text-center">Actions</th>
                                     </tr>
                                 </thead>
@@ -304,13 +288,6 @@
                                     <tr>
                                         <td scope="row">{{$item->id}}</td>
                                         <td class="fw-medium">{{$item->title}}</td>
-                                        <td>
-                                            <span class="badge rounded-pill 
-                                                {{ $item->competency_level == 'Basic' ? 'bg-info' : 
-                                                ($item->competency_level == 'Intermediate' ? 'bg-primary' : 'bg-dark') }}">
-                                                {{ucfirst($item->competency_level)}}
-                                            </span>
-                                        </td>
                                         <td class="text-center">
                                             <button
                                                 class="btn btn-success btn-sm"
@@ -384,12 +361,11 @@
                             <h6 class="fw-bold mb-3">Required Skills</h6>
 
                             <div class="table-responsive">
-                                <table class="table table-hover">
+                                <table class="table table-hover table-bordered text-center global-table">
                                     <thead class="table-light">
                                         <tr>
                                             <th class="fw-semibold">#</th>
                                             <th class="fw-semibold">Skill Title</th>
-                                            <th class="fw-semibold">Competency Level</th>
                                         </tr>
                                     </thead>
 
@@ -398,13 +374,6 @@
                                         <tr>
                                             <td>{{ $index + 1 }}</td>
                                             <td class="fw-medium">{{ $selectedskill['title'] }}</td>
-                                            <td class="fw-medium">
-                                                <span class="badge rounded-pill 
-                                                    {{ $selectedskill['competency_level'] == 'Basic' ? 'bg-info' : 
-                                                    ($selectedskill['competency_level'] == 'Intermediate' ? 'bg-primary' : 'bg-dark') }}">
-                                                    {{ $selectedskill['competency_level'] }}
-                                                </span>
-                                            </td>
                                         </tr>
                                         @empty
                                         <tr>

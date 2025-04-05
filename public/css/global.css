@@ -9,8 +9,8 @@
     border-bottom-right-radius: 30px;
 }
 
- /* Improve button hover effects */
- .btn {
+/* Improve button hover effects */
+.btn {
     transition: all 0.2s ease-in-out;
 }
 
@@ -48,4 +48,15 @@
 .modal-header {
     background-color: #ffffff !important; /* Bootstrap primary blue */
     color: rgb(0, 0, 0) !important;
+}
+
+.global-table {
+    border-collapse: collapse;
+    text-align: center;
+}
+
+.global-table th {
+    background-color: #1a1851;
+    color: white;
+    border: 1px solid #1a1851;
 }

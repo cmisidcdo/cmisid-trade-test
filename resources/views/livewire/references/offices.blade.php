@@ -74,7 +74,7 @@
                     </div>
 
                     <div class="table-responsive">
-                        <table class="table table-hover table-bordered table-striped align-middle text-center">
+                        <table class="table table-hover table-bordered text-center global-table">
                             <thead class="table-light">
                                 <tr>
                                     <th scope="col" class="text-center">#</th>
@@ -134,7 +134,7 @@
                         </div> --}}
                     </div>
 
-                    <div class="d-flex justify-content-center mt-4 gap-3">
+                    <div>
                         {{ $offices->links() }}
                     </div>                    
 

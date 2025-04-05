@@ -75,7 +75,7 @@
 
             <!-- Data table -->
             <div class="table-responsive">
-                <table class="table table-hover table-bordered table-striped text-center">
+                <table class="table table-hover table-bordered text-center global-table">
                     <thead style="background-color: #f8f9fa;">
                         <tr>
                             <th class="text-center" style="width: 5%;">#</th>
@@ -239,7 +239,7 @@
                             <label class="form-label fw-bold fs-6">Choices</label>
                         
                             <div class="table-responsive">
-                                <table class="table table-bordered align-middle">
+                                <table class="table table-hover table-bordered text-center global-table">
                                     <thead class="table-light">
                                         <tr>
                                             <th class="fs-7">Option</th>
@@ -345,7 +345,7 @@
                     <div class="border-top pt-3">
                         <h6 class="fw-bold mb-3">Options</h6>
                         <div class="table-responsive">
-                            <table class="table table-bordered align-middle">
+                            <table class="table table-hover table-bordered text-center global-table">
                                 <thead class="table-light">
                                     <tr>
                                         <th class="fw-semibold text-center" style="width: 5%;">#</th>

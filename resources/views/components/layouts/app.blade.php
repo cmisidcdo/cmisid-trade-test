@@ -31,10 +31,10 @@
   <link href="{{asset('css/global.css')}}" rel="stylesheet">
 
 
-
 </head>
 
 <body>
+  @livewire('change-password')
 
   <header id="header" class="header fixed-top d-flex align-items-center">
 
@@ -222,9 +222,9 @@
             </li>
 
             <li>
-              <a class="dropdown-item d-flex align-items-center" href="users-profile.html">
-                <i class="bi bi-gear"></i>
-                <span>Account Settings</span>
+              <a class="dropdown-item d-flex align-items-center" href="javascript:void(0);" data-bs-toggle="modal" data-bs-target="#changePasswordModal">
+                  <i class="bi bi-gear"></i>
+                  <span>Change Password</span>
               </a>
             </li>
             <li>
@@ -488,8 +488,6 @@
     {{ $slot }} 
   </main>
 
-
-
   <footer id="footer" class="footer">
     <div class="copyright">
       &copy; Copyright <strong><span>CMISID ACMS</span></strong>. All Rights Reserved
@@ -557,6 +555,7 @@
               }
           });
       });
+
 
 
     });

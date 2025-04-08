@@ -29,4 +29,13 @@ class Position extends Model
 
         return $logOptions;
     }
+
+    public function skills()
+    {
+        return $this->belongsToMany(Skill::class, 'position_skills')  
+            ->withPivot('competency_level')
+            ->withTimestamps()
+            ->withTrashed();
+    }
+
 }

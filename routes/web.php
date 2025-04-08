@@ -22,6 +22,9 @@ use App\Livewire\References\Venues;
 use App\Livewire\Reports\AdminReports;
 use App\Livewire\Reports\CandidateReports;
 use App\Livewire\Exam\CreateSchedule;
+use App\Livewire\Test\Assessment\AddQuestions;
+use App\Livewire\Test\Assessment\UpdateQuestions;
+use App\Livewire\Test\Assessment\ViewQuestions;
 use Illuminate\Support\Facades\Route;
 use App\Livewire\Dashboard;
 use App\Livewire\Eval\AssessmentNotes;
@@ -80,7 +83,9 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/scores/assessment', AssessmentScores::class )->name('scores.assessment');
     Route::get('/scores/practical', PracticalScores::class)->name('scores.practical');
     Route::get('/scores/oral', OralScores::class)->name('scores.oral');
-
+    Route::get('/test/assessment/addquestions', AddQuestions::class)->name('test.assessment.addquestions');
+    Route::get('/test/assessment/updatequestions', UpdateQuestions::class)->name('test.assessment.updatequestions');
+    Route::get('/test/assessment/viewquestions', ViewQuestions::class)->name('test.assessment.viewquestions');
 });
 
 Route::get('/candidate/login', Login::class)->name('candidate.login');

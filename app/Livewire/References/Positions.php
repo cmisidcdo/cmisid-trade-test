@@ -9,6 +9,7 @@ use App\Models\PositionSkill;
 use Illuminate\Support\Facades\DB;
 use Livewire\WithPagination;
 use Illuminate\Validation\Rule;
+use Illuminate\Support\Facades\Log;
 
 class Positions extends Component
 {
@@ -20,8 +21,9 @@ class Positions extends Component
 
     public $search;
     public $position_id;
-    public $title, $salary_grade, $competency_level;
+    public $title, $salary_grade, $competency_level, $position_description = '';
     public $selectedskills = [];
+    public $loadingSkillId = null;
 
     protected $listeners = ['deletePosition'];
 
@@ -54,19 +56,49 @@ class Positions extends Component
         $this->dispatch('hide-skillsModal');
     }
 
+    // public function addSkill($skillId)
+    // {
+    //     $skill = Skill::find($skillId);
+
+    //     if ($skill) {
+    //         $this->selectedskills[] = [
+    //             'id' => $skill->id,
+    //             'title' => $skill->title,
+    //             'competency_level' => 'basic',
+    //         ];
+    //     }
+
+    //     $this->dispatch('hide-skillsModal');
+    // }
+
     public function addSkill($skillId)
-    {
-        $skill = Skill::find($skillId);
+{
+    $this->loadingSkillId = $skillId;
 
-        if ($skill) {
-            $this->selectedskills[] = [
-                'id' => $skill->id,
-                'title' => $skill->title,
-            ];
-        }
-
-        $this->dispatch('hide-skillsModal');
+    // Simulate logic
+    $skill = Skill::find($skillId);
+    if ($skill) {
+        $this->selectedskills[] = [
+            'id' => $skill->id,
+            'title' => $skill->title,
+            'competency_level' => 'basic',
+        ];
     }
+
+    $this->loadingSkillId = null;
+}
+
+
+    public function updateCompetencyLevel($index, $level)
+    {
+        
+        $updatedSkills = $this->selectedskills;
+
+        $updatedSkills[$index]['competency_level'] = $level;
+
+        $this->selectedskills = $updatedSkills;
+    }
+
 
 
 
@@ -87,11 +119,11 @@ class Positions extends Component
                 'required',
                 'integer',
             ],
-            'competency_level' => [
+            'position_description' => [
                 'required',
                 'string',
-                Rule::in(['basic', 'intermediate', 'advanced']),
-            ],
+                'max:255'
+            ]
         ];
     }
 
@@ -141,22 +173,36 @@ class Positions extends Component
             $position = new Position();
             $position->title = $this->title;
             $position->salary_grade = $this->salary_grade;
-            $position->competency_level = $this->competency_level;
+            $position->position_description = $this->position_description;
             $position->save();
+    
+            Log::info('Position created', [
+                'id' => $position->id,
+                'title' => $position->title,
+                'salary_grade' => $position->salary_grade,
+            ]);
     
             foreach ($this->selectedskills as $skill) {
                 $positionSkill = new PositionSkill();
                 $positionSkill->skill_id = $skill['id'];
+                $positionSkill->competency_level = $skill['competency_level'];
                 $positionSkill->position_id = $position->id;
                 $positionSkill->save();
+    
+                Log::info('Linked skill to position', [
+                    'position_id' => $position->id,
+                    'skill_id' => $skill['id'],
+                    'competency_level' => $skill['competency_level'],
+                ]);
             }
         });
     
         $this->clear();
         $this->dispatch('hide-positionModal');
         $this->dispatch('success', 'Position Created Successfully');
-    }
     
+        Log::info('Position creation process completed successfully.');
+    }
     
 
 
@@ -173,6 +219,7 @@ class Positions extends Component
         $this->fill([
             'title' => $position->title,
             'salary_grade' => $position->salary_grade,
+            'position_description' => $position->position_description,
             'competency_level' => $position->competency_level,
         ]);
 
@@ -181,7 +228,7 @@ class Positions extends Component
 
         $this->selectedskills = PositionSkill::where('position_id', $positionId)
             ->join('skills', 'position_skills.skill_id', '=', 'skills.id') 
-            ->select('position_skills.skill_id as id', 'skills.title')
+            ->select('position_skills.skill_id as id', 'skills.title', 'position_skills.competency_level')
             ->get()
             ->toArray();
 
@@ -199,7 +246,7 @@ class Positions extends Component
             
             $position->title = $this->title;
             $position->salary_grade = $this->salary_grade;
-            $position->competency_level = $this->competency_level;
+            $position->position_description = $this->position_description;
             $position->save();
     
             $existingSkills = PositionSkill::where('position_id', $this->position_id)->get()->keyBy('skill_id');
@@ -208,11 +255,16 @@ class Positions extends Component
     
             foreach ($this->selectedskills as $skill) {
                 if (isset($existingSkills[$skill['id']])) {
-                
+                    $existingSkill = $existingSkills[$skill['id']];
+                    if ($existingSkill->competency_level !== $skill['competency_level']) {
+                        $existingSkill->competency_level = $skill['competency_level'];
+                        $existingSkill->save();
+                    }
                 } else {
                     PositionSkill::create([
                         'position_id' => $this->position_id,
                         'skill_id' => $skill['id'],
+                        'competency_level' => $skill['competency_level'],
                     ]);
                 }
             }
@@ -234,13 +286,14 @@ class Positions extends Component
         $this->fill([
             'title' => $position->title,
             'salary_grade' => $position->salary_grade,
+            'position_description' => $position->position_description,
         ]);
 
         $this->position_id = $position->id;
 
         $this->selectedskills = PositionSkill::where('position_id', $positionId)
             ->join('skills', 'position_skills.skill_id', '=', 'skills.id') 
-            ->select('position_skills.skill_id as id', 'skills.title')
+            ->select('position_skills.skill_id as id', 'skills.title', 'position_skills.competency_level')
             ->get()
             ->toArray();
 

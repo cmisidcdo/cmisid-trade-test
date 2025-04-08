@@ -15,11 +15,12 @@ return new class extends Migration
             $table->id();
             $table->string('title');
             $table->integer('salary_grade');
-            $table->enum('competency_level', ['basic', 'intermediate', 'advanced']);
+            $table->string('position_description')->nullable();
             $table->softDeletes();
             $table->timestamps();
         });
     }
+
 
     /**
      * Reverse the migrations.

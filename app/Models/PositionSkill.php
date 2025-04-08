@@ -10,4 +10,15 @@ class PositionSkill extends Model
 {
     protected $table = 'position_skills'; 
     protected $guarded = [];
+
+    public function position()
+    {
+        return $this->belongsTo(Position::class);
+    }
+
+    public function skill()
+    {
+        return $this->belongsTo(Skill::class);
+    }
+
 }

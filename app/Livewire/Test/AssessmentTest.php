@@ -2,6 +2,7 @@
 
 namespace App\Livewire\Test;
 
+use App\Models\PositionSkill;
 use Livewire\Component;
 use App\Models\AssessmentQuestion;
 use App\Models\Position;
@@ -16,57 +17,61 @@ class AssessmentTest extends Component
 {
 
     use WithPagination;
-    public $editMode;
+    public $editMode, $viewMode;
 
     public $archive = false;
 
     public $search;
-    public $title, $location, $venue_id;
-
     public $positions = [];
+
+    
     public $skills = [];
 
     public $choices = [['text' => '', 'status' => '']];
     
-    public $position_id, $skill_id, $question, $duration = 0, $status, $vduration;
+    public $position_id, $title, $skill_id, $question, $duration = 0, $status, $vduration;
     public $points = 1;
 
     public $hours = 0, $minutes = 0, $seconds = 0;
     public $assessmentquestion_id;
-    
     public $filterStatus = 'all'; 
-
-    public $competency_levels = ['basic', 'intermediate', 'advanced'];
-    
-    public $competency_level;
 
     protected $listeners = ['deleteAssessmentQuestion'];
 
     public function mount()
     {
-        // $user = auth()->user();
-
-        // if(!$user->can('read reference')){
-        //     abort(403);
-        // }
     }
 
-    public function updatedCompetencyLevel()
+    // public function updatedCompetencyLevel()
+    // {
+    //     $this->updateSkills();
+    //     $this->skill_id = null;
+    // }
+
+    public function updatedPositionId($value)
     {
         $this->updateSkills();
+
         $this->skill_id = null;
     }
+
+
 
     public function render()
     {
         return view('livewire.test.assessment-test', [
-            'assessmentquestions' => $this->loadAssessmentQuestions()
+            'assessmentquestions' => $this->loadPositionAssessmentQuestions(),
         ]);
     }
 
     public function updatingFilterStatus()
     {
         $this->resetPage(); 
+    }
+
+    private function loadDropdownData()
+    {
+        $this->positions = Position::all();
     }
 
 
@@ -138,29 +143,53 @@ class AssessmentTest extends Component
 
     public function loadAssessmentQuestions()
     {
-        return AssessmentQuestion::withTrashed()
-            ->with('skill')
+
+    }
+
+    public function refreshTable()
+    {
+        //haha
+    }
+
+    public function loadPositionAssessmentQuestions()
+    {
+        $query = AssessmentQuestion::withTrashed()
+            ->with(['positionSkill.position'])
             ->when($this->filterStatus !== 'all', function ($query) {
                 if ($this->filterStatus === 'yes') {
                     $query->whereNull('deleted_at');
                 } elseif ($this->filterStatus === 'no') {
-                    $query->whereNotNull('deleted_at'); 
+                    $query->whereNotNull('deleted_at');
                 }
             })
             ->when($this->search, function ($query) {
                 $query->where(function ($q) {
                     $q->where('question', 'like', '%' . $this->search . '%')
-                    ->orWhere('duration','like','%'. $this->search .'%');
+                        ->orWhere('duration', 'like', '%' . $this->search . '%');
                 });
-            })
-            ->paginate(10)
-            ->through(function ($question) {
-                $question->formatted_duration = gmdate("H:i:s", $question->duration);
-                $question->skill_title = $question->skill->title ?? 'N/A'; 
-                $question->competency_level = $question->skill->competency_level ?? 'N/A'; 
-                return $question;
             });
+    
+        $grouped = $query
+            ->join('position_skills', 'position_skills.id', '=', 'assessmentquestions.position_skill_id')
+            ->join('positions', 'positions.id', '=', 'position_skills.position_id')
+            ->select(
+                'positions.id as position_id',
+                'positions.title as position_title',
+                \DB::raw('COUNT(assessmentquestions.id) as total_questions'),
+                \DB::raw('SUM(assessmentquestions.duration) as total_duration')
+            )
+            ->groupBy('positions.id', 'positions.title')
+            ->paginate(10)
+            ->through(function ($item) {
+                $item->formatted_duration = gmdate("H:i:s", $item->total_duration);
+                return $item;
+            });
+    
+        return $grouped;
     }
+    
+
+
 
     public function createAssessmentQuestion()
     {
@@ -172,6 +201,7 @@ class AssessmentTest extends Component
                 Log::info('Starting transaction for question creation.');
 
                 $assessmentquestion = new AssessmentQuestion();
+                $assessmentquestion->question = $this->question;
                 $assessmentquestion->question = $this->question;
                 $assessmentquestion->points = $this->points;
                 $assessmentquestion->skill_id = $this->skill_id;
@@ -219,52 +249,105 @@ class AssessmentTest extends Component
         $this->choices = [
             ['text' => '', 'status' => 'incorrect']
         ];
+        $this->loadDropdownData();
     }
 
     public function updateSkills()
     {
-        if ($this->competency_level) {
-            $this->skills = Skill::where('competency_level', $this->competency_level)->get();
+        if ($this->position_id) {
+            $position = Position::find($this->position_id);
+
+            if ($position) {
+                $this->skills = $position->skills()
+                    ->whereNull('skills.deleted_at')
+                    ->get()
+                    ->map(function ($skill) use ($position) {
+                        $positionSkillId = DB::table('position_skills')
+                            ->where('position_id', $position->id)
+                            ->where('skill_id', $skill->id)
+                            ->value('id');
+
+                        $questionCount = AssessmentQuestion::where('position_skill_id', $positionSkillId)->count();
+
+                        return [
+                            'id' => $skill->id,
+                            'title' => $skill->title,
+                            'competency_level' => $skill->pivot->competency_level,
+                            'question_count' => $questionCount,
+                        ];
+                    });
+            } else {
+                $this->skills = collect();
+            }
         } else {
-            $this->skills = [];
+            $this->skills = collect();
         }
     }
 
-    public function readAssessmentQuestion($assessmentquestionId)
+    
+    public function addQuestions($position_id, $skill_id)
+    {
+
+        $this->position_id = $position_id;
+        $this->skill_id = $skill_id;
+
+        $this->dispatch('open-new-tab', 
+            position_id: $this->position_id,
+            skill_id: $this->skill_id,
+        );
+    }
+
+    public function updateQuestions($position_id, $skill_id)
+    {
+
+        $this->position_id = $position_id;
+        $this->skill_id = $skill_id;
+
+        $this->dispatch('open-new-update-tab', 
+            position_id: $this->position_id,
+            skill_id: $this->skill_id,
+        );
+    }
+
+    public function viewQuestions($position_id, $skill_id)
+    {
+
+        $this->position_id = $position_id;
+        $this->skill_id = $skill_id;
+
+        $this->dispatch('open-new-view-tab', 
+            position_id: $this->position_id,
+            skill_id: $this->skill_id,
+        );
+    }
+    
+    
+    
+
+    public function readAssessmentQuestion($positionId)
     {
         $this->clear();
-        $assessmentquestion = AssessmentQuestion::withTrashed()->with('skill')->findOrFail($assessmentquestionId);
     
-        $this->hours = floor($assessmentquestion->duration / 3600);
-        $this->minutes = floor(($assessmentquestion->duration % 3600) / 60);
-        $this->seconds = $assessmentquestion->duration % 60;
-    
-        $this->fill([
-            'assessmentquestion_id' => $assessmentquestion->id,
-            'question'          => $assessmentquestion->question,
-            'points'            => $assessmentquestion->points,
-            'skill_id'       => $assessmentquestion->skill_id,
-            'competency_level'  => $assessmentquestion->skill->competency_level ?? 'N/A',
-        ]);
-
-        $this->choices = $assessmentquestion->choices->map(function ($choice) {
-            return [
-                'text' => $choice->choice_text,
-                'status' => $choice->is_answer ? 'correct' : 'incorrect'
-            ];
-        })->toArray();
-    
-        if (empty($this->choices)) {
-            $this->choices = [
-                ['text' => '', 'status' => 'incorrect']
-            ];
-        }
-        $this->status = is_null($assessmentquestion->deleted_at) ? 'yes' : 'no';
-        $this->updateSkills();
         $this->editMode = true;
+        $this->position_id = $positionId;
+    
+        $this->updateSkills();
+    
         $this->dispatch('show-assessmentquestionModal');
     }
 
+    public function viewAssessmentQuestion($positionId)
+    {
+        $this->clear();
+    
+        $this->viewMode = true;
+        $this->position_id = $positionId;
+    
+        $this->updateSkills();
+    
+        $this->dispatch('show-assessmentquestionModal');
+    }
+    
     public function updateAssessmentQuestion()
     {
         Log::info('updateAssessmentQuestion called', [
@@ -379,9 +462,11 @@ class AssessmentTest extends Component
     public function showAddEditModal()
     {
         $this->clear();
+    
         if (!$this->editMode) { 
             $this->status = 'yes'; 
         }
+
         $this->dispatch('show-assessmentquestionModal');
     }
 

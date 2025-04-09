@@ -34,7 +34,7 @@
                         <div class="mb-2">
                             <label for="question_{{ $index }}" class="form-label fw-bold fs-7">Question</label>
                             <textarea class="form-control form-control-sm fs-7 @error('questions.' . $index . '.question') is-invalid @enderror"
-                                id="question_{{ $index }}" rows="2" wire:model.live="questions.{{ $index }}.question" placeholder="Enter your question here" maxlength="255"></textarea>
+                                id="question_{{ $index }}" rows="2" wire:model.live.debounce.500ms="questions.{{ $index }}.question" placeholder="Enter your question here" maxlength="255"></textarea>
                                 <div class="text-end small text-muted">
                                     <span id="char-count-{{ $index }}">{{ strlen($questions[$index]['question'] ?? '') }}</span> / 255
                                 </div>

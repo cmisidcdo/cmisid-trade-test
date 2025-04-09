@@ -73,7 +73,7 @@
                 </div>
 
                 <div class="table-responsive">
-                    <table class="table table-hover align-middle border">
+                    <table class="table table-hover align-middle border global-table">
                         <thead class="table-light">
                             <tr>
                                 <th scope="col" class="text-center" width="5%">#</th>

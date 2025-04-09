@@ -30,7 +30,13 @@
   <link href="{{asset('css/style.css')}}" rel="stylesheet">
   <link href="{{asset('css/global.css')}}" rel="stylesheet">
 
-
+<style>
+  #main, #footer {
+      margin-left: 0 !important; 
+      padding-left: 0 !important; 
+      width: 100%; 
+  }
+</style>
 
 </head>
 
@@ -39,10 +45,6 @@
   <header id="header" class="header fixed-top d-flex align-items-center">
 
   <div class="d-flex ">
-  <a href="{{ route('dashboard') }}" class="logo d-flex align-items-center">
-    <img src="{{ asset('img/logo.png') }}" alt="Logo" class="img-fluid" style="height: 75px;">
-  </a>
-  <i class="bi bi-list toggle-sidebar-btn"></i>
 </div>
 
 
@@ -87,13 +89,6 @@
             <li>
               <hr class="dropdown-divider">
             </li>
-
-            <li>
-              <a class="dropdown-item d-flex align-items-center" href="pages-faq.html">
-                <i class="bi bi-question-circle"></i>
-                <span>Need Help?</span>
-              </a>
-            </li>
             <li>
               <hr class="dropdown-divider">
             </li>
@@ -119,47 +114,6 @@
 
   </header><!-- End Header -->
 
-  <aside id="sidebar" class="sidebar">
-
-    <ul class="sidebar-nav" id="sidebar-nav">
-
-      <li class="nav-item">
-        <a class="nav-link {{ Request::routeIs('candidate.home') ? '' : 'collapsed' }}" href="{{ route('candidate.home') }}">
-          <i class="bi bi-grid-fill fs-5"></i>
-          <span>Home</span>
-        </a>
-      </li><!-- End Dashboard Nav -->
-
-   
-      <li class="nav-item">
-        <a class="nav-link {{ Request::routeIs('candidate.*') ? '' : 'collapsed' }}" data-bs-target="#tests-nav" data-bs-toggle="collapse" href="#">
-          <i class="bi bi-clipboard-check-fill fs-5"></i><span>Candidate</span><i class="bi bi-chevron-down ms-auto"></i>
-        </a>
-        <ul id="tests-nav" class="nav-content collapse {{ Request::routeIs('candidate.*') ? 'show' : '' }}" data-bs-parent="#sidebar-nav">         
-          <li>
-            <a class="{{ Request::routeIs('candidate.exam.assessmentinstructions') ? 'active' : '' }}" href="{{ route('candidate.exam.assessmentinstructions') }}">
-              <i class="bi bi-clipboard-data-fill fs-5"></i><span>Assessment Tests</span>
-            </a>
-          </li>
-          <li>
-            <a class="{{ Request::routeIs('candidate.exam.practical') ? 'active' : '' }}" href="{{ route('candidate.exam.practical') }}">
-              <i class="bi bi-person-fill-gear fs-5"></i><span>Practical Exams</span>
-            </a>
-          </li>
-          <li>
-            <a class="{{ Request::routeIs('candidate.exam.oral') ? 'active' : '' }}" href="{{ route('candidate.exam.oral') }}">
-              <i class="bi bi-wechat fs-5"></i><span>Oral Interviews</span>
-            </a>
-          </li>
-        </ul>
-      </li>
-
-
-   
-
-    </ul>
-
-  </aside><!-- End Sidebar-->
   <main id="main" class="main" style="padding-top: 0;"> 
     {{ $slot }} 
   </main>

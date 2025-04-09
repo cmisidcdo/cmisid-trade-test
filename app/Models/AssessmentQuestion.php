@@ -57,10 +57,10 @@ class AssessmentQuestion extends Model
         return $this->hasOneThrough(
             Position::class,
             PositionSkill::class,
-            'id',                 // Foreign key on PositionSkill table
-            'id',                 // Foreign key on Position table
-            'position_skill_id',  // Local key on AssessmentQuestion table
-            'position_id'        // Local key on PositionSkill table
+            'id',              
+            'id',             
+            'position_skill_id',
+            'position_id'      
         );
     }
 

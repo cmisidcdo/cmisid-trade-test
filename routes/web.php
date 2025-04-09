@@ -1,6 +1,7 @@
 <?php
 
 use App\Livewire\Candidate\Exam\Assessment;
+use App\Livewire\Candidate\Exam\AssessmentInstructions;
 use App\Livewire\Candidate\Exam\CandidateAssessment;
 use App\Livewire\Candidate\Exam\CandidateOral;
 use App\Livewire\Candidate\Exam\CandidatePractical;
@@ -25,6 +26,12 @@ use App\Livewire\Exam\CreateSchedule;
 use App\Livewire\Test\Assessment\AddQuestions;
 use App\Livewire\Test\Assessment\UpdateQuestions;
 use App\Livewire\Test\Assessment\ViewQuestions;
+use App\Livewire\Test\Oral\AddOralQuestions;
+use App\Livewire\Test\Oral\UpdateOralQuestions;
+use App\Livewire\Test\Oral\ViewOralQuestions;
+use App\Livewire\Test\Practical\AddScenarios;
+use App\Livewire\Test\Practical\UpdateScenarios;
+use App\Livewire\Test\Practical\ViewScenarios;
 use Illuminate\Support\Facades\Route;
 use App\Livewire\Dashboard;
 use App\Livewire\Eval\AssessmentNotes;
@@ -86,6 +93,12 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/test/assessment/addquestions', AddQuestions::class)->name('test.assessment.addquestions');
     Route::get('/test/assessment/updatequestions', UpdateQuestions::class)->name('test.assessment.updatequestions');
     Route::get('/test/assessment/viewquestions', ViewQuestions::class)->name('test.assessment.viewquestions');
+    Route::get('/test/practical/addscenarios', AddScenarios::class)->name('test.practical.addscenarios');
+    Route::get('/test/practical/updatescenarios', UpdateScenarios::class)->name('test.practical.updatescenarios');
+    Route::get('/test/practical/viewscenarios', ViewScenarios::class)->name('test.practical.viewscenarios');
+    Route::get('/test/oral/addoralquestions', AddOralQuestions::class)->name('test.oral.addoralquestions');
+    Route::get('/test/oral/updateoralquestions', UpdateOralQuestions::class)->name('test.oral.updateoralquestions');
+    Route::get('/test/oral/vieworalquestions', ViewOralQuestions::class)->name('test.oral.vieworalquestions');
 });
 
 Route::get('/candidate/login', Login::class)->name('candidate.login');
@@ -93,6 +106,7 @@ Route::get('/candidate/home', Home::class)->name('candidate.home');
 Route::get('/candidate/exam/assessment', CandidateAssessment::class)->name('candidate.exam.assessment');
 Route::get('/candidate/exam/practical', CandidatePractical::class)->name('candidate.exam.practical');
 Route::get('/candidate/exam/oral', CandidateOral::class)->name('candidate.exam.oral');
+Route::get('/candidate/exam/assessment-instructions', AssessmentInstructions::class)->name('candidate.exam.assessmentinstructions');
 
 Route::post('/candidate-logout', function (Request $request) {
     $request->session()->forget(['candidate_id', 'candidate_name']); 

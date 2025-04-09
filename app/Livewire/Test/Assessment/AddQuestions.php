@@ -27,7 +27,6 @@ class AddQuestions extends Component
 
     public $hours = 0, $minutes = 0, $seconds = 0;
     public $assessmentquestion_id;
-    public $filterStatus = 'all'; 
 
     public $questions = [
         [
@@ -176,7 +175,6 @@ class AddQuestions extends Component
         });
 
         $this->clear();
-        $this->dispatch('hide-assessmentquestionModal');
         $this->dispatch('success', 'Questions Created Successfully');
     }
 

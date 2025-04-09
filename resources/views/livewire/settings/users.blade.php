@@ -72,7 +72,7 @@
       </div>
       
 
-        <table class="table table-hover table-bordered table-striped text-center">
+        <table class="table table-hover table-bordered table-striped text-center global-table">
           <thead class="table-light">
             <tr>
               <th scope="col">#</th>
@@ -155,7 +155,7 @@
             </div>
     
             <h6 class="fw-bold text-primary text-center border-bottom pb-1 small">Permissions</h6>
-            <table class="table table-sm text-center mb-2 small">
+            <table class="table table-sm text-center mb-2 small global-table">
               <thead class="table-light">
                 <tr>
                   <th>Module</th>

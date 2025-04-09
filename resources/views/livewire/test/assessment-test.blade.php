@@ -129,7 +129,7 @@
                         </div>
                     @endif
     
-                    <form class="needs-validation" wire:submit.prevent="{{ $editMode ? 'updateAssessmentQuestion' : 'createAssessmentQuestion' }}">
+                    <form wire:submit.prevent>
                         <div class="row mb-2">
                             <div class="col-6">
                                 <label for="position_id" class="form-label fw-bold fs-7">Position</label>

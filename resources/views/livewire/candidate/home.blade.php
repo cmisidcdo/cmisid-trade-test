@@ -14,7 +14,7 @@
                         </p>
 
                         <div class="mt-5 action-buttons d-grid gap-3">
-                            <a href="{{ route('candidate.exam.assessment') }}" class="btn btn-primary btn-lg w-100">
+                            <a href="{{ route('candidate.exam.assessmentinstructions') }}" class="btn btn-primary btn-lg w-100">
                                 Take The Assessment Test Now!
                             </a>
                         </div>

@@ -13,11 +13,10 @@ return new class extends Migration
     {
         Schema::create('practical_scenarios', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('skill_id')->constrained('skills')->onDelete('cascade');
+            $table->foreignId('position_skill_id')->constrained('position_skills')->onDelete('cascade');
             $table->string('scenario');
             $table->string('description');
             $table->integer('duration');
-            $table->integer('points');
             $table->string('file_path')->nullable();
             $table->softDeletes();
             $table->timestamps();

@@ -249,8 +249,6 @@ class UpdateQuestions extends Component
         });
     
         $this->clear();
-        
-        $this->dispatch('hide-assessmentquestionModal');
         $this->dispatch('success', 'Questions Updated Successfully');
     }
     

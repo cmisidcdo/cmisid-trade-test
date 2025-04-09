@@ -43,6 +43,12 @@
                 </div>
             </div>
         </div>
+
+        <!-- Logos -->
+        <div class="logos col-lg-6 d-flex flex-column justify-content-center align-items-start text-start ps-3 mt-4">
+            <img src="{{ asset('img/cdologo.png') }}" alt="logo" class="img-fluid">
+        </div>
+
     </div>
 
     <!-- Confirmation Modal -->
@@ -84,8 +90,8 @@
                         <div class="card-body" style="padding: 12px;">
                             <h5 class="card-title text-center mb-3" style="color: #1a1851; font-weight: bold;">📌 Test Instructions</h5>
                             <ul class="card-text" style="padding-left: 15px; font-size: 15px;">
-                                <li><strong>📍 Proceed to the Venue which is to be held for the Practical Exam.</strong></li>
-                                <li><strong>🧐 Look for the Assessor which will be the one observing you executing tasks.</strong></li>
+                                <li><strong>Proceed to the Venue which is to be held for the Practical Exam.</strong></li>
+                                <li><strong>Look for the Assessor which will be the one observing you executing tasks.</strong></li>
                             </ul>
                         </div>
                     </div>
@@ -144,39 +150,57 @@
         </div>
     </div>
 
+    <style>
+        .logos img {
+            height: 150px;
+            max-width: 100%;
+        }
+    </style>
     <!-- Add Bootstrap and custom JS -->
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            // Open Confirmation Modal when clicking "Start the Interview"
+            // Initialize modals with static backdrop (confirmation and candidate info)
+            const confirmationModal = new bootstrap.Modal(document.getElementById('confirmationModal'), {
+                backdrop: 'static',
+                keyboard: false
+            });
+
+            const candidateInfoModal = new bootstrap.Modal(document.getElementById('candidateInfoModal'), {
+                backdrop: 'static',
+                keyboard: false
+            });
+
+            // Success modal with default dismissible behavior
+            const successModal = new bootstrap.Modal(document.getElementById('successModal'), {
+                backdrop: true
+            });
+
+            // Show confirmation modal on click
             document.getElementById('startInterview').addEventListener('click', function() {
-                var confirmationModal = new bootstrap.Modal(document.getElementById('confirmationModal'));
                 confirmationModal.show();
             });
 
-            // Confirm Interview (Opens Candidate Info Modal)
+            // When user agrees, hide confirmation and show candidate info modal
             document.getElementById('confirmInterview').addEventListener('click', function() {
-                bootstrap.Modal.getInstance(document.getElementById('confirmationModal')).hide();
-                var candidateInfoModal = new bootstrap.Modal(document.getElementById('candidateInfoModal'));
+                confirmationModal.hide();
                 candidateInfoModal.show();
             });
 
-            // Proceed to Success Modal
+            // When interview is submitted, show success modal then redirect
             document.getElementById('submitInterview').addEventListener('click', function() {
-                bootstrap.Modal.getInstance(document.getElementById('candidateInfoModal')).hide();
-                var successModal = new bootstrap.Modal(document.getElementById('successModal'));
+                candidateInfoModal.hide();
                 successModal.show();
 
-                // Redirect after 3 seconds
                 setTimeout(function() {
                     successModal.hide();
-                    // window.location.href = 'homepage.html'; // Uncomment this for redirection
+                    // Uncomment the line below to redirect after success
+                    // window.location.href = 'homepage.html';
                 }, 3000);
             });
 
+            // Time & date display updates
             function updateTimeAndDate() {
                 const now = new Date();
-
-                // Format time in 12-hour format with AM/PM
                 let hours = now.getHours();
                 let minutes = now.getMinutes();
                 let ampm = hours >= 12 ? 'PM' : 'AM';
@@ -184,7 +208,6 @@
                 minutes = minutes < 10 ? '0' + minutes : minutes;
                 const formattedTime = `${hours}:${minutes} ${ampm}`;
 
-                // Format date
                 const options = {
                     year: 'numeric',
                     month: 'long',
@@ -196,70 +219,22 @@
                 document.getElementById('currentDate').value = formattedDate;
             }
 
+            function updateDateTime() {
+                const now = new Date();
+                const date = now.toLocaleDateString();
+                const time = now.toLocaleTimeString([], {
+                    hour: '2-digit',
+                    minute: '2-digit'
+                });
+
+                document.getElementById("liveDate").value = date;
+                document.getElementById("liveTime").value = time;
+            }
+
             setInterval(updateTimeAndDate, 1000);
-            updateTimeAndDate();
-
-            function updateDateTime() {
-                const now = new Date();
-                const date = now.toLocaleDateString();
-                const time = now.toLocaleTimeString([], {
-                    hour: '2-digit',
-                    minute: '2-digit'
-                });
-
-                document.getElementById("liveDate").value = date;
-                document.getElementById("liveTime").value = time;
-            }
-
-            updateDateTime();
             setInterval(updateDateTime, 1000);
-        });
-
-        function updateTimeAndDate() {
-            const now = new Date();
-
-            // Format time in 12-hour format with AM/PM
-            let hours = now.getHours();
-            let minutes = now.getMinutes();
-            let ampm = hours >= 12 ? 'PM' : 'AM';
-            hours = hours % 12 || 12; // Convert 0 (midnight) and 12 (noon) to 12-hour format
-            minutes = minutes < 10 ? '0' + minutes : minutes; // Ensure two-digit minutes
-            const formattedTime = `${hours}:${minutes} ${ampm}`;
-
-            // Format date (e.g., March 31, 2025)
-            const options = {
-                year: 'numeric',
-                month: 'long',
-                day: 'numeric'
-            };
-            const formattedDate = now.toLocaleDateString('en-US', options);
-
-            // Update the input fields
-            document.getElementById('currentTime').value = formattedTime;
-            document.getElementById('currentDate').value = formattedDate;
-        }
-
-        // Run function every second
-        setInterval(updateTimeAndDate, 1000);
-
-        // Initialize on page load
-        document.addEventListener('DOMContentLoaded', updateTimeAndDate);
-
-        document.addEventListener("DOMContentLoaded", function() {
-            function updateDateTime() {
-                const now = new Date();
-                const date = now.toLocaleDateString();
-                const time = now.toLocaleTimeString([], {
-                    hour: '2-digit',
-                    minute: '2-digit'
-                });
-
-                document.getElementById("liveDate").value = date;
-                document.getElementById("liveTime").value = time;
-            }
-
-            updateDateTime(); // Update immediately
-            setInterval(updateDateTime, 1000); // Update every second
+            updateTimeAndDate();
+            updateDateTime();
         });
     </script>
 </div>

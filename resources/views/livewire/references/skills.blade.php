@@ -13,7 +13,7 @@
                         </button>
                 
                         <div class="d-flex gap-2">
-                            <div class="input-group">
+                            <div class="input-group input-group-sm">
                                 <span class="input-group-text bg-light border-end-0">
                                     <i class="bi bi-search"></i>
                                 </span>
@@ -151,44 +151,50 @@
         </div>
 
         <div class="modal fade" id="skillModal" tabindex="-1" aria-labelledby="skillModalLabel" aria-hidden="true" wire:ignore.self>
-            <div class="modal-dialog modal-dialog-centered modal-lg">
+            <div class="modal-dialog modal-dialog-centered modal-sm">
                 <div class="modal-content shadow">
                     <div class="modal-header bg-primary text-white py-2">
                         <h5 class="modal-title fw-bold text-center w-100 fs-6" id="skillModalLabel">
-                            {{$editMode ? 'Update Skill' : 'Add New Skill'}}
+                            {{$editMode ? 'Update Skill' : 'Add Skill'}}
                         </h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" wire:click='clear'></button>
+                        <button type="button" class="btn-close btn-sm" data-bs-dismiss="modal" aria-label="Close" wire:click='clear'></button>
                     </div>
-                    <div class="modal-body p-4">
+                    <div class="modal-body p-2">
                         <form class="needs-validation" wire:submit="{{$editMode ? 'updateSkill' : 'createSkill'}}">
-                            <div class="mb-4">
-                                <label for="skillTitle" class="form-label fw-medium">Skill Title<span class="text-danger"> *</span></label>
-                                <input type="text" class="form-control form-control-lg {{$errors->has('title') ? 'is-invalid' : ''}}"
+                            <div class="mb-2">
+                                <label for="skillTitle" class="form-label small fw-medium mb-1">Skill Title<span class="text-danger"> *</span></label>
+                                <input type="text" class="form-control form-control-sm {{$errors->has('title') ? 'is-invalid' : ''}}"
                                     id="skillTitle"
                                     wire:model="title"
                                     placeholder="Enter skill title"
                                     autocomplete="off">
                                 @error('title')
-                                <div class="invalid-feedback">
+                                <div class="invalid-feedback small">
                                     <i class="bi bi-exclamation-circle me-1"></i>
                                     {{$message}}
                                 </div>
                                 @enderror
                             </div>
-
-                            <div class="mb-4">
-                                <label class="form-label fw-semibold">Is Active?</label>
-                                <div>
-                                    <input type="radio" wire:model="status" value="yes" {{ $status === 'yes' || !$editMode ? 'checked' : '' }}> Yes
-                                    <input type="radio" wire:model="status" value="no" {{ $status === 'no' ? 'checked' : '' }}> No
+        
+                            <div class="mb-3">
+                                <label class="form-label small fw-medium mb-1">Is Active?</label>
+                                <div class="d-flex gap-3">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="radio" id="active" wire:model="status" value="yes" {{ $status === 'yes' || !$editMode ? 'checked' : '' }}>
+                                        <label class="form-check-label small" for="active">Yes</label>
+                                    </div>
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="radio" id="inactive" wire:model="status" value="no" {{ $status === 'no' ? 'checked' : '' }}>
+                                        <label class="form-check-label small" for="inactive">No</label>
+                                    </div>
                                 </div>
                             </div>
                             
-                            <div class="d-grid gap-2 d-md-flex justify-content-md-end mt-4">
-                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" wire:click='clear'>
+                            <div class="d-flex justify-content-end gap-2 mt-3">
+                                <button type="button" class="btn btn-sm btn-outline-secondary" data-bs-dismiss="modal" wire:click='clear'>
                                     Cancel
                                 </button>
-                                <button type="submit" class="btn btn-primary px-4">
+                                <button type="submit" class="btn btn-sm btn-primary">
                                     {{ $editMode ? 'Update' : 'Save' }}
                                 </button>
                             </div>

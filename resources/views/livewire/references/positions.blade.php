@@ -236,7 +236,7 @@
                                 </button>
                                 <button type="submit" class="btn btn-primary">
                                     <i class="bi {{ $editMode ? 'bi-check2-circle' : 'bi-plus-circle' }} me-1"></i>
-                                    {{ $editMode ? 'Update' : 'Save' }} Position
+                                    {{ $editMode ? 'Update' : 'Add' }} Position
                                 </button>
                             </div>
                         </form>

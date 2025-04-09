@@ -73,24 +73,16 @@
                 </div>
 
                 <div class="table-responsive">
-                    <table class="table table-hover table-striped align-middle border-bottom">
+                    <table class="table table-hover align-middle border">
                         <thead class="table-light">
                             <tr>
-                                <th scope="col" class="text-center">#</th>
-                                <th scope="col">
-                                    Full Name
-                                </th>
-                                <th scope="col">
-                                    Office Applied
-                                </th>
-                                <th scope="col">
-                                    Position Applied
-                                </th>
-                                <th scope="col">
-                                    Priority Group
-                                </th>
-                                <th scope="col" class="text-center">Status</th>
-                                <th scope="col" class="text-center">Actions</th>
+                                <th scope="col" class="text-center" width="5%">#</th>
+                                <th scope="col" width="20%">Full Name</th>
+                                <th scope="col" width="18%">Office Applied</th>
+                                <th scope="col" width="18%">Position Applied</th>
+                                <th scope="col" width="18%">Priority Group</th>
+                                <th scope="col" class="text-center" width="6%">Status</th>
+                                <th scope="col" class="text-center" width="15%">Actions</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -102,44 +94,29 @@
                                 <td>{{$item->position->title}}</td>
                                 <td>{{$item->prioritygroup->title}}</td>
                                 <td class="text-center">
-                                    <span class="badge rounded-pill {{$item->deleted_at == Null ? 'bg-success': 'bg-danger'}}">
-                                        {{$item->deleted_at == Null ? 'Active': 'Inactive'}}
-                                    </span>
-                                </td>
-                                <td class="text-center">
-                                    <div class="btn-group" role="group" aria-label="Candidate actions">
-
-                                        <button class="btn btn-sm btn-info rounded-2 d-flex align-items-center px-2 py-1 me-2"
-                                            wire:click='viewCandidate({{ $item->id }})'
-                                            data-bs-toggle="tooltip"
-                                            data-bs-title="View Candidate">
-                                            <i class="bi bi-eye"></i>
-                                            <span class="d-none d-md-inline ms-1">View</span>
-                                        </button>
-
-
-                                        @can('update candidate')
-                                        <button class="btn btn-sm btn-primary rounded-2 px-2 py-1 me-2"
-                                            wire:click='readCandidate({{$item->id}})'
-                                            data-bs-toggle="tooltip"
-                                            data-bs-title="Edit candidate">
-                                            <i class="bi bi-pencil"></i>
-                                            <span class="d-none d-md-inline ms-1">Edit</span>
-                                        </button>
-                                        @endcan
-
-                                        {{-- @can('delete candidate')
-                                        <button class="btn btn-sm rounded-2 px-2 py-1 me-2 {{$item->deleted_at == Null ? 'btn-danger' : 'btn-outline-success'}}"
-                                            wire:click='{{$item->deleted_at == Null ? 'deleteCandidate('.$item->id.')' : 'restoreCandidate('.$item->id.')'}}'
-                                            data-bs-toggle="tooltip"
-                                            data-bs-title="{{$item->deleted_at == Null ? 'Delete candidate' : 'Restore candidate'}}">
-                                            <i class="bi {{$item->deleted_at == Null ? 'bi-trash' : 'bi-arrow-counterclockwise'}}"></i>
-                                            <span class="d-none d-md-inline ms-1">{{$item->deleted_at == Null ? 'Delete' : 'Restore'}}</span>
-                                        </button>
-                                        @endcan --}}
+                                    <div class="status-indicator {{$item->deleted_at == Null ? 'status-active': 'status-inactive'}}" 
+                                        title="{{$item->deleted_at == Null ? 'Active': 'Inactive'}}">
                                     </div>
                                 </td>
+                                <td class="text-center">
+                                    <div class="btn-group btn-group-sm" role="group" aria-label="Candidate actions">
+                                        <button class="btn btn-icon btn-info me-1" 
+                                            wire:click='viewCandidate({{ $item->id }})'
+                                            data-bs-toggle="tooltip"
+                                            data-bs-title="View">
+                                            <i class="bi bi-eye"></i>
+                                        </button>
 
+                                        @can('update candidate')
+                                        <button class="btn btn-icon btn-primary me-1" 
+                                            wire:click='readCandidate({{$item->id}})'
+                                            data-bs-toggle="tooltip"
+                                            data-bs-title="Edit">
+                                            <i class="bi bi-pencil"></i>
+                                        </button>
+                                        @endcan
+                                    </div>
+                                </td>
                             </tr>
                             @empty
                             <tr>
@@ -172,7 +149,7 @@
         </div>
 
         <div class="modal fade" id="viewModal" tabindex="-1" aria-labelledby="viewModalLabel" aria-hidden="true" wire:ignore.self>
-            <div class="modal-dialog modal-dialog-centered modal-lg">
+            <div class="modal-dialog modal-dialog-centered">
                 <div class="modal-content shadow">
                    
                     <div class="modal-header bg-primary text-white py-2">
@@ -180,162 +157,157 @@
                         <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
 
-                   
-                    <div class="modal-body p-4">
-                        <div class="row mb-3">
-                            <div class="col-md-6 d-flex align-items-center gap-2">
-                                <strong>Full Name:</strong>
-                                <p class="m-0">{{ $candidate?->fullname }}</p>
-                            </div>
-                            <div class="col-md-6 d-flex align-items-center gap-2">
-                                <strong>Email:</strong>
-                                <p class="m-0">{{ $candidate?->email }}</p>
-                            </div>
-                        </div>
-
-                        <div class="row mb-3">
-                            <div class="col-md-6 d-flex align-items-center gap-2">
-                                <strong>Contact No:</strong>
-                                <p class="m-0">{{ $candidate?->contactno }}</p>
-                            </div>
-                            <div class="col-md-6 d-flex align-items-center gap-2">
-                                <strong>Position Applied:</strong>
-                                <p class="m-0">{{ $candidate?->position?->title ?? 'N/A' }}</p> 
-                            </div>
-                        </div>
-
-                        <div class="row mb-3">
-                            <div class="col-md-6 d-flex align-items-center gap-2">
-                                <strong>Office Applied:</strong>
-                                <p class="m-0">{{ $candidate?->office?->title ?? 'N/A' }}</p>
-                            </div>
-                            <div class="col-md-6 d-flex align-items-center gap-2">
-                                <strong>Priority Group:</strong>
-                                <p class="m-0">{{ $candidate?->priorityGroup?->title ?? 'N/A' }}</p>
-                            </div>
-                        </div>
-
-                        <div class="row mb-3">
-                            <div class="col-md-6 d-flex align-items-center gap-2">
-                                <strong>Endorsement Date:</strong>
-                                <p class="m-0">{{ $candidate?->endorsement_date }}</p>
-                            </div>
-                            <div class="col-md-6 d-flex align-items-center gap-2">
-                                <strong>Status:</strong>
-                                <span class="badge rounded-pill {{$candidate?->deleted_at == Null ? 'bg-success': 'bg-danger'}}">
-                                    {{$candidate?->deleted_at == Null ? 'Active': 'Inactive'}}
-                                </span>
-                            </div>
-                        </div>
-
-                        <div class="row">
-                            <div class="col-12 text-center">
-                                <strong class="d-block">Remarks:</strong>
-                                <p class="m-0">{{ $candidate?->remarks }}</p>
-                            </div>
-                        </div>
+                    <div class="modal-body p-3">
+                        <table class="table table-sm table-borderless mb-0">
+                            <tr>
+                                <th width="35%">Full Name:</th>
+                                <td>{{ $candidate?->fullname }}</td>
+                            </tr>
+                            <tr>
+                                <th>Email:</th>
+                                <td>{{ $candidate?->email }}</td>
+                            </tr>
+                            <tr>
+                                <th>Contact No:</th>
+                                <td>{{ $candidate?->contactno }}</td>
+                            </tr>
+                            <tr>
+                                <th>Position Applied:</th>
+                                <td>{{ $candidate?->position?->title ?? 'N/A' }}</td>
+                            </tr>
+                            <tr>
+                                <th>Office Applied:</th>
+                                <td>{{ $candidate?->office?->title ?? 'N/A' }}</td>
+                            </tr>
+                            <tr>
+                                <th>Priority Group:</th>
+                                <td>{{ $candidate?->priorityGroup?->title ?? 'N/A' }}</td>
+                            </tr>
+                            <tr>
+                                <th>Endorsement Date:</th>
+                                <td>{{ $candidate?->endorsement_date }}</td>
+                            </tr>
+                            <tr>
+                                <th>Status:</th>
+                                <td>
+                                    <div class="d-flex align-items-center">
+                                        <div class="status-indicator {{$candidate?->deleted_at == Null ? 'status-active': 'status-inactive'}}"></div>
+                                        <span class="ms-2">{{$candidate?->deleted_at == Null ? 'Active': 'Inactive'}}</span>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <th>Remarks:</th>
+                                <td>{{ $candidate?->remarks }}</td>
+                            </tr>
+                        </table>
                     </div>
 
-                   
-                    <div class="modal-footer bg-light border-0">
-                        <button type="button" class="btn btn-secondary rounded-2" data-bs-dismiss="modal">Close</button>
+                    <div class="modal-footer bg-light py-2">
+                        <button type="button" class="btn btn-sm btn-secondary" data-bs-dismiss="modal">Close</button>
                     </div>
                 </div>
             </div>
         </div>
 
         <div class="modal fade" id="candidateModal" tabindex="-1" aria-labelledby="candidateModalLabel" aria-hidden="true" wire:ignore.self>
-            <div class="modal-dialog modal-dialog-centered modal-lg">
+            <div class="modal-dialog modal-dialog-centered">
                 <div class="modal-content shadow">
-                    <div class="modal-header bg-light">
+                    <div class="modal-header bg-light py-2">
                         <h5 class="modal-title fw-bold text-center w-100 fs-6" id="candidateModalLabel">
                             {{$editMode ? 'Update Candidate' : 'Add New Candidate'}}
                         </h5>
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" wire:click='clear'></button>
                     </div>
-                    <div class="modal-body p-4">
+                    <div class="modal-body p-3">
                         <form class="needs-validation" wire:submit="{{$editMode ? 'updateCandidate' : 'createCandidate'}}">
-                            <div class="row g-3">
+                            <div class="row g-2">
                                 <div class="col-md-6">
-                                    <label for="fullname" class="form-label">Full Name</label>
-                                    <input type="text" class="form-control" id="fullname" wire:model="fullname" required>
-                                    @error('fullname') <span class="text-danger">{{ $message }}</span> @enderror
+                                    <label for="fullname" class="form-label small">Full Name</label>
+                                    <input type="text" class="form-control form-control-sm" id="fullname" wire:model="fullname" required>
+                                    @error('fullname') <span class="text-danger small">{{ $message }}</span> @enderror
                                 </div>
                                 <div class="col-md-6">
-                                    <label for="email" class="form-label">Email</label>
-                                    <input type="email" class="form-control" id="email" wire:model="email" required>
-                                    @error('email') <span class="text-danger">{{ $message }}</span> @enderror
+                                    <label for="email" class="form-label small">Email</label>
+                                    <input type="email" class="form-control form-control-sm" id="email" wire:model="email" required>
+                                    @error('email') <span class="text-danger small">{{ $message }}</span> @enderror
                                 </div>
                             </div>
 
-                            <div class="row g-3 mt-1">
+                            <div class="row g-2 mt-2">
                                 <div class="col-md-6">
-                                    <label for="contactno" class="form-label">Contact No</label>
-                                    <input type="text" class="form-control" id="contactno" wire:model="contactno" required>
-                                    @error('contactno') <span class="text-danger">{{ $message }}</span> @enderror
+                                    <label for="contactno" class="form-label small">Contact No</label>
+                                    <input type="text" class="form-control form-control-sm" id="contactno" wire:model="contactno" required>
+                                    @error('contactno') <span class="text-danger small">{{ $message }}</span> @enderror
                                 </div>
                                 <div class="col-md-6">
-                                    <label for="position_id" class="form-label">Position</label>
-                                    <select class="form-select" id="position_id" wire:model="position_id" required>
+                                    <label for="position_id" class="form-label small">Position</label>
+                                    <select class="form-select form-select-sm" id="position_id" wire:model="position_id" required>
                                         <option value="">Select Position</option>
                                         @foreach($positions as $position)
                                         <option value="{{ $position->id }}">{{ $position->title }}</option>
                                         @endforeach
                                     </select>
-                                    @error('position_id') <span class="text-danger">{{ $message }}</span> @enderror
+                                    @error('position_id') <span class="text-danger small">{{ $message }}</span> @enderror
                                 </div>
                             </div>
 
-                            <div class="row g-3 mt-1">
+                            <div class="row g-2 mt-2">
                                 <div class="col-md-6">
-                                    <label for="office_id" class="form-label">Office</label>
-                                    <select class="form-select" id="office_id" wire:model="office_id" required>
+                                    <label for="office_id" class="form-label small">Office</label>
+                                    <select class="form-select form-select-sm" id="office_id" wire:model="office_id" required>
                                         <option value="">Select Office</option>
                                         @foreach($offices as $office)
                                         <option value="{{ $office->id }}">{{ $office->title }}</option>
                                         @endforeach
                                     </select>
-                                    @error('office_id') <span class="text-danger">{{ $message }}</span> @enderror
+                                    @error('office_id') <span class="text-danger small">{{ $message }}</span> @enderror
                                 </div>
                                 <div class="col-md-6">
-                                    <label for="priority_group_id" class="form-label">Priority Group</label>
-                                    <select class="form-select" id="priority_group_id" wire:model="priority_group_id" required>
+                                    <label for="priority_group_id" class="form-label small">Priority Group</label>
+                                    <select class="form-select form-select-sm" id="priority_group_id" wire:model="priority_group_id" required>
                                         <option value="">Select Priority Group</option>
                                         @foreach($priorityGroups as $priorityGroup)
                                         <option value="{{ $priorityGroup->id }}">{{ $priorityGroup->title }}</option>
                                         @endforeach
                                     </select>
-                                    @error('priority_group_id') <span class="text-danger">{{ $message }}</span> @enderror
+                                    @error('priority_group_id') <span class="text-danger small">{{ $message }}</span> @enderror
                                 </div>
                             </div>
 
-                            <div class="row g-3 mt-1">
+                            <div class="row g-2 mt-2">
                                 <div class="col-md-6">
-                                    <label class="form-label">Is Active?</label>
-                                    <div>
-                                        <input type="radio" wire:model="status" value="yes" {{ $status === 'yes' || !$editMode ? 'checked' : '' }}> Yes
-                                        <input type="radio" wire:model="status" value="no" {{ $status === 'no' ? 'checked' : '' }}> No
+                                    <label class="form-label small">Status</label>
+                                    <div class="d-flex gap-3">
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="radio" wire:model="status" value="yes" id="statusActive" {{ $status === 'yes' || !$editMode ? 'checked' : '' }}>
+                                            <label class="form-check-label small" for="statusActive">Active</label>
+                                        </div>
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="radio" wire:model="status" value="no" id="statusInactive" {{ $status === 'no' ? 'checked' : '' }}>
+                                            <label class="form-check-label small" for="statusInactive">Inactive</label>
+                                        </div>
                                     </div>
                                 </div>
 
                                 <div class="col-md-6">
-                                    <label for="endorsement_date" class="form-label">Endorsement Date</label>
-                                    <input type="date" class="form-control" id="endorsement_date" wire:model="endorsement_date" required>
-                                    @error('endorsement_date') <span class="text-danger">{{ $message }}</span> @enderror
+                                    <label for="endorsement_date" class="form-label small">Endorsement Date</label>
+                                    <input type="date" class="form-control form-control-sm" id="endorsement_date" wire:model="endorsement_date" required>
+                                    @error('endorsement_date') <span class="text-danger small">{{ $message }}</span> @enderror
                                 </div>
                             </div>
 
-                            <div class="row g-3 mt-1">
+                            <div class="row g-2 mt-2">
                                 <div class="col-md-12">
-                                    <label for="remarks" class="form-label">Remarks</label>
-                                    <textarea class="form-control" id="remarks" wire:model="remarks" rows="3"></textarea>
-                                    @error('remarks') <span class="text-danger">{{ $message }}</span> @enderror
+                                    <label for="remarks" class="form-label small">Remarks</label>
+                                    <textarea class="form-control form-control-sm" id="remarks" wire:model="remarks" rows="2"></textarea>
+                                    @error('remarks') <span class="text-danger small">{{ $message }}</span> @enderror
                                 </div>
                             </div>
 
-                            <div class="mt-4 text-end">
-                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" wire:click='clear'>Cancel</button>
-                                <button type="submit" class="btn btn-primary px-4">
+                            <div class="mt-3 text-end">
+                                <button type="button" class="btn btn-sm btn-secondary" data-bs-dismiss="modal" wire:click='clear'>Cancel</button>
+                                <button type="submit" class="btn btn-sm btn-primary px-3">
                                     <span wire:loading.remove wire:target="{{$editMode ? 'updateCandidate' : 'createCandidate'}}">
                                         {{$editMode ? 'Update' : 'Save'}}
                                     </span>
@@ -350,36 +322,70 @@
                 </div>
             </div>
         </div>
-
     </section>
 </div>
 
 @push('styles')
 <style>
-    .custom-invalid-feedback {
-        display: block;
-        width: 100%;
-        margin-top: 0.25rem;
-        font-size: 0.875em;
-        color: #dc3545;
+    .status-indicator {
+        width: 12px;
+        height: 12px;
+        border-radius: 50%;
+        display: inline-block;
+    }
+    
+    .status-active {
+        background-color: #28a745;
+        box-shadow: 0 0 5px rgba(40, 167, 69, 0.5);
+    }
+    
+    .status-inactive {
+        background-color: #dc3545;
+        box-shadow: 0 0 5px rgba(220, 53, 69, 0.5);
+    }
+    
+    .btn-icon {
+        width: 32px;
+        height: 32px;
+        padding: 0;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 4px;
     }
 
-    .sortable {
-        cursor: pointer;
+    .table {
+        font-size: 0.9rem;
     }
-
-    .sortable:hover {
-        background-color: rgba(0, 0, 0, 0.05);
+    
+    .table th {
+        font-weight: 600;
     }
-
+    
+    .table tr {
+        border-bottom: 1px solid #e9ecef;
+    }
+    
+    .modal-header {
+        padding: 0.6rem 1rem;
+    }
+    
+    .modal-footer {
+        padding: 0.5rem 1rem;
+    }
+    
+    .form-label {
+        margin-bottom: 0.25rem;
+    }
+    
     @media (max-width: 768px) {
         .card-title {
             font-size: 1.25rem;
         }
-
-        .table th,
-        .table td {
-            padding: 0.5rem;
+        
+        .btn-icon {
+            width: 28px;
+            height: 28px;
         }
     }
 </style>
@@ -403,7 +409,7 @@
 
     $wire.on('hide-candidateModal', () => {
         console.log('Hiding candidate modal');
-        $('#candidateModal').modal('hide');
+        $('candidateModal').modal('hide');
 
         const toast = new bootstrap.Toast(document.getElementById('successToast'));
         document.getElementById('successMessage').textContent = 'Candidate saved successfully!';
@@ -428,7 +434,5 @@
         console.log('Showing view modal');
         $('#viewModal').modal('show');
     });
-
-
 </script>
 @endscript

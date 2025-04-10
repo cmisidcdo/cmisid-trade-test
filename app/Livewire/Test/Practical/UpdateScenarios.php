@@ -6,13 +6,11 @@ use Illuminate\Support\Facades\Storage;
 use Livewire\Component;
 use App\Models\Position;
 use App\Models\Skill;
-use App\Models\AQChoice;
 use App\Models\PracticalScenario;
 use App\Models\PositionSkill;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\DB;
 use Livewire\WithFileUploads;
-use Livewire\WithPagination;
 use Illuminate\Validation\Rule;
 
 

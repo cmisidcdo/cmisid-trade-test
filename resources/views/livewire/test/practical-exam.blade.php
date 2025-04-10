@@ -193,16 +193,10 @@
 @script
 <script>
     $wire.on('hide-practicalscenarioModal', () => {
-        console.log('Hiding practicalScenario modal');
         $('#practicalScenarioModal').modal('hide');
-
-        const toast = new bootstrap.Toast(document.getElementById('successToast'));
-        document.getElementById('successMessage').textContent = 'practicalScenario saved successfully!';
-        toast.show();
     });
 
     $wire.on('show-practicalscenarioModal', () => {
-        console.log('Showing practicalScenario modal');
         $('#practicalScenarioModal').modal('show');
     });
 
@@ -240,10 +234,10 @@
 
 <style>
     .filename-container {
-    max-width: 200px; 
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    vertical-align: middle;
-}
+        max-width: 200px; 
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        vertical-align: middle;
+    }
 </style>

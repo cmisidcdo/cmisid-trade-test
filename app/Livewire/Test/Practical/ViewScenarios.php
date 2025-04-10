@@ -5,7 +5,6 @@ namespace App\Livewire\Test\Practical;
 use Livewire\Component;
 use App\Models\Position;
 use App\Models\Skill;
-use App\Models\AQChoice;
 use App\Models\PracticalScenario;
 use App\Models\PositionSkill;
 use Illuminate\Support\Facades\Log;

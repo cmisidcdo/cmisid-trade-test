@@ -103,22 +103,6 @@
                                     @else
                                         <p class="text-muted">No files attached.</p>
                                     @endif
-                        
-                                    @if (empty($scenario['existing_file']) || (!empty($replaceFileVisibility[$index]) && $replaceFileVisibility[$index]))
-                                        <input type="file"
-                                            class="form-control mb-1 @error('scenarios.' . $index . '.file') is-invalid @enderror"
-                                            id="addScenarioFileInput_{{ $index }}"
-                                            wire:model="scenarios.{{ $index }}.file"
-                                            accept=".pdf,.png,.jpg,.jpeg">
-                                        <small class="text-muted">Allowed formats: PDF, PNG, JPG</small>
-                                    @endif
-                        
-                                    @error('scenarios.' . $index . '.file')
-                                        <div class="invalid-feedback">
-                                            <i class="bi bi-exclamation-circle me-1"></i>
-                                            {{ $message }}
-                                        </div>
-                                    @enderror
                                 </div>
                             </div>
                             <div class="col-6">

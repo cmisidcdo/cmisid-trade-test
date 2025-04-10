@@ -32,7 +32,31 @@ class OralQuestion extends Model
 
     public function skill()
     {
-        return $this->belongsTo(Skill::class, 'skill_id'); 
+        return $this->hasOneThrough(
+            Skill::class,
+            PositionSkill::class,
+            'id',                 
+            'id',                 
+            'position_skill_id',  
+            'skill_id'         
+        );
+    }
+
+    public function position()
+    {
+        return $this->hasOneThrough(
+            Position::class,
+            PositionSkill::class,
+            'id',                
+            'id',                
+            'position_skill_id',  
+            'position_id'
+        );
+    }
+
+    public function positionSkill()
+    {
+        return $this->belongsTo(PositionSkill::class, 'position_skill_id');
     }
 
 }

@@ -13,9 +13,11 @@ return new class extends Migration
     {
         Schema::create('oral_questions', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('skill_id')->constrained('skills')->onDelete('cascade');
+            $table->foreignId('position_skill_id')->constrained('position_skills')->onDelete('cascade');
             $table->string('question');
-            $table->string('notes')->nullable();
+            $table->string('description');
+            $table->integer('duration');
+            $table->string('file_path')->nullable();
             $table->softDeletes();
             $table->timestamps();
         });

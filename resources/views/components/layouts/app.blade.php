@@ -31,10 +31,10 @@
   <link href="{{asset('css/global.css')}}" rel="stylesheet">
 
 
-
 </head>
 
 <body>
+  @livewire('change-password')
 
   <header id="header" class="header fixed-top d-flex align-items-center">
 
@@ -222,9 +222,9 @@
             </li>
 
             <li>
-              <a class="dropdown-item d-flex align-items-center" href="users-profile.html">
-                <i class="bi bi-gear"></i>
-                <span>Account Settings</span>
+              <a class="dropdown-item d-flex align-items-center" href="javascript:void(0);" data-bs-toggle="modal" data-bs-target="#changePasswordModal">
+                  <i class="bi bi-gear"></i>
+                  <span>Change Password</span>
               </a>
             </li>
             <li>
@@ -402,8 +402,33 @@
             </a>
           </li>
         </ul>
-      </li><!-- End Charts Nav -->
+      </li>
     @endcan
+
+    @can('assessor permission')
+    <li class="nav-item">
+      <a class="nav-link {{ Request::routeIs('scores.*') ? '' : 'collapsed' }}" data-bs-target="#scores-nav" data-bs-toggle="collapse" href="#">
+        <i class="bi bi-clipboard-check-fill fs-5"></i><span>Scores & Notes</span><i class="bi bi-chevron-down ms-auto"></i>
+      </a>
+      <ul id="scores-nav" class="nav-content collapse {{ Request::routeIs('scores.*') ? 'show' : '' }}" data-bs-parent="#sidebar-nav">      
+        <li>
+          <a class="{{ Request::routeIs('scores.assessment') ? 'active' : '' }}" href="{{ route('scores.assessment') }}">
+            <i class="bi bi-clipboard-data-fill fs-5"></i><span>Assessment Test Scores</span>
+          </a>
+        </li>
+        <li>
+          <a class="{{ Request::routeIs('scores.practical') ? 'active' : '' }}" href="{{ route('scores.practical') }}">
+            <i class="bi bi-person-fill-gear fs-5"></i><span>Practical Scores & Notes</span>
+          </a>
+        </li>
+        <li>
+          <a class="{{ Request::routeIs('scores.oral') ? 'active' : '' }}" href="{{ route('scores.oral') }}">
+            <i class="bi bi-wechat fs-5"></i><span>Oral Interview Scores & Notes</span>
+          </a>
+        </li>
+      </ul>
+    </li>
+  @endcan
 
     @can('secretariat permission')
       <li class="nav-item">
@@ -427,9 +452,9 @@
             </a>
           </li>
         </ul>
-      </li><!-- End Icons Nav -->
+      </li>
     @endcan
-      {{-- <li class="nav-heading">Pages</li> --}}
+
 
       <li class="nav-item">
         <a class="nav-link {{ Request::routeIs('reports.*') ? '' : 'collapsed' }}" data-bs-target="#reports-nav" data-bs-toggle="collapse" href="#">
@@ -463,8 +488,6 @@
     {{ $slot }} 
   </main>
 
-
-
   <footer id="footer" class="footer">
     <div class="copyright">
       &copy; Copyright <strong><span>CMISID ACMS</span></strong>. All Rights Reserved
@@ -475,6 +498,9 @@
       <!-- Licensing information: https://bootstrapmade.com/license/ -->
       <!-- Purchase the pro version with working PHP/AJAX contact form: https://bootstrapmade.com/nice-admin-bootstrap-admin-html-template/ -->
       Designed by <a href="https://bootstrapmade.com/">BootstrapMade</a>
+      <div>
+      <img src="{{ asset('img/rise-cdo.png') }}" class="img-fluid" style="height: 110px;" alt="Login Illustration">
+      </div>
     </div>
   </footer><!-- End Footer -->
 
@@ -529,6 +555,7 @@
               }
           });
       });
+
 
 
     });

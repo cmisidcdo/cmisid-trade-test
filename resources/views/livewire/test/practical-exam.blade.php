@@ -6,9 +6,24 @@
     <div class="card p-3">
         <div class="row align-items-center pt-3 pb-3">
             <div class="d-flex justify-content-between align-items-center mb-3">
-                <button class="btn btn-primary" wire:click="showAddEditModal">
-                    <i class="bi bi-plus"></i> Add Practical Scenario
-                </button>
+                <div class="d-flex gap-2">
+                    <button class="btn btn-primary" wire:click="showAddEditModal">
+                        <i class="bi bi-plus"></i> Practical Scenario
+                    </button>
+        
+                    <button class="btn btn-outline-secondary"
+                            wire:click="refreshTable"
+                            wire:loading.attr="disabled"
+                            wire:target="refreshTable">
+                        <span wire:loading.remove wire:target="refreshTable">
+                            <i class="bi bi-arrow-clockwise"></i> Refresh
+                        </span>
+                        <span wire:loading wire:target="refreshTable">
+                            <span class="spinner-border spinner-border-sm text-primary" role="status"></span>
+                            Loading...
+                        </span>
+                    </button>
+                </div>
         
                 <div class="d-flex gap-2">
                     <div class="input-group">
@@ -16,12 +31,12 @@
                             <i class="bi bi-search"></i>
                         </span>
                         <input type="text" class="form-control border-start-0 ps-0"
-                            placeholder="Search question..."
-                            wire:model.live.debounce.300ms="search"
-                            aria-label="Search question">
+                               placeholder="Search position..."
+                               wire:model.live.debounce.300ms="search"
+                               aria-label="Search position">
                         <button class="btn btn-outline-secondary border-start-0 bg-light" type="button"
-                            wire:loading.class="d-none" wire:target="search"
-                            wire:click="$set('search', '')">
+                                wire:loading.class="d-none" wire:target="search"
+                                wire:click="$set('search', '')">
                             <i class="bi bi-x"></i>
                         </button>
                         <span wire:loading wire:target="search" class="input-group-text bg-light border-start-0">
@@ -30,342 +45,199 @@
                             </div>
                         </span>
                     </div>
-        
-                    <div class="dropdown">
-                        <button class="btn btn-outline-primary dropdown-toggle" type="button" id="filterDropdown"
-                            data-bs-toggle="dropdown" aria-expanded="false">
-                            <i class="bi bi-funnel"></i> Filter
-                        </button>
-                        <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="filterDropdown">
-                            <li>
-                                <button class="dropdown-item" wire:click="$set('filterStatus', 'all')">
-                                    <i class="bi bi-list"></i> All
-                                </button>
-                            </li>
-                            <li>
-                                <button class="dropdown-item" wire:click="$set('filterStatus', 'yes')">
-                                    <i class="bi bi-person-check"></i> Active
-                                </button>
-                            </li>
-                            <li>
-                                <button class="dropdown-item" wire:click="$set('filterStatus', 'no')">
-                                    <i class="bi bi-person-x"></i> Inactive
-                                </button>
-                            </li>
-                        </ul>
-                    </div>
-        
-                    <div>
-                        @if($filterStatus !== 'all')
-                            <span class="badge bg-secondary">
-                                <i class="bi bi-funnel"></i> 
-                                {{ $filterStatus === 'yes' ? 'Active' : 'Inactive' }}
-                                <button class="btn btn-sm btn-outline-light border-0 ms-1" wire:click="$set('filterStatus', 'all')">
-                                    <i class="bi bi-x"></i>
-                                </button>
-                            </span>
-                        @endif
-                    </div>
                 </div>
             </div>
         </div>
 
         <div class="table-responsive">
-            <table class="table table-hover table-bordered table-striped text-center">
-                <thead class="table-light">
+            <table class="table table-hover table-bordered text-center global-table">
+                <thead style="background-color: #f8f9fa;">
                     <tr>
-                        <th scope="col">Attachment</th>
-                        <th scope="col">Scenarios</th>
-                        <th scope="col">Time Duration</th>
-                        <th scope="col">Actions</th>
+                        <th class="text-center" style="width: 5%;">#</th>
+                        <th class="text-center">Position</th>
+                        <th class="text-center" style="width: 15%;">Actions</th>
                     </tr>
                 </thead>
+        
                 <tbody>
+                    @forelse($practicalscenarios as $item)
                     <tr>
-                        <td class="text-center"><i class="bi bi-paperclip"></i></td>
-                        <td>You are given a partially developed web application with a few missing functionalities...</td>
-                        <td>00:10:00</td>
-                        <td class="text-center">
-                            <button class="btn btn-sm btn-info me-1" data-bs-toggle="modal" data-bs-target="#viewScenarioModal">
-                                <i class="bi bi-eye"></i>
-                                <span class="d-none d-md-inline ms-1">View</span>
-                            </button>
-                            <button class="btn btn-sm btn-primary" data-bs-toggle="modal" data-bs-target="#editScenarioModal">
-                                <i class="bi bi-pencil"></i>
-                                <span class="d-none d-md-inline ms-1">Edit</span>
-                            </button>
+                        <td class="text-center fw-medium align-middle">{{ $loop->iteration }}</td>
+                        <td class="fw-bold align-middle">{{ $item->position_title }}</td>
+                        <td style="width: 15%;">
+                            <div class="d-flex align-items-center justify-content-center gap-2">
+                                <button class="btn btn-sm btn-info rounded-2"
+                                    wire:click='viewPracticalScenario({{$item->position_id}})'
+                                    data-bs-title="View Scenarios">
+                                    <i class="bi bi-eye"></i>
+                                    <span class="d-none d-md-inline ms-1">View</span>
+                                </button>
+        
+                                @can('update reference')
+                                <button class="btn btn-sm btn-primary rounded-2"
+                                    wire:click='readPracticalScenario({{$item->position_id}})'
+                                    data-bs-toggle="tooltip"
+                                    data-bs-title="Edit Scenarios">
+                                    <i class="bi bi-pencil-square"></i>
+                                    <span class="d-none d-md-inline ms-1">Edit</span>
+                                </button>
+                                @endcan
+                            </div>
                         </td>
                     </tr>
-                    <!-- Additional table rows can be added similarly -->
+                    @empty
+                    <tr>
+                        <td colspan="7" class="text-center py-4 text-muted">
+                            <i class="bi bi-inbox fs-3 d-block mb-2"></i>
+                            No scenarios found
+                        </td>
+                    </tr>
+                    @endforelse
                 </tbody>
             </table>
         </div>
+        <div>
+            {{$practicalscenarios->links()}}
+        </div>
     </div>
 
-    <!-- Add Practical Test Scenario Modal -->
-    <div class="modal fade" id="addPracticalScenarioModal" tabindex="-1">
-        <div class="modal-dialog modal-lg modal-dialog-centered">
-            <div class="modal-content">
-                <div class="modal-header bg-primary text-white">
-                    <h5 class="modal-title  w-100 text-center">Add Practical Test Scenario</h5>
-                    <button type="button" class="btn-close btn-close-white position-absolute end-0 me-3" data-bs-dismiss="modal"></button>
+    <div class="modal fade" id="practicalScenarioModal" tabindex="-1" aria-labelledby="practicalScenarioModalLabel" aria-hidden="true" wire:ignore.self>
+        <div class="modal-dialog modal-dialog-centered modal-lg">
+            <div class="modal-content shadow">
+                <div class="modal-header bg-primary text-white py-2">
+                    <h5 class="modal-title fw-bold text-center w-100 fs-6" id="practicalScenarioModalLabel">
+                        {{ $editMode ? 'Update Practical Scenarios' : ($viewMode ? 'View Practical Scenarios' : 'Add Practical Scenarios') }}
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white position-absolute end-0 me-2" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
-                <div class="modal-body">
-                    <form>
-                        <div class="row">
-                            <div class="col-md-6">
-                                <label class="fw-bold form-label">Competency Level</label>
-                                <select class="form-select">
-                                    <option>Choose Level</option>
-                                    <option>Basic</option>
-                                    <option>Intermediate</option>
-                                    <option>Advanced</option>
+    
+                <div class="modal-body p-3 text-sm">
+    
+                    @if (session()->has('success'))
+                        <div class="alert alert-success alert-dismissible fade show fs-7 py-1 px-2" role="alert">
+                            <i class="bi bi-check-circle-fill me-1"></i> {{ session('success') }}
+                            <button type="button" class="btn-close btn-close-sm" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+                    @endif
+    
+                    <form wire:submit.prevent>
+                        <div class="row mb-2">
+                            <div class="col-6">
+                                <label for="position_id" class="form-label fw-bold fs-7">Position</label>
+                                <select class="form-select form-select-sm fs-7 @error('position_id') is-invalid @enderror" id="position_id" wire:model.live="position_id">
+                                    <option value="">Select Position</option>
+                                    @foreach($positions as $pos)
+                                        <option value="{{ $pos->id }}">{{ $pos->title }}</option>
+                                    @endforeach
                                 </select>
                             </div>
-                            <div class="col-md-6">
-                                <label class="fw-bold form-label">Choose Skill</label>
-                                <select class="form-select">
-                                    <option>Choose Skill</option>
-                                    <option>Analytical Thinking</option>
-                                    <option>Problem Solving</option>
-                                </select>
-                            </div>
-                            <div class="col-md-6 mt-2">
-                                <label class="fw-bold form-label">Point(s)</label>
-                                <input type="number" class="form-control" value="1">
-                            </div>
-                            <div class="col-md-6 mt-2">
-                                <label class="fw-bold form-label">Time Duration</label>
-                                <input type="text" class="form-control" placeholder="HH:MM:SS">
-                            </div>
-                            <div class="col-md-12 mt-2">
-                                <label class="fw-bold form-label">Scenario</label>
-                                <textarea class="form-control" rows="2"></textarea>
-                            </div>
-                            <div class="col-md-12 mt-2">
-                                <label class="fw-bold form-label">Description</label>
-                                <textarea class="form-control" rows="2"></textarea>
-                            </div>
-                            <!-- In the Add Practical Test Scenario Modal -->
-                            <div class="col-md-12 mt-2">
-                                <label class="fw-bold form-label">Attachment</label>
-                                <input type="file" class="form-control mb-1" id="addScenarioFileInput">
-                                <div class="mt-1 d-flex align-items-center">
-                                    <button class="btn btn-outline-secondary btn-sm me-2"><i class="bi bi-upload"></i> Upload</button>
-                                    <a href="#" id="addScenarioDownloadBtn" class="btn btn-outline-primary btn-sm me-2 d-none">
-                                        <i class="bi bi-download"></i> Download
-                                    </a>
-                                    <button id="addScenarioClearBtn" class="btn btn-outline-danger btn-sm me-2 d-none">
-                                        <i class="bi bi-x-circle"></i> Clear
-                                    </button>
-                                    <span id="addScenarioFileName" class="text-muted d-none"></span>
-                                </div>
-                            </div>
                         </div>
-                        <div class="modal-footer d-flex justify-content-between mt-2">
-                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Go Back</button>
-                            <button type="submit" class="btn btn-primary">Add Scenario</button>
+    
+                        <table class="table table-hover table-bordered text-center global-table">
+                            <thead class="table-light">
+                                <tr>
+                                    <th class="fw-semibold" style="width:5%">#</th>
+                                    <th class="fw-semibold">Skill Title</th>
+                                    <th class="fw-semibold" style="width:20%">Competency Level</th>
+                                    <th class="fw-semibold" style="width:20%">Total Scenarios</th>
+                                    <th class="fw-semibold text-center" style="width:15%">Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @forelse($skills as $item)
+                                <tr>
+                                    <td scope="row" class="text-center" style="width:5%">{{ $loop->iteration }}</td>
+                                    <td class="fw-medium">{{ $item['title'] }}</td> 
+                                    <td class="fw-medium" style="width:20%">
+                                        <span class="badge rounded-pill 
+                                            {{  $item['competency_level'] == 'basic' ? 'bg-info' : 
+                                            ($item['competency_level'] == 'intermediate' ? 'bg-primary' : 'bg-dark') }}">
+                                            {{ ucfirst($item['competency_level']) }}
+                                        </span>
+                                    </td>
+                                    <td class="fw-medium text-center" style="width:20%">
+                                        {{ $item['scenario_count'] ?? 0 }}
+                                    </td>
+                                    <td class="text-center" style="width:15%">
+                                        <button
+                                            class="btn {{$editMode ? 'btn-primary' : ($viewMode ? 'btn-info' : 'btn-success')}} btn-sm"
+                                            wire:click="{{ $editMode ? 'updateScenarios(' . $position_id . ', ' . $item['id'] . ')' : ($viewMode ? 'viewScenarios(' . $position_id . ', ' . $item['id'] . ')' : 'addScenarios(' . $position_id . ', ' . $item['id'] . ')') }}">
+                                            <i class="bi {{ $editMode ? 'bi-pencil-fill' : ($viewMode ? 'bi-eye' : 'bi-plus-circle') }} me-1"></i>
+                                            {{ $editMode ? 'Update' : ($viewMode ? 'View' : 'Add') }}
+                                        </button>
+                                    </td>                                    
+                                </tr>
+                            @empty
+                                <tr>
+                                    <td colspan="5" class="text-center py-4 text-muted">
+                                        <i class="bi bi-info-circle me-1"></i> No skills available.
+                                    </td>
+                                </tr>
+                            @endforelse
+                            
+                            </tbody>
+                        </table>
+
+                        <div class="d-flex justify-content-between mt-3">
+                            <button type="button" class="btn btn-secondary btn-sm px-3 fs-7" data-bs-dismiss="modal">
+                                Go Back
+                            </button>
                         </div>
+    
                     </form>
                 </div>
             </div>
         </div>
     </div>
 
-
-
-
-
-
-    <!-- View Practical Test Scenario Modal -->
-    <div class="modal fade" id="viewScenarioModal" tabindex="-1">
-        <div class="modal-dialog modal-dialog-centered">
-            <div class="modal-content">
-                <div class="modal-header bg-primary text-white">
-                    <h5 class="modal-title  w-100 text-center">View Practical Test Scenario</h5>
-                    <button type="button" class="btn-close btn-close-white position-absolute end-0 me-3" data-bs-dismiss="modal"></button>
-                </div>
-                <div class="modal-body">
-                    <div class="row">
-                        <div class="col-md-6 mb-3">
-                            <strong>Competency Level:</strong>
-                            <p>Human Resources</p>
-                        </div>
-                        <div class="col-md-6 mb-3">
-                            <strong>Choose Skill:</strong>
-                            <p>Analytical Thinking</p>
-                        </div>
-                        <div class="col-md-6 mb-3">
-                            <strong>Point(s):</strong>
-                            <p>1</p>
-                        </div>
-                        <div class="col-md-6 mb-3">
-                            <strong>Time Duration:</strong>
-                            <p>00:10:00</p>
-                        </div>
-                        <div class="col-md-6 mb-3">
-                            <strong>Is Active?</strong>
-                            <p>Yes</p>
-                        </div>
-                        <div class="col-md-6 mb-3">
-                            <strong>Attachment:</strong>
-                            <p><i class="bi bi-paperclip"></i> project_file.pdf</p>
-                            <button class="btn btn-outline-secondary btn-sm"><i class="bi bi-download"></i> Download</button>
-                        </div>
-                        <div class="col-md-12 mb-3">
-                            <strong>Scenario:</strong>
-                            <p>You are given a partially developed web application with missing functionalities...</p>
-                        </div>
-                        <div class="col-md-12 mb-3">
-                            <strong>Description:</strong>
-                            <p>Debug and fix an issue where users cannot log in despite entering correct credentials...</p>
-                        </div>
-                    </div>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Go Back</button>
-                </div>
-            </div>
-        </div>
-    </div>
-
-
-
-    <!-- Fix for Edit Practical Scenario Modal -->
-    <div class="modal fade" id="editScenarioModal" tabindex="-1">
-        <div class="modal-dialog modal-lg modal-dialog-centered">
-            <div class="modal-content">
-                <div class="modal-header bg-primary text-white">
-                    <h5 class="modal-title w-100 text-center">Edit Practical Test Scenario</h5>
-                    <button type="button" class="btn-close btn-close-white position-absolute end-0 me-3" data-bs-dismiss="modal"></button>
-                </div>
-                <div class="modal-body">
-                    <form>
-                        <div class="row">
-                            <div class="col-md-6">
-                                <label class="fw-bold form-label">Competency Level</label>
-                                <select class="form-select">
-                                    <option>Choose Level</option>
-                                    <option>Basic</option>
-                                    <option>Intermediate</option>
-                                    <option>Advanced</option>
-                                </select>
-                            </div>
-                            <div class="col-md-6">
-                                <label class="fw-bold form-label">Choose Skill</label>
-                                <select class="form-select">
-                                    <option>Choose Skill</option>
-                                    <option>Analytical Thinking</option>
-                                    <option>Problem Solving</option>
-                                </select>
-                            </div>
-                            <div class="col-md-6 mt-2">
-                                <label class="fw-bold form-label">Point(s)</label>
-                                <input type="number" class="form-control" value="1">
-                            </div>
-                            <div class="col-md-6 mt-2">
-                                <label class="fw-bold form-label">Time Duration</label>
-                                <input type="text" class="form-control" placeholder="HH:MM:SS">
-                            </div>
-                            <div class="col-md-12 mt-2">
-                                <label class="fw-bold form-label">Scenario</label>
-                                <textarea class="form-control" rows="2"></textarea>
-                            </div>
-                            <div class="col-md-12 mt-2">
-                                <label class="fw-bold form-label">Description</label>
-                                <textarea class="form-control" rows="2"></textarea>
-                            </div>
-                            <!-- In the Edit Practical Scenario Modal -->
-                            <div class="col-md-12 mt-2">
-                                <label class="fw-bold form-label">Attachment</label>
-                                <input type="file" class="form-control mb-1" id="editScenarioFileInput">
-                                <div class="mt-1 d-flex align-items-center">
-                                    <button class="btn btn-outline-secondary btn-sm me-2"><i class="bi bi-upload"></i> Upload</button>
-                                    <a href="#" id="editScenarioDownloadBtn" class="btn btn-outline-primary btn-sm me-2 d-none">
-                                        <i class="bi bi-download"></i> Download
-                                    </a>
-                                    <button id="editScenarioClearBtn" class="btn btn-outline-danger btn-sm me-2 d-none">
-                                        <i class="bi bi-x-circle"></i> Clear
-                                    </button>
-                                    <span id="editScenarioFileName" class="text-muted d-none"></span>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="modal-footer d-flex justify-content-between mt-2">
-                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Go Back</button>
-                            <button type="submit" class="btn btn-primary">Update Scenario</button>
-                        </div>
-                    </form>
-                </div>
-            </div>
-        </div>
-    </div>
-
-
-
-</div>
+@script
 <script>
-   document.addEventListener('DOMContentLoaded', function() {
-    // Function to handle file input changes
-    function handleFileUpload(fileInputId, fileDisplayId, downloadBtnId, clearBtnId) {
-        const fileInput = document.getElementById(fileInputId);
-        const fileDisplay = document.getElementById(fileDisplayId);
-        const downloadBtn = document.getElementById(downloadBtnId);
-        const clearBtn = document.getElementById(clearBtnId);
+    $wire.on('hide-practicalscenarioModal', () => {
+        $('#practicalScenarioModal').modal('hide');
+    });
 
-        fileInput.addEventListener('change', function(event) {
-            const file = event.target.files[0];
-            
-            if (file) {
-                // Show file name
-                fileDisplay.textContent = file.name;
-                fileDisplay.classList.remove('d-none');
+    $wire.on('show-practicalscenarioModal', () => {
+        $('#practicalScenarioModal').modal('show');
+    });
 
-                // Show download button and create download link
-                downloadBtn.classList.remove('d-none');
-                downloadBtn.href = URL.createObjectURL(file);
-                downloadBtn.download = file.name;
+        Livewire.on('open-new-tab', (data = {}) => {
+            const { position_id, skill_id } = data;
 
-                // Show clear button
-                clearBtn.classList.remove('d-none');
+            if (position_id && skill_id) {
+                const newTab = window.open(`/test/practical/addscenarios?position_id=${position_id}&skill_id=${skill_id}`, '_blank');
             } else {
-                resetFileInput();
+                console.log('Invalid data received.');
             }
-        });
+        });  
 
-        // Clear button functionality
-        clearBtn.addEventListener('click', function(event) {
-            // Prevent form submission or modal closure
-            event.preventDefault();
-            event.stopPropagation();
-            
-            resetFileInput();
-        });
+        Livewire.on('open-new-update-tab', (data = {}) => {
+            const { position_id, skill_id } = data;
 
-        // Reset function
-        function resetFileInput() {
-            fileInput.value = ''; // Clear the file input
-            fileDisplay.textContent = '';
-            fileDisplay.classList.add('d-none');
-            downloadBtn.classList.add('d-none');
-            clearBtn.classList.add('d-none');
-        }
-    }
+            if (position_id && skill_id) {
+                const newTab = window.open(`/test/practical/updatescenarios?position_id=${position_id}&skill_id=${skill_id}`, '_blank');
+            } else {
+                console.log('Invalid data received.');
+            }
+        });      
 
-    // Initialize for Add Modal
-    handleFileUpload(
-        'addScenarioFileInput', 
-        'addScenarioFileName', 
-        'addScenarioDownloadBtn',
-        'addScenarioClearBtn'
-    );
+        Livewire.on('open-new-view-tab', (data = {}) => {
+            const { position_id, skill_id } = data;
 
-    // Initialize for Edit Modal
-    handleFileUpload(
-        'editScenarioFileInput', 
-        'editScenarioFileName', 
-        'editScenarioDownloadBtn',
-        'editScenarioClearBtn'
-    );
-});
+            if (position_id && skill_id) {
+                const newTab = window.open(`/test/practical/viewscenarios?position_id=${position_id}&skill_id=${skill_id}`, '_blank');
+            } else {
+                console.log('Invalid data received.');
+            }
+        }); 
 </script>
+@endscript
+
+<style>
+    .filename-container {
+        max-width: 200px; 
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        vertical-align: middle;
+    }
+</style>

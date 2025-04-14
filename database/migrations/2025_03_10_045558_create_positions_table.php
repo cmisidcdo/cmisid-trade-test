@@ -15,11 +15,12 @@ return new class extends Migration
             $table->id();
             $table->string('title');
             $table->integer('salary_grade');
-            $table->boolean('interview_priority')->default(true);
+            $table->string('position_description')->nullable();
             $table->softDeletes();
             $table->timestamps();
         });
     }
+
 
     /**
      * Reverse the migrations.

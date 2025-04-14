@@ -2,10 +2,12 @@
 
 namespace App\Livewire\Test;
 
+use App\Models\PositionSkill;
 use Livewire\Component;
-use App\Models\OralQuestion;
+use App\Models\PracticalScenario;
 use App\Models\Position;
 use App\Models\Skill;
+use App\Models\AQChoice;
 use Illuminate\Support\Facades\DB;
 use Livewire\WithPagination;
 use Illuminate\Validation\Rule;
@@ -14,61 +16,44 @@ use Illuminate\Support\Facades\Log;
 class PracticalExam extends Component
 {
     use WithPagination;
-    public $editMode;
 
-    public $archive = false;
+    public $editMode, $viewMode;
 
     public $search;
+    public $positions = [];
 
+    
     public $skills = [];
-
-    public $choices = [['text' => '', 'status' => '']];
     
-    public $position_id, $skill_id, $question, $status, $notes, $skill, $vduration, $title;
+    public $position_id, $title, $skill_id, $scenario, $duration = 0, $status, $vduration;
+    public $points = 1;
 
-    public $oralquestion_id;
-    
-    public $filterStatus = 'all'; 
-
-    public $competency_levels = ['basic', 'intermediate', 'advanced'];
-    
-    public $competency_level;
+    public $hours = 0, $minutes = 0, $seconds = 0;
+    public $PracticalScenario_id;
 
     public function mount()
     {
-        // $user = auth()->user();
-
-        // if(!$user->can('read reference')){
-        //     abort(403);
-        // }
-
     }
 
-    public function updatedCompetencyLevel()
+    public function updatedPositionId($value)
     {
         $this->updateSkills();
+
         $this->skill_id = null;
     }
+
+
 
     public function render()
     {
         return view('livewire.test.practical-exam', [
-            'oralquestions' => $this->loadOralQuestions()
+            'practicalscenarios' => $this->loadPositionPracticalScenarios(),
         ]);
     }
-    
-    public function rules()
-    {
-        return [
-            'skill_id' => ['required'],
-            'question' => ['required', 'string', 'max:255'],
-        ];
-    }
 
-
-    public function updatingFilterStatus()
+    private function loadDropdownData()
     {
-        $this->resetPage(); 
+        $this->positions = Position::all();
     }
 
     public function updatedSearch()
@@ -76,137 +61,156 @@ class PracticalExam extends Component
         $this->resetPage();
     }
 
-    public function loadOralQuestions()
+    public function updated($property)
     {
-        return OralQuestion::withTrashed()
-            ->with('skill')
-            ->when($this->filterStatus !== 'all', function ($query) {
-                if ($this->filterStatus === 'yes') {
-                    $query->whereNull('deleted_at');
-                } elseif ($this->filterStatus === 'no') {
-                    $query->whereNotNull('deleted_at'); 
-                }
-            })
+        $this->duration = ($this->hours * 3600) + ($this->minutes * 60) + $this->seconds;
+    }
+
+    public function refreshTable()
+    {
+        //haha
+    }
+
+    public function loadPositionPracticalScenarios()
+    {
+        $query = PracticalScenario::withTrashed()
+            ->with(['positionSkill.position'])
             ->when($this->search, function ($query) {
                 $query->where(function ($q) {
-                    $q->where('question', 'like', '%' . $this->search . '%');
+                    $q->where('scenario', 'like', '%' . $this->search . '%')
+                        ->orWhere('duration', 'like', '%' . $this->search . '%');
                 });
-            })
-            ->paginate(10);
+            });
+    
+        $grouped = $query
+            ->join('position_skills', 'position_skills.id', '=', 'practical_scenarios.position_skill_id')
+            ->join('positions', 'positions.id', '=', 'position_skills.position_id')
+            ->select(
+                'positions.id as position_id',
+                'positions.title as position_title',
+                \DB::raw('COUNT(practical_scenarios.id) as total_scenarios'),
+                \DB::raw('SUM(practical_scenarios.duration) as total_duration')
+            )
+            ->groupBy('positions.id', 'positions.title')
+            ->paginate(10)
+            ->through(function ($item) {
+                $item->formatted_duration = gmdate("H:i:s", $item->total_duration);
+                return $item;
+            });
+    
+        return $grouped;
     }
 
     public function clear()
     {
         $this->reset();
-        $this->resetValidation();
-        $this->choices = [
-            ['text' => '', 'status' => 'incorrect']
-        ];
+        $this->loadDropdownData();
     }
 
     public function updateSkills()
     {
-        if ($this->competency_level) {
-            $this->skills = Skill::where('competency_level', $this->competency_level)->get();
+        if ($this->position_id) {
+            $position = Position::find($this->position_id);
+
+            if ($position) {
+                $this->skills = $position->skills()
+                    ->whereNull('skills.deleted_at')
+                    ->get()
+                    ->map(function ($skill) use ($position) {
+                        $positionSkillId = DB::table('position_skills')
+                            ->where('position_id', $position->id)
+                            ->where('skill_id', $skill->id)
+                            ->value('id');
+
+                        $scenarioCount = PracticalScenario::where('position_skill_id', $positionSkillId)->count();
+
+                        return [
+                            'id' => $skill->id,
+                            'title' => $skill->title,
+                            'competency_level' => $skill->pivot->competency_level,
+                            'scenario_count' => $scenarioCount,
+                        ];
+                    });
+            } else {
+                $this->skills = collect();
+            }
         } else {
-            $this->skills = [];
+            $this->skills = collect();
         }
+    }
+
+    
+    public function addScenarios($position_id, $skill_id)
+    {
+
+        $this->position_id = $position_id;
+        $this->skill_id = $skill_id;
+
+        $this->dispatch('open-new-tab', 
+            position_id: $this->position_id,
+            skill_id: $this->skill_id,
+        );
+    }
+
+    public function updateScenarios($position_id, $skill_id)
+    {
+
+        $this->position_id = $position_id;
+        $this->skill_id = $skill_id;
+
+        $this->dispatch('open-new-update-tab', 
+            position_id: $this->position_id,
+            skill_id: $this->skill_id,
+        );
+    }
+
+    public function viewScenarios($position_id, $skill_id)
+    {
+
+        $this->position_id = $position_id;
+        $this->skill_id = $skill_id;
+
+        $this->dispatch('open-new-view-tab', 
+            position_id: $this->position_id,
+            skill_id: $this->skill_id,
+        );
+    }
+    
+    public function readPracticalScenario($positionId)
+    {
+        $this->clear();
+    
+        $this->editMode = true;
+        $this->position_id = $positionId;
+    
+        $this->updateSkills();
+    
+        $this->dispatch('show-practicalscenarioModal');
+    }
+
+    public function viewPracticalScenario($positionId)
+    {
+        $this->clear();
+    
+        $this->viewMode = true;
+        $this->position_id = $positionId;
+    
+        $this->updateSkills();
+    
+        $this->dispatch('show-practicalscenarioModal');
     }
 
     public function showAddEditModal()
     {
         $this->clear();
+    
         if (!$this->editMode) { 
             $this->status = 'yes'; 
         }
-        $this->dispatch('show-oralquestionModal');
+
+        $this->dispatch('show-practicalscenarioModal');
     }
-
-    public function readOralQuestion($oralquestionId)
-    {
-        $this->clear();
-        $oralquestion = OralQuestion::withTrashed()->with('skill')->findOrFail($oralquestionId);
     
-        $this->fill([
-            'oralquestion_id' => $oralquestion->id,
-            'question'          => $oralquestion->question,
-            'skill_id'       => $oralquestion->skill_id,
-            'competency_level'  => $oralquestion->skill->competency_level ?? 'N/A',
-        ]);
-
-        $this->status = is_null($oralquestion->deleted_at) ? 'yes' : 'no';
-        $this->updateSkills();
-        $this->editMode = true;
-        $this->dispatch('show-oralquestionModal');
-    }
-
-    public function createOralQuestion()
-    {
-        
-        $this->validate();
-
-        DB::transaction(function () {
-
-            $oralquestion = new OralQuestion();
-            $oralquestion->question = $this->question;
-            $oralquestion->skill_id = $this->skill_id;
-            $oralquestion->save();
-
-        });
-
-        $this->clear();
-        $this->dispatch('hide-oralquestionModal');
-        $this->dispatch('success', 'Question Created Successfully');
-    }
-
-    public function updateOralQuestion()
-    {
-
-        $this->validate();
-
-
-        DB::transaction(function () {  
-            $oralquestion = OralQuestion::withTrashed()->findOrFail($this->oralquestion_id);
-            
-            Log::info('oralQuestion found', ['id' => $oralquestion->id]);
-
-            $oralquestion->question = $this->question;
-            $oralquestion->notes = $this->notes;
-            $oralquestion->skill_id = $this->skill_id;
-
-            if ($this->status === 'no' && is_null($oralquestion->deleted_at)) {
-                $oralquestion->delete();
-            } elseif ($this->status === 'yes' && !is_null($oralquestion->deleted_at)) {
-                $oralquestion->restore();
-            } else {
-                $oralquestion->save();
-            }
-
-        });
-
-        $this->clear();
-        $this->dispatch('hide-oralquestionModal');
-        $this->dispatch('success', 'Question and choices updated successfully.');
-    }
-
-    public function showViewModal($questionId)
-    {
-        $this->clear();
-    
-        $question = OralQuestion::withTrashed()
-            ->with('skill') 
-            ->findOrFail($questionId);
-    
-        $this->fill([
-            'title' => optional($question->skill)->title, 
-            'competency_level' => optional($question->skill)->competency_level,
-            'status' => is_null($question->deleted_at) ? 'yes' : 'no',
-            'question' =>$question->question,
-        ]);
-    
-        $this->question_id = $question->id;
-    
-        $this->dispatch('show-viewModal');
-    }
-
 }
+
+

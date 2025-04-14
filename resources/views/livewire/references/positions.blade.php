@@ -46,62 +46,62 @@
                     </div>
                 </div>
                 <div class="table-responsive">
-                    <table class="table table-hover table-bordered table-striped text-center align-middle">
+                    <table class="table table-hover table-bordered text-center global-table">
                         <thead class="table-light">
                             <tr>
-                                <th scope="col" class="fw-semibold">#</th>
+                                <th scope="col" class="fw-semibold" style="width: 5%;">#</th>
                                 <th scope="col" class="fw-semibold">Title</th>
-                                <th scope="col" class="fw-semibold">Salary Grade</th>
-                                <th scope="col" class="fw-semibold">Status</th>
-                                <th scope="col" class="fw-semibold">Priority</th>
-                                <th scope="col" class="fw-semibold text-center">Actions</th>
+                                <th scope="col" class="fw-semibold" style="width: 40%;">Description</th>
+                                <th scope="col" class="fw-semibold" style="width: 10%;">Salary Grade</th>
+                                <th scope="col" class="fw-semibold" style="width: 5%;">Status</th>
+                                
+                                <th scope="col" class="fw-semibold text-center" style="width: 15%;">Actions</th>
                             </tr>
                         </thead>
                         <tbody>
                             @forelse($positions as $item)
                             <tr class="position-row">
-                                <td scope="row">{{$item->id}}</td>
-                                <td class="fw-medium">{{$item->title}}</td>
-                                <td>{{$item->salary_grade}}</td>
-                                <td>
+                                <td scope="row"  class="text-center align-middle" style="width: 5%;">{{$loop->iteration}}</td>
+                                <td class="fw-medium align-middle" style="max-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;"">{{$item->title}}</td>
+                                <td class="fw-medium align-middle text-truncate" style="width: 40%; max-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
+                                    {{$item->position_description}}
+                                </td>                                
+                                <td class="fw-medium align-middle" style="width: 10%;">{{$item->salary_grade}}</td>
+                                <td class="fw-medium align-middle" style="width: 5%;">
                                     <span class="badge rounded-pill {{$item->deleted_at == Null ? 'bg-success': 'bg-danger'}}">
                                         {{$item->deleted_at == Null ? 'Active': 'Inactive'}}
                                     </span>
                                 </td>
-                                <td>
-                                    <span class="badge rounded-pill {{$item->interview_priority == True ? 'bg-success': 'bg-secondary'}}">
-                                        {{$item->interview_priority == True ? 'Yes': 'No    '}}
-                                    </span>
-                                </td>
-                                <td>
-                                    <div class="d-flex justify-content-center gap-2">
+                                
+                                <td style="width: 15%;">
+                                    <div class="d-flex align-items-center justify-content-center gap-2">
                                         <button
                                             class="btn btn-sm btn-info"
                                             wire:click='viewPosition({{$item->id}})'
                                             title="View position skills">
-                                            <i class="bi bi-eye me-1"></i> View
+                                            <i class="bi bi-eye me-0"></i>
                                         </button>
-
+                                
                                         @can('update reference')
                                         <button
                                             class="btn btn-sm btn-primary"
                                             wire:click='readPosition({{$item->id}})'
                                             title="Edit position">
-                                            <i class="bi bi-pencil-square me-1"></i> Edit
+                                            <i class="bi bi-pencil-square me-0"></i>
                                         </button>
                                         @endcan
-
+                                
                                         @can('delete reference')
                                         <button
                                             class="btn btn-sm {{$item->deleted_at == Null ? 'btn-danger': 'btn-outline-success'}}"
                                             wire:click='{{$item->deleted_at == Null ? 'confirmDelete('.$item->id.')': 'restorePosition('.$item->id.')'}}'
                                             title="{{$item->deleted_at == Null ? 'Move to archive' : 'Restore position'}}">
-                                            <i class="bi {{$item->deleted_at == Null ? 'bi-archive' : 'bi-arrow-counterclockwise'}} me-1"></i>
-                                            {{$item->deleted_at == Null ? 'Archive': 'Restore'}}
+                                            <i class="bi {{$item->deleted_at == Null ? 'bi-archive' : 'bi-arrow-counterclockwise'}} me-0"></i>
                                         </button>
                                         @endcan
                                     </div>
                                 </td>
+                                
                             </tr>
                             @empty
                             <tr>
@@ -138,20 +138,19 @@
                     <div class="modal-body">
                         <form class="row g-4" wire:submit.prevent="{{$editMode ? 'updatePosition' : 'createPosition'}}">
 
-                            <div class="col-12">
-                                <label for="title" class="form-label fw-semibold">Title <span class="text-danger">*</span></label>
-                                <input
-                                    type="text"
-                                    id="title"
-                                    class="form-control @error('title') is-invalid @enderror"
-                                    wire:model="title"
-                                    placeholder="Enter position title">
-                                @error('title')
-                                <div class="invalid-feedback">{{$message}}</div>
-                                @enderror
-                            </div>
-
                             <div class="row g-3">
+                                <div class="col-6">
+                                    <label for="title" class="form-label fw-semibold">Title <span class="text-danger">*</span></label>
+                                    <input
+                                        type="text"
+                                        id="title"
+                                        class="form-control @error('title') is-invalid @enderror"
+                                        wire:model="title"
+                                        placeholder="Enter position title">
+                                    @error('title')
+                                    <div class="invalid-feedback">{{$message}}</div>
+                                    @enderror
+                                </div>
                                 <div class="col-md-6">
                                     <label for="salary_grade" class="form-label fw-semibold">Salary Grade <span class="text-danger">*</span></label>
                                     <input
@@ -164,32 +163,35 @@
                                     <div class="invalid-feedback">{{$message}}</div>
                                     @enderror
                                 </div>
-
-                                <div class="col-md-6">
-                                    <label class="form-label fw-semibold d-block">Interview Priority <span class="text-danger">*</span></label>
-                                    <div class="form-check form-check-inline">
-                                        <input
-                                            class="form-check-input @error('interview_priority') is-invalid @enderror"
-                                            type="radio"
-                                            id="priorityYes"
-                                            wire:model="interview_priority"
-                                            value="1">
-                                        <label class="form-check-label" for="priorityYes">Yes</label>
-                                    </div>
-                                    <div class="form-check form-check-inline">
-                                        <input
-                                            class="form-check-input @error('interview_priority') is-invalid @enderror"
-                                            type="radio"
-                                            id="priorityNo"
-                                            wire:model="interview_priority"
-                                            value="0">
-                                        <label class="form-check-label" for="priorityNo">No</label>
-                                    </div>
-                                    @error('interview_priority')
-                                    <div class="d-block invalid-feedback">{{$message}}</div>
-                                    @enderror
-                                </div>
                             </div>
+                            
+                               
+
+                            <div class="col-12">
+                                <label for="position_description" class="form-label fw-semibold">
+                                    Position Description <span class="text-danger">*</span>
+                                </label>
+                            
+                                <textarea
+                                    id="position_description"
+                                    class="form-control @error('position_description') is-invalid @enderror"
+                                    wire:model.live="position_description"
+                                    placeholder="Enter Description"
+                                    rows="4"
+                                    maxlength="255"
+                                ></textarea>
+                            
+                                <div class="text-end small text-muted">
+                                    {{ strlen($position_description) }} / 255
+                                </div>
+                            
+                                @error('position_description')
+                                    <div class="invalid-feedback">{{ $message }}</div>
+                                @enderror
+                            </div>
+                            
+                            
+                            
 
                             <div class="col-12">
                                 <div class="d-flex justify-content-between align-items-center mb-3">
@@ -203,7 +205,7 @@
                                 </div>
 
                                 <div class="table-responsive">
-                                    <table class="table table-hover">
+                                    <table class="table table-hover table-bordered text-center global-table">
                                         <thead class="table-light">
                                             <tr>
                                                 <th class="fw-semibold">#</th>
@@ -217,12 +219,15 @@
                                             <tr>
                                                 <td>{{ $index + 1 }}</td>
                                                 <td class="fw-medium">{{ $selectedskill['title'] }}</td>
-                                                <td>
-                                                    <span class="badge rounded-pill 
-                                                        {{ $selectedskill['competency_level'] == 'Basic' ? 'bg-info' : 
-                                                        ($selectedskill['competency_level'] == 'Intermediate' ? 'bg-primary' : 'bg-dark') }}">
-                                                        {{ucfirst($selectedskill['competency_level'])}}
-                                                    </span>
+                                                <td class="fw-medium">
+                                                    <select
+                                                        class="form-select form-select-sm"
+                                                        wire:change="updateCompetencyLevel({{ $index }}, $event.target.value)"
+                                                        aria-label="Select competency level">
+                                                        <option value="basic" {{ $selectedskill['competency_level'] == 'basic' ? 'selected' : '' }}>Basic</option>
+                                                        <option value="intermediate" {{ $selectedskill['competency_level'] == 'intermediate' ? 'selected' : '' }}>Intermediate</option>
+                                                        <option value="advanced" {{ $selectedskill['competency_level'] == 'advanced' ? 'selected' : '' }}>Advanced</option>
+                                                    </select>
                                                 </td>
                                                 <td class="text-center">
                                                     <button
@@ -251,7 +256,7 @@
                                 </button>
                                 <button type="submit" class="btn btn-primary">
                                     <i class="bi {{ $editMode ? 'bi-check2-circle' : 'bi-plus-circle' }} me-1"></i>
-                                    {{ $editMode ? 'Update' : 'Save' }} Position
+                                    {{ $editMode ? 'Update' : 'Add' }} Position
                                 </button>
                             </div>
                         </form>
@@ -290,48 +295,43 @@
                         </div>
 
                         <div class="table-responsive">
-                            <table class="table table-hover align-middle">
+                            <table class="table table-hover table-bordered text-center global-table">
                                 <thead class="table-light">
                                     <tr>
                                         <th class="fw-semibold">#</th>
                                         <th class="fw-semibold">Skill Title</th>
-                                        <th class="fw-semibold">Competency Level</th>
                                         <th class="fw-semibold text-center">Actions</th>
                                     </tr>
                                 </thead>
                                 <tbody>
                                     @forelse($skills as $item)
-                                    <tr>
-                                        <td scope="row">{{$item->id}}</td>
-                                        <td class="fw-medium">{{$item->title}}</td>
-                                        <td>
-                                            <span class="badge rounded-pill 
-                                                {{ $item->competency_level == 'Basic' ? 'bg-info' : 
-                                                ($item->competency_level == 'Intermediate' ? 'bg-primary' : 'bg-dark') }}">
-                                                {{ucfirst($item->competency_level)}}
-                                            </span>
-                                        </td>
-                                        <td class="text-center">
-                                            <button
-                                                class="btn btn-success btn-sm"
-                                                wire:click="addSkill({{$item->id}})"
-                                                wire:loading.attr="disabled"
-                                                wire:target="addSkill({{$item->id}})">
-                                                <i class="bi bi-plus-circle me-1"></i> Add
-                                                <span wire:loading wire:target="addSkill({{$item->id}})">
-                                                    <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
-                                                </span>
-                                            </button>
-                                        </td>
-                                    </tr>
+                                        <tr>
+                                            <td scope="row" class="text-center">{{ $loop->iteration }}</td>
+                                            <td class="fw-medium">{{ $item->title }}</td>
+                                            <td class="text-center">
+                                                <button
+                                                    class="btn btn-success btn-sm"
+                                                    wire:click="addSkill({{ $item->id }})"
+                                                    @if($loadingSkillId === $item->id) disabled @endif
+                                                >
+                                                    <i class="bi bi-plus-circle me-1"></i>
+                                                    @if($loadingSkillId === $item->id)
+                                                        <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+                                                    @else
+                                                        Add
+                                                    @endif
+                                                </button>
+                                            </td>
+                                        </tr>
                                     @empty
-                                    <tr>
-                                        <td colspan="4" class="text-center py-4 text-muted">
-                                            <i class="bi bi-info-circle me-1"></i> No skills available.
-                                        </td>
-                                    </tr>
+                                        <tr>
+                                            <td colspan="4" class="text-center py-4 text-muted">
+                                                <i class="bi bi-info-circle me-1"></i> No skills available.
+                                            </td>
+                                        </tr>
                                     @endforelse
                                 </tbody>
+                                
                             </table>
 
                             <div class="mt-3">
@@ -367,16 +367,16 @@
                             <div class="row g-3">
                                 <div class="col-md-6">
                                     <p class="mb-1"><span class="fw-medium">Title:</span> {{$this->title}}</p>
-                                    <p class="mb-1"><span class="fw-medium">Salary Grade:</span> {{$this->salary_grade}}</p>
+                                    
                                 </div>
                                 <div class="col-md-6">
-                                    <p class="mb-1">
-                                        <span class="fw-medium">Priority:</span>
-                                        <span class="badge rounded-pill bg-success">
-                                            Priority
-                                        </span>
-                                    </p>
+                                    <p class="mb-1"><span class="fw-medium">Salary Grade:</span> {{$this->salary_grade}}</p>
                                 </div>
+                            </div>
+                            <br>
+                            <div class="col-md-12">
+                                <p class="mb-1">Description:</p>
+                                <p>{{$this->position_description}}</p>
                             </div>
                         </div>
 
@@ -384,25 +384,25 @@
                             <h6 class="fw-bold mb-3">Required Skills</h6>
 
                             <div class="table-responsive">
-                                <table class="table table-hover">
+                                <table class="table table-hover table-bordered text-center global-table">
                                     <thead class="table-light">
                                         <tr>
-                                            <th class="fw-semibold">#</th>
+                                            <th class="fw-semibold" style="width:5%">#</th>
                                             <th class="fw-semibold">Skill Title</th>
-                                            <th class="fw-semibold">Competency Level</th>
+                                            <th class="fw-semibold" style="width:20%">Competency Level</th>
                                         </tr>
                                     </thead>
 
                                     <tbody>
                                         @forelse($selectedskills as $index => $selectedskill)
                                         <tr>
-                                            <td>{{ $index + 1 }}</td>
+                                            <td style="width:5%">{{ $index + 1 }}</td>
                                             <td class="fw-medium">{{ $selectedskill['title'] }}</td>
-                                            <td class="fw-medium">
+                                            <td class="fw-medium" style="width:20%">
                                                 <span class="badge rounded-pill 
-                                                    {{ $selectedskill['competency_level'] == 'Basic' ? 'bg-info' : 
-                                                    ($selectedskill['competency_level'] == 'Intermediate' ? 'bg-primary' : 'bg-dark') }}">
-                                                    {{ $selectedskill['competency_level'] }}
+                                                    {{ $selectedskill['competency_level'] == 'basic' ? 'bg-info' : 
+                                                    ($selectedskill['competency_level'] == 'intermediate' ? 'bg-primary' : 'bg-dark') }}">
+                                                    {{ucfirst($selectedskill['competency_level'])}}
                                                 </span>
                                             </td>
                                         </tr>

@@ -7,6 +7,8 @@ use App\Livewire\Candidate\Exam\CandidateOral;
 use App\Livewire\Candidate\Exam\CandidatePractical;
 use App\Livewire\Candidate\Home;
 use App\Livewire\Candidate\Login;
+use App\Livewire\References\Scoresheets\OralScoring;
+use App\Livewire\References\Scoresheets\PracticalScoring;
 use App\Livewire\Scores\AssessmentScores;
 use App\Livewire\Scores\OralScores;
 use App\Livewire\Scores\PracticalScores;
@@ -87,6 +89,8 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/exam/interviewlist', Interviewlist::class)->name('exam.interviewlist');
     Route::get('/references/criterias/practical', Practical::class)->name('references.criterias.practical');
     Route::get('/references/criterias/oral', Oral:: class)->name('references.criterias.oral');
+    Route::get('/references/scoresheets/practical', PracticalScoring::class)->name('references.scoresheets.practical');
+    Route::get('/references/scoresheets/oral', OralScoring::class)->name('references.scoresheets.oral');
     Route::get('/scores/assessment', AssessmentScores::class )->name('scores.assessment');
     Route::get('/scores/practical', PracticalScores::class)->name('scores.practical');
     Route::get('/scores/oral', OralScores::class)->name('scores.oral');

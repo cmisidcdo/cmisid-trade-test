@@ -254,16 +254,10 @@
     });
 
     $wire.on('hide-skillModal', () => {
-        console.log('Hiding skill modal');
         $('#skillModal').modal('hide');
-
-        const toast = new bootstrap.Toast(document.getElementById('successToast'));
-        document.getElementById('successMessage').textContent = 'Skill saved successfully!';
-        toast.show();
     });
 
     $wire.on('show-skillModal', () => {
-        console.log('Showing skill modal');
         $('#skillModal').modal('show');
     });
 

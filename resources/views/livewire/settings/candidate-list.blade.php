@@ -93,10 +93,10 @@
                                 <td>{{$item->office->title}}</td>
                                 <td>{{$item->position->title}}</td>
                                 <td>{{$item->prioritygroup->title}}</td>
-                                <td class="text-center">
-                                    <div class="status-indicator {{$item->deleted_at == Null ? 'status-active': 'status-inactive'}}" 
-                                        title="{{$item->deleted_at == Null ? 'Active': 'Inactive'}}">
-                                    </div>
+                                <td>
+                                    <span class="badge rounded-3 {{$item->deleted_at == Null ? 'bg-success': 'bg-danger'}}">
+                                      {{$item->deleted_at == Null ? 'Active' : 'Inactive'}}
+                                    </span>
                                 </td>
                                 <td class="text-center">
                                     <div class="btn-group btn-group-sm" role="group" aria-label="Candidate actions">
@@ -408,30 +408,18 @@
     });
 
     $wire.on('hide-candidateModal', () => {
-        console.log('Hiding candidate modal');
-        $('candidateModal').modal('hide');
-
-        const toast = new bootstrap.Toast(document.getElementById('successToast'));
-        document.getElementById('successMessage').textContent = 'Candidate saved successfully!';
-        toast.show();
+        $('#candidateModal').modal('hide');
     });
 
     $wire.on('show-candidateModal', () => {
-        console.log('Showing candidate modal');
         $('#candidateModal').modal('show');
     });
 
     $wire.on('hide-viewModal', () => {
-        console.log('Hiding view modal');
         $('#viewModal').modal('hide');
-
-        const toast = new bootstrap.Toast(document.getElementById('successToast'));
-        document.getElementById('successMessage').textContent = 'view saved successfully!';
-        toast.show();
     });
 
     $wire.on('show-viewModal', () => {
-        console.log('Showing view modal');
         $('#viewModal').modal('show');
     });
 </script>

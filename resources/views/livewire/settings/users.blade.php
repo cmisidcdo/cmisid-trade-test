@@ -127,7 +127,7 @@
         </table>
 
         <div>
-          {{$users->links()}}
+          {{$users->links(data: ['scrollTo' => false])}}
         </div>
       </div>
     </div>

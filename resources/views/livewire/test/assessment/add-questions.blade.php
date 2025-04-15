@@ -48,13 +48,14 @@
 
                         <div class="row mb-2">
                             <div class="col-6">
-                                <label for="points_{{ $index }}" class="form-label fw-bold fs-7">Point(s)</label>
-                                <select class="form-select form-select-sm fs-7" id="points_{{ $index }}" wire:model.defer="questions.{{ $index }}.points">
-                                    @for ($i = 1; $i <= 10; $i++)
-                                        <option value="{{ $i }}" class="fs-7">{{ $i }}</option>
-                                    @endfor
+                                <label for="competency_level_{{ $index }}" class="form-label fw-bold fs-7">Competency Level</label>
+                                <select class="form-select form-select-sm fs-7" id="competency_level_{{ $index }}" wire:model.defer="questions.{{ $index }}.competency_level">
+                                    <option value="">Select Level</option>
+                                    <option value="basic">Basic</option>
+                                    <option value="intermediate">Intermediate</option>
+                                    <option value="advanced">Advanced</option>
                                 </select>
-                            </div>
+                            </div>                            
 
                             <div class="col-6">
                                 <label for="timeDuration_{{ $index }}" class="form-label fw-bold fs-7">Time Duration (HH:MM:SS)</label>
@@ -113,7 +114,7 @@
 
                     </div>
                     @endforeach
-
+                    
                     <div class="d-flex justify-content-between mt-3">
                         <div>
                             <button type="button" class="btn btn-outline-primary btn-sm px-3 fs-7" wire:click="addQuestion">

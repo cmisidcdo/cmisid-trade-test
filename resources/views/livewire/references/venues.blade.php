@@ -101,7 +101,7 @@
                         </tbody>
                     </table>
                     <div>
-                        {{$venues->links()}}
+                        {{$venues->links(data: ['scrollTo' => false])}}
                       </div>
                 </div>
 

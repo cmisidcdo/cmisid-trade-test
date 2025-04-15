@@ -33,7 +33,7 @@ class UpdateScenarios extends Component
     public $file, $existing_file;
 
     public $hours = 0, $minutes = 0, $seconds = 0;
-    public $practicalscenario_id;
+    public $practicalscenario_id, $archive;
     public $deletedScenarios = [];
     public $showReplaceInput = null;
     public $replaceFileVisibility = [];
@@ -84,8 +84,13 @@ class UpdateScenarios extends Component
 
     public function loadPracticalScenarios($position_skill_id)
     {
-        $this->scenarios = PracticalScenario::where('position_skill_id', $position_skill_id)
-            ->get()
+        $query = PracticalScenario::where('position_skill_id', $position_skill_id);
+
+        if ($this->archive) {
+            $query->onlyTrashed();
+        }
+
+        $this->scenarios = $query->get()
             ->map(function ($scenario) {
                 return [
                     'id' => $scenario->id,
@@ -98,6 +103,7 @@ class UpdateScenarios extends Component
                 ];
             })->toArray();
     }
+
 
     public function addScenario()
     {
@@ -118,6 +124,24 @@ class UpdateScenarios extends Component
             }
             unset($this->scenarios[$index]);
             $this->scenarios = array_values($this->scenarios);
+        }
+    }
+
+    public function restoreScenario($scenarioId)
+    {
+        $scenario = PracticalScenario::onlyTrashed()->find($scenarioId);
+        if ($scenario) {
+            $scenario->restore();
+
+            Log::info("Scenario #{$scenarioId} restored.");
+
+            if ($this->position_skill_id) {
+                $this->loadPracticalScenarios($this->position_skill_id);
+            }
+
+            $this->dispatch('success', 'Scenario restored successfully.');
+        } else {
+            $this->dispatch('error', 'Scenario not found or already active.');
         }
     }
 
@@ -232,6 +256,15 @@ class UpdateScenarios extends Component
 
         $this->clear();
         $this->dispatch('success', 'Scenarios Updated Successfully');
+    }
+
+    public function toggleArchive()
+    {
+        $this->archive = !$this->archive;
+
+        if ($this->position_skill_id) {
+            $this->loadPracticalScenarios($this->position_skill_id);
+        }
     }
 
     public function toggleReplaceInput($index)

@@ -128,7 +128,7 @@
                         </tbody>
                     </table>
                     <div>
-                        {{$skills->links()}}
+                        {{$skills->links(data: ['scrollTo' => false])}}
                     </div>
                 </div>
 

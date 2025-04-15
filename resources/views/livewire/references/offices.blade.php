@@ -129,13 +129,10 @@
                                 @endforelse
                             </tbody>
                         </table>
-                    {{-- <div>
-                            {{$criterias->links()}}
-                        </div> --}}
                     </div>
 
                     <div>
-                        {{ $offices->links() }}
+                        {{ $offices->links(data: ['scrollTo' => false])}}
                     </div>                    
 
                     <div class="position-fixed bottom-0 end-0 p-3" style="z-index: 11">
@@ -260,5 +257,7 @@
             console.log('Showing office modal');
             $('#officeModal').modal('show');
         });
+
+        
     </script>
     @endscript

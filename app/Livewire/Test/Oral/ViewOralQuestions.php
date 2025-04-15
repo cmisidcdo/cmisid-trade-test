@@ -18,7 +18,7 @@ class ViewOralQuestions extends Component
     public $skills = [];
     
     public $position_skill, $position_skill_id, $position, $position_id, $title, $skill, $skill_id, $question, $duration = 0, $status, $vduration;
-    public $points = 1;
+    public $points = 1, $archive;
 
     public $hours = 0, $minutes = 0, $seconds = 0;
     public $oralquestion_id, $existing_file;
@@ -63,7 +63,13 @@ class ViewOralQuestions extends Component
 
     public function loadOralQuestions($position_skill_id)
     {
-        $this->questions = OralQuestion::where('position_skill_id', $position_skill_id)
+        $query = OralQuestion::query();
+
+        if ($this->archive) {
+            $query->onlyTrashed();
+        }
+
+        $this->questions = $query->where('position_skill_id', $position_skill_id)
             ->get()
             ->map(function ($question) {
                 return [
@@ -76,5 +82,14 @@ class ViewOralQuestions extends Component
                     'existing_file' => $question->file_path ?? null,
                 ];
             })->toArray();
+    }
+
+    public function toggleArchive()
+    {
+        $this->archive = !$this->archive;
+
+        if ($this->position_skill_id) {
+            $this->loadOralQuestions($this->position_skill_id);
+        }
     }
 }

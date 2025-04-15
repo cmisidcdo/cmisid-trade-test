@@ -97,7 +97,7 @@
             </table>
         </div>
         <div>
-            {{$practicalscenarios->links()}}
+            {{$practicalscenarios->links(data: ['scrollTo' => false])}}
         </div>
     </div>
 

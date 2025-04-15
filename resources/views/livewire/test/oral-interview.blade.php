@@ -97,7 +97,7 @@
             </table>
         </div>
         <div>
-            {{$oralquestions->links()}}
+            {{$oralquestions->links(data: ['scrollTo' => false])}}
         </div>
     </div>
 

@@ -32,7 +32,7 @@ class UpdateOralQuestions extends Component
     public $file, $existing_file;
 
     public $hours = 0, $minutes = 0, $seconds = 0;
-    public $oralquestion_id;
+    public $oralquestion_id, $archive;
     public $deletedQuestions = [];
     public $showReplaceInput = null;
     public $replaceFileVisibility = [];
@@ -83,7 +83,13 @@ class UpdateOralQuestions extends Component
 
     public function loadOralQuestions($position_skill_id)
     {
-        $this->questions = OralQuestion::where('position_skill_id', $position_skill_id)
+        $query = OralQuestion::query();
+
+        if ($this->archive) {
+            $query->onlyTrashed();
+        }
+
+        $this->questions = $query->where('position_skill_id', $position_skill_id)
             ->get()
             ->map(function ($question) {
                 return [
@@ -117,6 +123,24 @@ class UpdateOralQuestions extends Component
             }
             unset($this->questions[$index]);
             $this->questions = array_values($this->questions);
+        }
+    }
+
+    public function restoreQuestion($questionId)
+    {
+        $question = OralQuestion::onlyTrashed()->find($questionId);
+        if ($question) {
+            $question->restore();
+
+            Log::info("Question #{$questionId} restored.");
+
+            if ($this->position_skill_id) {
+                $this->loadOralQuestions($this->position_skill_id);
+            }
+
+            $this->dispatch('success', 'Question restored successfully.');
+        } else {
+            $this->dispatch('error', 'Question not found or already active.');
         }
     }
 
@@ -231,6 +255,15 @@ class UpdateOralQuestions extends Component
 
         $this->clear();
         $this->dispatch('success', 'questions Updated Successfully');
+    }
+
+    public function toggleArchive()
+    {
+        $this->archive = !$this->archive;
+        
+        if ($this->position_skill_id) {
+            $this->loadOralQuestions($this->position_skill_id);
+        }
     }
 
     public function toggleReplaceInput($index)

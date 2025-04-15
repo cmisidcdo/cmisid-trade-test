@@ -121,7 +121,7 @@
                 </div>
 
                 <div class="d-flex justify-content-center mt-4 gap-3">
-                    {{ $positions->links() }}
+                    {{ $positions->links(data: ['scrollTo' => false]) }}
                 </div>
             </div>
         </div>

@@ -127,7 +127,7 @@
                         </tbody>
                     </table>
                     <div>
-                        {{$prioritygroups->links()}}
+                        {{$prioritygroups->links(data: ['scrollTo' => false])}}
                     </div>
                 </div>
 

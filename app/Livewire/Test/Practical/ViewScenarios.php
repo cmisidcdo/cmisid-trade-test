@@ -24,7 +24,7 @@ class ViewScenarios extends Component
     public $skills = [];
     
     public $position_skill, $position_skill_id, $position, $position_id, $title, $skill, $skill_id, $scenario, $duration = 0, $status, $vduration;
-    public $points = 1;
+    public $points = 1, $archive;
 
     public $hours = 0, $minutes = 0, $seconds = 0;
     public $practicalscenario_id, $existing_file;
@@ -65,7 +65,13 @@ class ViewScenarios extends Component
 
     public function loadPracticalScenarios($position_skill_id)
     {
-        $this->scenarios = PracticalScenario::where('position_skill_id', $position_skill_id)
+        $query = PracticalScenario::query();
+    
+        if ($this->archive) {
+            $query->onlyTrashed();
+        }
+    
+        $this->scenarios = $query->where('position_skill_id', $position_skill_id)
             ->get()
             ->map(function ($scenario) {
                 return [
@@ -78,5 +84,15 @@ class ViewScenarios extends Component
                     'existing_file' => $scenario->file_path ?? null,
                 ];
             })->toArray();
+    }
+    
+
+    public function toggleArchive()
+    {
+        $this->archive = !$this->archive;
+
+        if ($this->position_skill_id) {
+            $this->loadPracticalScenarios($this->position_skill_id);
+        }
     }
 }

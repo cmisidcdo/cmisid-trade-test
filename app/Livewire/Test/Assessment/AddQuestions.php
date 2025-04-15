@@ -23,7 +23,7 @@ class AddQuestions extends Component
     public $choices = [['text' => '', 'status' => 'incorrect']];
     
     public $position_skill, $position_skill_id, $position, $position_id, $title, $skill, $skill_id, $question, $duration = 0, $status, $vduration;
-    public $points = 1;
+    public $points = 1, $competency_level = 'basic';
 
     public $hours = 0, $minutes = 0, $seconds = 0;
     public $assessmentquestion_id;
@@ -63,7 +63,7 @@ class AddQuestions extends Component
     protected $rules = [
         'questions' => 'required|array|min:1',
         'questions.*.question' => 'required|string|max:255',
-        'questions.*.points' => 'required|integer|min:1',
+        'questions.*.competency_level' => 'required|in:basic,intermediate,advanced',
         'questions.*.hours' => 'nullable|integer|min:0',
         'questions.*.minutes' => 'nullable|integer|min:0|max:59',
         'questions.*.seconds' => 'nullable|integer|min:0|max:59',
@@ -92,7 +92,7 @@ class AddQuestions extends Component
     {
         $this->questions[] = [
             'question' => '',
-            'points' => 1,
+            'competency_level' => 'basic',
             'hours' => 0,
             'minutes' => 0,
             'seconds' => 0,
@@ -128,7 +128,7 @@ class AddQuestions extends Component
 
                     $assessmentquestion = new AssessmentQuestion();
                     $assessmentquestion->question = $questionData['question'];
-                    $assessmentquestion->points = $questionData['points'] ?? $this->points;
+                    $assessmentquestion->competency_level = $questionData['competency_level'] ?? $this->competency_level;
                     $assessmentquestion->position_skill_id = $this->position_skill_id;
 
                     $totalSeconds = (
@@ -184,7 +184,7 @@ class AddQuestions extends Component
         $this->questions = [
             [
                 'question' => '',
-                'points' => 1,
+                'competency_level' => 'basic',
                 'hours' => 0,
                 'minutes' => 0,
                 'seconds' => 0,

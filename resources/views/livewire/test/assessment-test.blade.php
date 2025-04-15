@@ -104,7 +104,7 @@
                 </table>
             </div>
             <div>
-                {{$assessmentquestions->links()}}
+                {{$assessmentquestions->links(data: ['scrollTo' => false])}}
             </div>
             
         </div>

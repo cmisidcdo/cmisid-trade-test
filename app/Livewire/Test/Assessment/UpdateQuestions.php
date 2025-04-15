@@ -23,17 +23,17 @@ class UpdateQuestions extends Component
     public $choices = [['text' => '', 'status' => 'incorrect']];
     
     public $position_skill, $position_skill_id, $position, $position_id, $title, $skill, $skill_id, $question, $duration = 0, $status, $vduration;
-    public $points = 1;
+    public $points = 1, $competency_level = 'basic';
 
     public $hours = 0, $minutes = 0, $seconds = 0;
-    public $assessmentquestion_id;
-    public $deletedQuestions = [];
+    public $assessmentquestion_id, $archive;
+    public $deletedQuestions = [], $restoredQuestions = [];
 
 
     public $questions = [
         [
             'question' => '',
-            'points' => 1,
+            'competency_level' => 'basic',
             'hours' => 0,
             'minutes' => 0,
             'seconds' => 0,
@@ -65,12 +65,23 @@ class UpdateQuestions extends Component
             }
         }
     }
+
+    public function toggleArchive()
+    {
+        $this->archive = !$this->archive;
+
+        if ($this->position_skill_id) {
+            $this->loadAssessmentQuestions($this->position_skill_id);
+        }
+    }
+
+
     
 
     protected $rules = [
         'questions' => 'required|array|min:1',
         'questions.*.question' => 'required|string|max:255',
-        'questions.*.points' => 'required|integer|min:1',
+        'questions.*.competency_level' => 'required|in:basic,intermediate,advanced',
         'questions.*.hours' => 'nullable|integer|min:0',
         'questions.*.minutes' => 'nullable|integer|min:0|max:59',
         'questions.*.seconds' => 'nullable|integer|min:0|max:59',
@@ -81,14 +92,19 @@ class UpdateQuestions extends Component
 
     public function loadAssessmentQuestions($position_skill_id)
     {
-        $this->questions = AssessmentQuestion::where('position_skill_id', $position_skill_id)
-            ->with('choices')
-            ->get()
+        $query = AssessmentQuestion::with('choices')
+            ->where('position_skill_id', $position_skill_id);
+
+        if ($this->archive) {
+            $query->onlyTrashed();
+        }
+
+        $this->questions = $query->get()
             ->map(function ($question) {
                 return [
                     'id' => $question->id,
                     'question' => $question->question,
-                    'points' => $question->points,
+                    'competency_level' => $question->competency_level,
                     'hours' => floor($question->duration / 3600),
                     'minutes' => floor(($question->duration % 3600) / 60),
                     'seconds' => $question->duration % 60,
@@ -101,6 +117,7 @@ class UpdateQuestions extends Component
                 ];
             })->toArray();
     }
+
         
     public function render()
     {
@@ -122,7 +139,7 @@ class UpdateQuestions extends Component
     {
         $this->questions[] = [
             'question' => '',
-            'points' => 1,
+            'competency_level' => 'basic',
             'hours' => 0,
             'minutes' => 0,
             'seconds' => 0,
@@ -143,6 +160,25 @@ class UpdateQuestions extends Component
             $this->questions = array_values($this->questions);
         }
     }
+
+    public function restoreQuestion($questionId)
+    {
+        $question = AssessmentQuestion::onlyTrashed()->find($questionId);
+        if ($question) {
+            $question->restore();
+
+            Log::info("Question #{$questionId} restored.");
+
+            if ($this->position_skill_id) {
+                $this->loadAssessmentQuestions($this->position_skill_id);
+            }
+
+            $this->dispatch('success', 'Question restored successfully.');
+        } else {
+            $this->dispatch('error', 'Question not found or already active.');
+        }
+    }
+
 
     public function updateAssessmentQuestions()
     {
@@ -165,7 +201,7 @@ class UpdateQuestions extends Component
                         $assessmentquestion = AssessmentQuestion::find($questionData['id']);
                         if ($assessmentquestion) {
                             $assessmentquestion->question = $questionData['question'];
-                            $assessmentquestion->points = $questionData['points'];
+                            $assessmentquestion->competency_level = $questionData['competency_level'];
                             $assessmentquestion->position_skill_id = $this->position_skill_id;
     
                             $totalSeconds = (
@@ -208,7 +244,7 @@ class UpdateQuestions extends Component
                     } else {
                         $assessmentquestion = new AssessmentQuestion();
                         $assessmentquestion->question = $questionData['question'];
-                        $assessmentquestion->points = $questionData['points'];
+                        $assessmentquestion->competency_level = $questionData['competency_level'];
                         $assessmentquestion->position_skill_id = $this->position_skill_id;
     
                         $totalSeconds = (

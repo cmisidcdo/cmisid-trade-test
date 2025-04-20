@@ -150,45 +150,50 @@
             </div>
 
             <div class="modal fade" id="officeModal" tabindex="-1" aria-labelledby="officeModalLabel" aria-hidden="true" wire:ignore.self>
-                <div class="modal-dialog modal-dialog-centered modal-lg">
+                <div class="modal-dialog modal-dialog-centered">
                     <div class="modal-content shadow">
                         <div class="modal-header bg-primary text-white py-2">
-                                <h5 class="modal-title fw-bold text-center w-100 fs-6" id="officeModalLabel">
-                                    {{$editMode ? 'Update Office' : 'Add Office'}}
-                                </h5>
+                            <h5 class="modal-title fs-6" id="officeModalLabel">
+                                {{$editMode ? 'Update Office' : 'Add Office'}}
                             </h5>
-                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" wire:click='clear'></button>
+                            <button type="button" class="btn-close btn-sm btn-close-white" data-bs-dismiss="modal" aria-label="Close" wire:click='clear'></button>
                         </div>
-                        <div class="modal-body p-4">
+                        <div class="modal-body p-3">
                             <form class="needs-validation" wire:submit="{{$editMode ? 'updateOffice' : 'createOffice'}}">
-                                <div class="mb-4">
-                                    <label for="officeTitle" class="form-label fw-medium">Office Title</label>
-                                    <input type="text" class="form-control form-control-lg {{$errors->has('title') ? 'is-invalid' : ''}}"
+                                <div class="mb-3">
+                                    <label for="officeTitle" class="form-label small fw-medium">Office Title</label>
+                                    <input type="text" class="form-control {{$errors->has('title') ? 'is-invalid' : ''}}"
                                         id="officeTitle"
                                         wire:model="title"
                                         placeholder="Enter office title"
                                         autocomplete="off">
                                     @error('title')
-                                    <div class="invalid-feedback">
+                                    <div class="invalid-feedback small">
                                         <i class="bi bi-exclamation-circle me-1"></i>
                                         {{$message}}
                                     </div>
                                     @enderror
                                 </div>
-
-                                <div class="mb-4">
-                                    <label class="form-label fw-semibold">Is Active?</label>
-                                    <div>
-                                        <input type="radio" wire:model="status" value="yes" {{ $status === 'yes' || !$editMode ? 'checked' : '' }}> Yes
-                                        <input type="radio" wire:model="status" value="no" {{ $status === 'no' ? 'checked' : '' }}> No
+            
+                                <div class="mb-3">
+                                    <label class="form-label small fw-medium">Is Active?</label>
+                                    <div class="d-flex gap-3">
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="radio" wire:model="status" value="yes" id="statusYes" {{ $status === 'yes' || !$editMode ? 'checked' : '' }}>
+                                            <label class="form-check-label small" for="statusYes">Yes</label>
+                                        </div>
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="radio" wire:model="status" value="no" id="statusNo" {{ $status === 'no' ? 'checked' : '' }}>
+                                            <label class="form-check-label small" for="statusNo">No</label>
+                                        </div>
                                     </div>
                                 </div>
-
-                                <div class="d-grid gap-2 d-md-flex justify-content-md-end mt-4">
-                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" wire:click='clear'>
+            
+                                <div class="d-flex justify-content-end gap-2 mt-3">
+                                    <button type="button" class="btn btn-sm btn-outline-secondary" data-bs-dismiss="modal" wire:click='clear'>
                                         Cancel
                                     </button>
-                                    <button type="submit" class="btn btn-primary px-4">
+                                    <button type="submit" class="btn btn-sm btn-primary">
                                         {{ $editMode ? 'Update' : 'Save' }}
                                     </button>
                                 </div>

@@ -62,41 +62,35 @@
         <!-- Enhanced Modal -->
         <div class="modal fade" id="permissionModal" tabindex="-1" aria-labelledby="permissionModalLabel" aria-hidden="true" wire:ignore.self>
             <div class="modal-dialog modal-dialog-centered">
-                <div class="modal-content border-0 shadow">
-                    <div class="modal-header bg-light">
-                        <h5 class="modal-title" id="permissionModalLabel">
-                            <i class="bi bi-plus-circle me-2"></i>
-                            Add New Permission
-                        </h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" wire:click='clear'></button>
+                <div class="modal-content shadow">
+                    <div class="modal-header py-2 bg-light">
+                        <h5 class="modal-title fw-bold text-center w-100 mb-0 fs-6" id="permissionModalLabel">Add Permission</h5>
+                        <button type="button" class="btn-close btn-sm" data-bs-dismiss="modal" aria-label="Close" wire:click='clear'></button>
                     </div>
-                    <div class="modal-body p-4">
+                    <div class="modal-body p-3">
                         <form class="needs-validation" wire:submit="createPermission">
-                            <div class="mb-4">
-                                <label for="permissionName" class="form-label fw-medium">Permission Name</label>
-                                <input type="text" class="form-control form-control-lg {{$errors->has('permission_name') ? 'is-invalid' : ''}}"
+                            <div class="mb-3">
+                                <label for="permissionName" class="form-label small fw-medium">Permission Name</label>
+                                <input type="text" class="form-control {{$errors->has('permission_name') ? 'is-invalid' : ''}}"
                                     id="permission_name"
                                     wire:model="permission_name"
-                                    placeholder="Enter permission permission_name"
+                                    placeholder="Enter Permission Name"
                                     autocomplete="off">
                                 @error('permission_name')
-                                <div class="invalid-feedback">
+                                <div class="invalid-feedback small">
                                     <i class="bi bi-exclamation-circle me-1"></i>
                                     {{$message}}
                                 </div>
                                 @enderror
                             </div>
-                            <div class="d-grid gap-2 d-md-flex justify-content-md-end mt-4">
-                                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal" wire:click='clear'>
+                            <div class="d-flex justify-content-end gap-2 mt-3">
+                                <button type="button" class="btn btn-sm btn-outline-secondary" data-bs-dismiss="modal" wire:click='clear'>
                                     Cancel
                                 </button>
-                                <button type="submit" class="btn btn-primary px-4">
-                                    <span wire:loading.remove wire:target="createPermission">
-                                        Save
-                                    </span>
+                                <button type="submit" class="btn btn-sm btn-primary">
+                                    <span wire:loading.remove wire:target="createPermission">Save</span>
                                     <span wire:loading wire:target="createPermission">
                                         <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
-                                        Processing...
                                     </span>
                                 </button>
                             </div>
@@ -105,8 +99,6 @@
                 </div>
             </div>
         </div>
-    </section>
-</div>
 
 @push('styles')
 <style>

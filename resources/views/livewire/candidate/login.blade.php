@@ -36,8 +36,8 @@
                     </div>
                     <form id="loginForm" wire:submit.prevent="login">
                         <div class="input-group mb-3">
-                            <input type="text" wire:model="fullname" class="form-control form-control-lg rounded-3 bg-light fs-6 @error('code') is-invalid @enderror" placeholder="Enter Code" aria-label="Unique Code" required>
-                            @error('fullname')
+                            <input type="text" wire:model="inputcode" class="form-control form-control-lg rounded-3 bg-light fs-6 @error('code') is-invalid @enderror" placeholder="Enter Code" aria-label="Unique Code" required>
+                            @error('inputcode')
                             <span class="invalid-feedback" role="alert">
                                 <strong>{{ $message }}</strong>
                             </span>

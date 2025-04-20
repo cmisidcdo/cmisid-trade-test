@@ -78,7 +78,7 @@ class ViewQuestions extends Component
                 return [
                     'id' => $question->id,
                     'question' => $question->question,
-                    'points' => $question->points,
+                    'competency_level' => $question->competency_level,
                     'hours' => floor($question->duration / 3600),
                     'minutes' => floor(($question->duration % 3600) / 60),
                     'seconds' => $question->duration % 60,

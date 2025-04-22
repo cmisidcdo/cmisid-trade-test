@@ -2,6 +2,7 @@
 
 namespace App\Livewire\Scores;
 
+use App\Models\OralScoreSkill;
 use Illuminate\Support\Facades\Log;
 use Livewire\Component;
 use App\Models\OralScore;
@@ -17,10 +18,10 @@ class OralScores extends Component
     public $title, $skill_id, $status;
     public $assigned_date, $oralScores, $dateFinished, $timeFinished, $candidateName, $candidate_id, $assessorName, $access_code, $draft_status = 'draft';
 
-    public $venues = [], $oralscoreskills = [];
+    public $venues = [], $evaluation = [], $oralscoreskills = [];
     public $selectedcandidate;
 
-    public $oralScoreId; 
+    public $oralScoreId, $oral_skillId, $skillname; 
 
     public function render()
     {
@@ -62,5 +63,65 @@ class OralScores extends Component
 
         $this->dispatch('show-oralScoreModal');
     }
+
+    public function evaluateSkill($oralskillId)
+    {
+        $oral_scoreskill = OralScoreSkill::findOrFail($oralskillId);
+        $this->oral_skillId = $oralskillId;
+        $this->evaluation = [
+            'knowledge' => $oral_scoreskill->knowledge ?? '',
+            'problem_solving' => $oral_scoreskill->problem_solving ?? '',
+            'completeness' => $oral_scoreskill->completeness ?? '',
+            'recommendation' => $oral_scoreskill->recommendation ?? '',
+            'comment' => $oral_scoreskill->comment ?? '',
+        ];
+
+        $this->skillname = optional($oral_scoreskill->position_skill->skill)->title ?? 'N/A';
+
+        $this->dispatch('show-evaluationModal');
+    }
+
+    public function submitEvaluation()
+    {
+        $this->validate([
+            'evaluation.knowledge' => 'required|integer|min:1|max:10',
+            'evaluation.problem_solving' => 'required|integer|min:1|max:10',
+            'evaluation.completeness' => 'required|integer|min:1|max:10',
+            'evaluation.recommendation' => 'nullable|string|max:255',
+            'evaluation.comment' => 'nullable|string|max:255',
+        ]);
+        $score = OralScoreSkill::findOrFail($this->oral_skillId);
+    
+        $average_score = round((
+            $this->evaluation['knowledge'] +
+            $this->evaluation['problem_solving'] +
+            $this->evaluation['completeness']
+        ) / 3, 2);
+
+        \Log::info('Submitting oral evaluation', [
+            'oral_skill_id' => $this->oral_skillId,
+            'scores' => [
+                'knowledge' => $this->evaluation['knowledge'],
+                'problem_solving' => $this->evaluation['problem_solving'],
+                'completeness' => $this->evaluation['completeness'],
+                'average' => $average_score
+            ],
+            'recommendation' => $this->evaluation['recommendation'],
+            'comment' => $this->evaluation['comment']
+        ]);
+
+        $score->update([
+            'knowledge' => $this->evaluation['knowledge'],
+            'problem_solving' => $this->evaluation['problem_solving'],
+            'completeness' => $this->evaluation['completeness'], 
+            'score' => $average_score,
+            'recommendation' => $this->evaluation['recommendation'],
+            'comment' => $this->evaluation['comment'],
+        ]);
+
+        $this->dispatch('hide-evaluationModal');
+        session()->flash('message', 'Evaluation submitted successfully.');
+    }
+
 
 }

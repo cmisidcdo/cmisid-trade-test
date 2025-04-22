@@ -15,7 +15,13 @@ return new class extends Migration
             $table->id();
             $table->foreignId('practical_score_id')->constrained('practical_scores')->onDelete('cascade');
             $table->foreignId('position_skill_id')->constrained('position_skills')->onDelete('cascade');
-            $table->integer('score')->default(0);
+            $table->decimal('score', 3, 2)->nullable();
+            $table->tinyInteger('task_completion')->nullable();
+            $table->tinyInteger('accuracy')->nullable();
+            $table->tinyInteger('problem_solving')->nullable();
+            $table->tinyInteger('efficiency')->nullable();
+            $table->string('recommendation')->nullable();
+            $table->string('comment')->nullable();
             $table->timestamps();
         });
     }

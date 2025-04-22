@@ -196,8 +196,6 @@ class Practicallist extends Component
         $this->dispatch('show-assignedPracticalModal');
     }
 
-
-
     public function selectCandidates()
     {
         $this->dispatch('show-candidatesModal');

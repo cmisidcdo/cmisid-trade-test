@@ -165,12 +165,12 @@
                                                     <button class="btn btn-sm btn-outline-dark me-1" data-bs-toggle="modal" data-bs-target="#viewModal" data-bs-placement="top" title="View">
                                                         <i class="bi bi-eye-fill"></i>
                                                     </button></td>
-                                                <td style="border: 1px solid black;">{{ $item->completion ?? 'N/A' }}</td>
-                                                <td style="border: 1px solid black;">{{ $item->accuracy ?? 'N/A' }}</td>
+                                                <td style="border: 1px solid black;">{{ $item->knowledge ?? 'N/A' }}</td>
+                                                <td style="border: 1px solid black;">{{ $item->completeness ?? 'N/A' }}</td>
                                                 <td style="border: 1px solid black;">{{ $item->problem_solving ?? 'N/A' }}</td>
-                                                <td style="border: 1px solid black;">{{ $item->aoralscores->total_score ?? 'N/A' }}</td>
+                                                <td style="border: 1px solid black;">{{ $item->score ?? 'N/A' }}</td>
                                                 <td style="border: 1px solid black;">
-                                                    <button class="btn btn-sm btn-outline-primary me-1" data-bs-toggle="modal" data-bs-target="#oralScoreModal" title="Edit">
+                                                    <button class="btn btn-sm btn-outline-primary me-1" wire:click='evaluateSkill({{$item->id}})' title="Edit">
                                                         <i class="bi bi-pencil-square"></i>
                                                     </button>
                                                 </td>
@@ -191,7 +191,60 @@
                 </div>
                 
                 
-                
+                <div class="modal fade" id="evaluationModal" tabindex="-1" aria-labelledby="evaluationModalLabel" aria-hidden="true" wire:ignore.self>>
+                    <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="evaluationModalLabel">{{ $skillname }} Score</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                            </div>
+
+                            <form wire:submit.prevent="submitEvaluation">
+                                <div class="modal-body">
+                                    <div class="row g-4">
+                                        <div class="col-md-6 d-flex flex-column gap-3">
+                                            <div class="d-flex align-items-center">
+                                                <label class="form-label me-3 mb-0" style="min-width: 180px;">Knowledge & Understanding</label>
+                                                <input type="number" class="form-control" wire:model="evaluation.knowledge" min="1" max="10">
+                                            </div>
+                                            <div class="d-flex align-items-center">
+                                                <label class="form-label me-3 mb-0" style="min-width: 180px;">Completeness & Relevance of Responses</label>
+                                                <input type="number" class="form-control" wire:model="evaluation.completeness" min="1" max="10">
+                                            </div>
+                                            <div class="d-flex align-items-center">
+                                                <label class="form-label me-3 mb-0" style="min-width: 180px;">Problem Solving & Troubleshooting</label>
+                                                <input type="number" class="form-control" wire:model="evaluation.problem_solving" min="1" max="10">
+                                            </div>
+                                        </div>
+
+                                        <div class="col-md-6">
+                                            <div class="mb-3">
+                                                <label class="form-label">Recommendation</label>
+                                                <textarea class="form-control" rows="4" wire:model.live.debounce.500ms="evaluation.recommendation" maxlength="255"></textarea>
+                                                <div class="text-end small text-muted">
+                                                    <span>{{ strlen($evaluation['recommendation'] ?? '') }}</span> / 255
+                                                </div>
+                                            </div>
+                                            <div>
+                                                <label class="form-label">Comment</label>
+                                                <textarea class="form-control" rows="4" wire:model.live.debounce.500ms="evaluation.comment" maxlength="255"></textarea>
+                                                <div class="text-end small text-muted">
+                                                    <span>{{ strlen($evaluation['comment'] ?? '') }}</span> / 255
+                                                </div>
+                                            </div>
+                                        </div>                        
+                                    </div>
+                                </div>
+
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                                    <button type="submit" class="btn btn-primary" wire:click="submitEvaluation">Submit Evaluation</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+
             </div>
         </div>
     </section>
@@ -219,6 +272,16 @@
 
     $wire.on('show-oralScoreModal', () => {
         $('#oralScoreModal').modal('show');
+    });
+
+    $wire.on('show-evaluationModal', () => {
+        bootstrap.Modal.getInstance(document.getElementById('oralScoreModal')).hide();
+        new bootstrap.Modal(document.getElementById('evaluationModal')).show();
+    });
+
+    $wire.on('hide-evaluationModal', () => {
+        new bootstrap.Modal(document.getElementById('oralScoreModal')).show();
+        bootstrap.Modal.getInstance(document.getElementById('evaluationModal')).hide();
     });
 
 </script>

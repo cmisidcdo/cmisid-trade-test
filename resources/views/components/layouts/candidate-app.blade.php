@@ -142,12 +142,12 @@
             </a>
           </li>
           <li>
-            <a class="{{ Request::routeIs('candidate.exam.practical') ? 'active' : '' }}" href="{{ route('candidate.exam.practical') }}">
+            <a class="{{ Request::routeIs('candidate.exam.practicalcode') ? 'active' : '' }}" href="{{ route('candidate.exam.practicalcode') }}">
               <i class="bi bi-person-fill-gear fs-5"></i><span>Practical Exams</span>
             </a>
           </li>
           <li>
-            <a class="{{ Request::routeIs('candidate.exam.oral') ? 'active' : '' }}" href="{{ route('candidate.exam.oral') }}">
+            <a class="{{ Request::routeIs('candidate.exam.oralcode') ? 'active' : '' }}" href="{{ route('candidate.exam.oralcode') }}">
               <i class="bi bi-wechat fs-5"></i><span>Oral Interviews</span>
             </a>
           </li>

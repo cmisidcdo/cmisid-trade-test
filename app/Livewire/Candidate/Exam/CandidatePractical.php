@@ -8,6 +8,6 @@ class CandidatePractical extends Component
 {
     public function render()
     {
-        return view('livewire.candidate.exam.candidate-practical')->layout('components.layouts.candidate-app');
+        return view('livewire.candidate.exam.candidate-practical')->layout('components.layouts.candidate-exam');
     }
 }

@@ -91,10 +91,7 @@
                                 <td style="border: 1px solid black;">{{ $item->status ?? 'N/A' }}</td>
                                 <td style="border: 1px solid black;">{{ $item->total_score ?? 'N/A' }}</td>
                                 <td style="border: 1px solid black;">
-                                    <button class="btn btn-sm btn-outline-dark me-1" data-bs-toggle="modal" data-bs-target="#viewModal" data-bs-placement="top" title="View">
-                                        <i class="bi bi-eye-fill"></i>
-                                    </button>
-                                    <button class="btn btn-sm btn-outline-primary me-1" data-bs-toggle="modal" data-bs-target="#assessmentScoreModal" title="Edit">
+                                    <button class="btn btn-sm btn-outline-primary me-1" wire:click='readAssessmentScore({{$item->id}})' title="Edit">
                                         <i class="bi bi-pencil-square"></i>
                                     </button>
                                 </td>
@@ -112,67 +109,85 @@
                 </div>
                 
 
-                    <div class="modal fade" id="assessmentScoreModal" tabindex="-1" aria-labelledby="assessmentScoreModalLabel" aria-hidden="true"  wire:ignore.self>
-                        <div class="modal-dialog modal-dialog-centered modal-lg">
-                            <div class="modal-content" style="border-radius: 12px;">
-                                <div class="modal-body p-4">
-                                    <h5 class="text-center mb-4 fw-bold text-dark">Add Schedule for Assessment Test</h5>
-                                    <form wire:submit.prevent="{{$editMode ? 'updateassessmentScore' : 'createassessmentScore'}}">
-                                        <div class="row g-3">
-                    
-                                            <div class="col-md-6">
-                                                <div class="input-group">
-                                                    <input type="text" id="selectedCandidate" class="form-control border-dark rounded-start-3" wire:model="selectedcandidate.fullname" placeholder="Candidate Name" readonly>
-                                                    <button type="button" class="btn btn-outline-primary rounded-end-3 px-3" wire:click='selectCandidates'>
-                                                        Select
-                                                    </button>
-                                                </div>
-                                            </div>
-
-                                            <div class="col-md-6">
-                                                <select class="form-select border-dark rounded-3" wire:model="draft_status" id="status">
-                                                    <option value="draft" selected>Draft</option>
-                                                    <option value="published">Publish</option>
-                                                </select>
-                                            </div>
-                    
-                                            <div class="col-md-6">
-                                                <input type="date" class="form-control border-dark rounded-3" wire:model="assigned_date" id="selectDate">
-                                            </div>
-                    
-                                            <div class="col-md-6">
-                                                <input type="time" class="form-control border-dark rounded-3" wire:model="assigned_time" id="selectTime">
-                                            </div>
-                                            
-                                            <div class="col-md-12">
-                                                <label for="venue_id" class="form-label small">Venue</label>
-                                                <select class="form-select border-dark rounded-3" id="venue_id" wire:model="venue_id" required>
-                                                    <option value="">Select Venue</option>
-                                                    @foreach($venues as $venue)
-                                                    <option value="{{ $venue->id }}">{{ $venue->name }}, {{ $venue->location }}</option>
-                                                    @endforeach
-                                                </select>
-                                                @error('venue_id') <span class="text-danger small">{{ $message }}</span> @enderror
-                                            </div>
-                                        </div>
-                    
-                                        <hr class="my-4 border-dark">
-
-                                        <div class="d-flex justify-content-between">
-
-                                            <button type="button" class="btn btn-outline-secondary btn-sm d-flex align-items-center px-3" data-bs-dismiss="modal">
-                                                <i class="bi bi-arrow-left me-2"></i> Back
-                                            </button>
-
-                                            <button type="submit" class="btn btn-primary btn-sm d-flex align-items-center px-3">
-                                                <i class="bi bi-check-circle me-2"></i> Create Schedule
-                                            </button>
-                                        </div>
-                                    </form>
+                <div class="modal fade" id="assessmentScoreModal" tabindex="-1" aria-labelledby="assessmentScoreModalLabel" aria-hidden="true" wire:ignore.self>
+                    <div class="modal-dialog modal-dialog-centered modal-xl"> 
+                        <div class="modal-content" style="border-radius: 12px;">
+                            <div class="modal-body p-4">
+                                <h5 class="text-center mb-4 fw-bold text-dark">(Edit) Assessment Test</h5>
+                
+                                <div class="row mb-3">
+                                    <div class="col-md-6">
+                                        <label for="candidate" class="form-label fw-semibold fs-6">Candidate</label>
+                                        <input type="text" class="form-control form-control-sm" id="candidate" wire:model="candidateName" readonly>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label for="assessor" class="form-label fw-semibold fs-6">Assessor</label>
+                                        <input type="text" class="form-control form-control-sm" id="assessor" wire:model="assessorName" readonly>
+                                    </div>
                                 </div>
+                
+                                <div class="row mb-4">
+                                    <div class="col-md-4">
+                                        <label class="form-label fw-semibold fs-6">Date Finished</label>
+                                        <input type="text" class="form-control form-control-sm" wire:model="dateFinished" readonly>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <label class="form-label fw-semibold fs-6">Time Finished</label>
+                                        <input type="text" class="form-control form-control-sm" wire:model="timeFinished" readonly>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <label class="form-label fw-semibold fs-6">Status</label>
+                                        <input type="text" class="form-control form-control-sm" wire:model="status" readonly>
+                                    </div>
+                                </div>
+                
+                                <table class="table table-hover align-middle border global-table">
+                                    <thead style="border-collapse: collapse;">
+                                        <tr>
+                                            <th scope="col" class="text-center" width="5%">#</th>
+                                            <th>Skills Assigned</th>
+                                            <th>Competency Level</th>
+                                            <th>Questions</th>
+                                            <th>Candidate Score</th>
+                                            <th>Final Score</th>
+                                            <th>Action</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody style="border: 1px solid #ccc; border-collapse: collapse;">
+                                        @forelse($assessmentscoreskills as $item)
+                                            <tr>
+                                                <td style="border: 1px solid black;">{{$loop->iteration}}</td>
+                                                <td style="border: 1px solid black;">{{ $item->skill->title ?? 'N/A' }}</td>
+                                                <td style="border: 1px solid black;">{{ $item->position_skill->competency_level ?? 'N/A' }}</td>
+                                                <td style="border: 1px solid black;">  
+                                                    <button class="btn btn-sm btn-outline-dark me-1" data-bs-toggle="modal" data-bs-target="#viewModal" data-bs-placement="top" title="View">
+                                                        <i class="bi bi-eye-fill"></i>
+                                                    </button></td>
+                                                <td style="border: 1px solid black;">{{ $item->skill_score ?? 'N/A' }}</td>
+                                                <td style="border: 1px solid black;">{{ $item->assessmentscore->total_score ?? 'N/A' }}</td>
+                                                <td style="border: 1px solid black;">
+                                                    <button class="btn btn-sm btn-outline-primary me-1" data-bs-toggle="modal" data-bs-target="#assessmentScoreModal" title="Edit">
+                                                        <i class="bi bi-pencil-square"></i>
+                                                    </button>
+                                                </td>
+                                            </tr>
+                                        @empty
+                                            <tr>
+                                                <td colspan="9" class="text-center py-4 text-muted">
+                                                    <i class="bi bi-inbox fs-3 d-block mb-2"></i>
+                                                    No assessment scores found
+                                                </td>
+                                            </tr>
+                                        @endforelse
+                                    </tbody>
+                                </table>
                             </div>
                         </div>
                     </div>
+                </div>
+                
+                
+                
             </div>
         </div>
     </section>

@@ -1,6 +1,6 @@
 <div>
     <div class="card-header text-white text-center py-3" style="background-color: #1a1851; border-radius: 12px 12px 0 0;">
-        <h2 class="fw-bold m-0">Assessment List Test </h2>
+        <h2 class="fw-bold m-0">Assessment Test List</h2>
     </div>
     <section class="section dashboard">
         <div class="card shadow-sm border-0 rounded-3">

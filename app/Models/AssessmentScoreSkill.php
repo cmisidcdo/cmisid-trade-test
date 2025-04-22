@@ -14,4 +14,13 @@ class AssessmentScoreSkill extends Model
         return $this->belongsTo(AssessmentScore::class, 'assessment_scores_id');
     }
 
+    public function position_skill()
+    {
+        return $this->belongsTo(PositionSkill::class);
+    }
+
+    public function getSkillAttribute()
+    {
+        return $this->position_skill?->skill;
+    }
 }

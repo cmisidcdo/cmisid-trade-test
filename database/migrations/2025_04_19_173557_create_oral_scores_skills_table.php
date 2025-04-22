@@ -13,9 +13,9 @@ return new class extends Migration
     {
         Schema::create('oral_scores_skills', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('oral_scores_id')->constrained('oral_scores')->onDelete('cascade');
-            $table->foreignId('positon_skill_id')->constrained('position_skills')->onDelete('cascade');
-            $table->integer('score')->default(0);
+            $table->foreignId('oral_score_id')->constrained('oral_scores')->onDelete('cascade');
+            $table->foreignId('position_skill_id')->constrained('position_skills')->onDelete('cascade');
+            $table->tinyInteger('score')->default(0);
             $table->timestamps();
         });
     }

@@ -2,22 +2,10 @@
 
 namespace App\Livewire\Scores;
 
-use App\Models\AssignedAssessment;
-use App\Models\Candidate;
-use App\Models\Venue;
 use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Validation\Rule;
-use Illuminate\Support\Str; 
 use Livewire\Component;
-use Livewire\WithPagination;
-use Carbon\Carbon;
 use App\Models\AssessmentScore;
-use App\Models\Position;
-use App\Models\AssessmentScoreSkill;
-use App\Models\PositionSkill;
-use App\Models\AssessmentQuestion;
-use App\Models\AssessmentScoreSkillQuestion;
+
 
 
 class AssessmentScores extends Component
@@ -29,15 +17,17 @@ class AssessmentScores extends Component
     public $search;
     public $filterStatus = 'all'; 
     public $title, $skill_id, $status;
-    public $assigned_date, $assessmentScores, $assigned_time, $venue_id, $candidate_id, $candidate_name, $access_code, $draft_status = 'draft';
+    public $assigned_date, $assessmentScores, $dateFinished, $timeFinished, $candidateName, $candidate_id, $assessorName, $access_code, $draft_status = 'draft';
 
-    public $venues = [];
+    public $venues = [], $assessmentscoreskills = [];
     public $selectedcandidate;
+
+    public $assessmentScoreId; 
 
     public function render()
     {
         return view('livewire.scores.assessment-scores', [
-            'assessmentscores' => $this->loadAssessmentScores(),         
+            'assessmentscores' => $this->loadAssessmentScores(),    
         ]);
     }
 
@@ -55,6 +45,24 @@ class AssessmentScores extends Component
             })
             ->orderByDesc('created_at')
             ->paginate(10);
+    }
+
+    public function readAssessmentScore($assessmentscoreId)
+    {
+        $assessmentscore = AssessmentScore::with('candidate') 
+            ->findOrFail($assessmentscoreId);
+        $this->fill([
+            'candidateName' => $assessmentscore->candidate?->fullname ?? 'N/A',
+            'assessorName' => 'N/A', 
+            'dateFinished' => $assessmentscore->date_finished ?? 'N/A',
+            'timeFinished' => $assessmentscore->time_finished ?? 'N/A',
+            'status' => $assessmentscore->status ?? 'N/A',
+            'assessmentscoreskills' => $assessmentscore->assessmentScoreSkills, 
+        ]);
+
+        $this->editMode = true;
+
+        $this->dispatch('show-assessmentScoreModal');
     }
 
 }

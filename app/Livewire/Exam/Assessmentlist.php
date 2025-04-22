@@ -297,32 +297,6 @@ class Assessmentlist extends Component
         $this->dispatch('success', 'Skill updated successfully.');
     }
 
-    public function confirmDelete($id)
-    {
-
-        $this->dispatch('confirm-delete', 
-            message: 'This skill will be sent to archive',
-            eventName: 'deleteSkill',
-            eventData: ['id' => $id]
-        );
-    }
-
-    
-    public function deleteAssignedAssessment($id)
-    {
-        AssignedAssessment::findOrFail($id)->delete();
-
-        $this->dispatch('success', 'Skill archived successfully');
-    }
-
-    public function restoreSkill($skill_id)
-    {
-        $skill = AssignedAssessment::withTrashed()->findOrFail($skill_id);
-        $skill->restore();
-    
-        $this->dispatch('success', 'Skill restored successfully.');
-    }
-
     public function showAddEditModal()
     {
         $this->clear();

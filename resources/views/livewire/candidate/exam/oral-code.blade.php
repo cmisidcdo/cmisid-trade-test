@@ -72,7 +72,7 @@
     </style>
 
     <script>
-            document.addEventListener('DOMContentLoaded', function () {
+    document.addEventListener('DOMContentLoaded', function () {
         const startButton = document.getElementById('startInterview');
         const confirmButton = document.getElementById('confirmInterview');
 

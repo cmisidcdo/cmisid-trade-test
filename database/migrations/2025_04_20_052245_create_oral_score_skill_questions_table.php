@@ -13,13 +13,13 @@ return new class extends Migration
     {
         Schema::create('oral_score_skill_questions', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('assessment_score_skill_id')
-                    ->constrained('assessment_score_skills')
+            $table->foreignId('oral_score_skill_id')
+                    ->constrained('oral_score_skills')
                     ->onDelete('cascade')
                     ->name('fk_ass_score_skill'); 
 
-            $table->foreignId('assessmentquestion_id')
-                    ->constrained('assessmentquestions')
+            $table->foreignId('oral_question_id')
+                    ->constrained('oral_questions')
                     ->onDelete('cascade');
 
             $table->tinyInteger('knowledge')->nullable();

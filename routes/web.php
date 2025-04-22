@@ -9,6 +9,8 @@ use App\Livewire\Candidate\Exam\OralCode;
 use App\Livewire\Candidate\Exam\PracticalCode;
 use App\Livewire\Candidate\Home;
 use App\Livewire\Candidate\Login;
+use App\Livewire\Exam\OralScheduledQuestions;
+use App\Livewire\Exam\OralScheduledQuestionsUpdate;
 use App\Livewire\Exam\PracticalScheduledScenarios;
 use App\Livewire\Exam\PracticalScheduledScenariosUpdate;
 use App\Livewire\References\Scoresheets\OralScoring;
@@ -89,6 +91,8 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/exam/interviewlist', Interviewlist::class)->name('exam.interviewlist');
     Route::get('/exam/practical-scheduled-scenarios/{newAssignedId}', PracticalScheduledScenarios::class)->name('exam.practicalscheduledscenarios');
     Route::get('/exam/practical-scheduled-scenarios-update/{AssignedId}', PracticalScheduledScenariosUpdate::class)->name('exam.practicalscheduledscenariosupdate');
+    Route::get('/exam/oral-scheduled-scenarios/{newAssignedId}', OralScheduledQuestions::class)->name('exam.oralscheduledquestions');
+    Route::get('/exam/oral-scheduled-scenarios-update/{AssignedId}', OralScheduledQuestionsUpdate::class)->name('exam.oralscheduledquestionsupdate');
     Route::get('/references/criterias/practical', Practical::class)->name('references.criterias.practical');
     Route::get('/references/criterias/oral', Oral:: class)->name('references.criterias.oral');
     Route::get('/references/scoresheets/practical', PracticalScoring::class)->name('references.scoresheets.practical');

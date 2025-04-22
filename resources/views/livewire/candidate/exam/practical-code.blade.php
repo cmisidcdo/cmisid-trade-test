@@ -85,5 +85,18 @@
     </style>
     <!-- Add Bootstrap and custom JS -->
     <script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const startButton = document.getElementById('startInterview');
+        const confirmButton = document.getElementById('confirmInterview');
+
+        startButton.addEventListener('click', function () {
+            const confirmationModal = new bootstrap.Modal(document.getElementById('confirmationModal'));
+            confirmationModal.show();
+        });
+
+        confirmButton.addEventListener('click', function () {
+            window.location.href = "{{ url('candidate/exam/practical') }}";
+        });
+    });
     </script>
 </div>

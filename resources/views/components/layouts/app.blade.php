@@ -438,6 +438,11 @@
             <i class="bi bi-wechat fs-5"></i><span>Oral Interview Scores & Notes</span>
           </a>
         </li>
+        <li>
+          <a class="{{ Request::routeIs('scores.candidatecompetency') ? 'active' : '' }}" href="{{ route('scores.candidatecompetency') }}">
+            <i class="bi bi-lightbulb fs-5"></i><span>Candidate Competency</span>
+          </a>
+        </li>
       </ul>
     </li>
   @endcan

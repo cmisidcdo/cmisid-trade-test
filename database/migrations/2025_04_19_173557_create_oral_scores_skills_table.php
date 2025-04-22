@@ -15,7 +15,12 @@ return new class extends Migration
             $table->id();
             $table->foreignId('oral_score_id')->constrained('oral_scores')->onDelete('cascade');
             $table->foreignId('position_skill_id')->constrained('position_skills')->onDelete('cascade');
-            $table->tinyInteger('score')->default(0);
+            $table->tinyInteger('knowledge')->nullable();
+            $table->tinyInteger('completeness')->nullable();
+            $table->tinyInteger('problem_solving')->nullable();
+            $table->decimal('score', 3, 2)->nullable();
+            $table->string('recommendation')->nullable();
+            $table->string('comment')->nullable();
             $table->timestamps();
         });
     }

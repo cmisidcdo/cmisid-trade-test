@@ -1,6 +1,6 @@
 <div>
     <div class="card-header text-white text-center py-3" style="background-color: #1a1851; border-radius: 12px 12px 0 0;">
-        <h2 class="fw-bold m-0">Assessment Scores </h2>
+        <h2 class="fw-bold m-0">Oral Interview Scores </h2>
     </div>
     <section class="section dashboard">
         <div class="card shadow-sm border-0 rounded-3">
@@ -82,7 +82,7 @@
                             </tr>
                         </thead>
                         <tbody style="border: 1px solid #ccc; border-collapse: collapse;">
-                            @forelse($assessmentscores as $item)
+                            @forelse($oralscores as $item)
                             <tr>
                                 <td style="border: 1px solid black;">{{$loop->iteration}}</td>
                                 <td style="border: 1px solid black;">{{ $item->candidate->fullname ?? 'N/A' }}</td>
@@ -91,7 +91,7 @@
                                 <td style="border: 1px solid black;">{{ $item->status ?? 'N/A' }}</td>
                                 <td style="border: 1px solid black;">{{ $item->total_score ?? 'N/A' }}</td>
                                 <td style="border: 1px solid black;">
-                                    <button class="btn btn-sm btn-outline-primary me-1" wire:click='readAssessmentScore({{$item->id}})' title="Edit">
+                                    <button class="btn btn-sm btn-outline-primary me-1" wire:click='readOralScore({{$item->id}})' title="Edit">
                                         <i class="bi bi-pencil-square"></i>
                                     </button>
                                 </td>
@@ -100,7 +100,7 @@
                             <tr>
                                 <td colspan="9" class="text-center py-4 text-muted">
                                     <i class="bi bi-inbox fs-3 d-block mb-2"></i>
-                                    No assessment scores found
+                                    No oral exam scores found
                                 </td>
                             </tr>
                             @endforelse
@@ -109,11 +109,11 @@
                 </div>
                 
 
-                <div class="modal fade" id="assessmentScoreModal" tabindex="-1" aria-labelledby="assessmentScoreModalLabel" aria-hidden="true" wire:ignore.self>
+                <div class="modal fade" id="oralScoreModal" tabindex="-1" aria-labelledby="oralScoreModalLabel" aria-hidden="true" wire:ignore.self>
                     <div class="modal-dialog modal-dialog-centered modal-xl"> 
                         <div class="modal-content" style="border-radius: 12px;">
                             <div class="modal-body p-4">
-                                <h5 class="text-center mb-4 fw-bold text-dark">(Edit) Assessment Test</h5>
+                                <h5 class="text-center mb-4 fw-bold text-dark">(Edit) oral Exam</h5>
                 
                                 <div class="row mb-3">
                                     <div class="col-md-6">
@@ -148,13 +148,15 @@
                                             <th>Skills Assigned</th>
                                             <th>Competency Level</th>
                                             <th>Questions</th>
-                                            <th>Candidate Score</th>
+                                            <th>Knowledge and Understanding</th>
+                                            <th>Completeness and Relevance of Responses</th>
+                                            <th>Problem Solving and Troubleshooting</th>
                                             <th>Final Score</th>
                                             <th>Action</th>
                                         </tr>
                                     </thead>
                                     <tbody style="border: 1px solid #ccc; border-collapse: collapse;">
-                                        @forelse($assessmentscoreskills as $item)
+                                        @forelse($oralscoreskills as $item)
                                             <tr>
                                                 <td style="border: 1px solid black;">{{$loop->iteration}}</td>
                                                 <td style="border: 1px solid black;">{{ $item->skill->title ?? 'N/A' }}</td>
@@ -163,10 +165,12 @@
                                                     <button class="btn btn-sm btn-outline-dark me-1" data-bs-toggle="modal" data-bs-target="#viewModal" data-bs-placement="top" title="View">
                                                         <i class="bi bi-eye-fill"></i>
                                                     </button></td>
-                                                <td style="border: 1px solid black;">{{ $item->skill_score ?? 'N/A' }}</td>
-                                                <td style="border: 1px solid black;">{{ $item->assessmentscore->total_score ?? 'N/A' }}</td>
+                                                <td style="border: 1px solid black;">{{ $item->completion ?? 'N/A' }}</td>
+                                                <td style="border: 1px solid black;">{{ $item->accuracy ?? 'N/A' }}</td>
+                                                <td style="border: 1px solid black;">{{ $item->problem_solving ?? 'N/A' }}</td>
+                                                <td style="border: 1px solid black;">{{ $item->aoralscores->total_score ?? 'N/A' }}</td>
                                                 <td style="border: 1px solid black;">
-                                                    <button class="btn btn-sm btn-outline-primary me-1" data-bs-toggle="modal" data-bs-target="#assessmentScoreModal" title="Edit">
+                                                    <button class="btn btn-sm btn-outline-primary me-1" data-bs-toggle="modal" data-bs-target="#oralScoreModal" title="Edit">
                                                         <i class="bi bi-pencil-square"></i>
                                                     </button>
                                                 </td>
@@ -175,7 +179,7 @@
                                             <tr>
                                                 <td colspan="9" class="text-center py-4 text-muted">
                                                     <i class="bi bi-inbox fs-3 d-block mb-2"></i>
-                                                    No assessment scores found
+                                                    No oral interview scores found
                                                 </td>
                                             </tr>
                                         @endforelse
@@ -209,12 +213,12 @@
         });
     });
 
-    $wire.on('hide-assessmentScoreModal', () => {
-        $('#assessmentScoreModal').modal('hide');
+    $wire.on('hide-oralScoreModal', () => {
+        $('#oralScoreModal').modal('hide');
     });
 
-    $wire.on('show-assessmentScoreModal', () => {
-        $('#assessmentScoreModal').modal('show');
+    $wire.on('show-oralScoreModal', () => {
+        $('#oralScoreModal').modal('show');
     });
 
 </script>

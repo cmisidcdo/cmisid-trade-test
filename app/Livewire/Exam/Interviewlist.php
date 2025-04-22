@@ -2,8 +2,12 @@
 
 namespace App\Livewire\Exam;
 
-use App\Models\AssignedAssessment;
+use App\Models\AssignedOral;
 use App\Models\Candidate;
+use App\Models\OralQuestion;
+use App\Models\OralScore;
+use App\Models\OralScoreSkill;
+use App\Models\OralScoreSkillScenario;
 use App\Models\Venue;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\DB;
@@ -12,12 +16,8 @@ use Illuminate\Support\Str;
 use Livewire\Component;
 use Livewire\WithPagination;
 use Carbon\Carbon;
-use App\Models\AssessmentScore;
 use App\Models\Position;
-use App\Models\AssessmentScoreSkill;
 use App\Models\PositionSkill;
-use App\Models\AssessmentQuestion;
-use App\Models\AssessmentScoreSkillQuestion;
 
 class Interviewlist extends Component
 {
@@ -32,13 +32,15 @@ class Interviewlist extends Component
     public $assigned_date, $assigned_time, $venue_id, $candidate_id, $candidate_name, $access_code, $draft_status = 'draft';
 
     public $venues = [];
-    public $selectedcandidate;
-    
+    public $selectedcandidate, $assignedoralId;
+
+    public $selected_candidate_name;
+
     public function render()
     {
 
         return view('livewire.exam.interviewlist', [
-            'assignedassessments' => $this->loadAssignedAssessments(),
+            'assignedOrals' => $this->loadAssignedOrals(),
             'candidates' => $this->getCandidates(),
             'selectedcandidate' => $this->selectedcandidate,            
         ]);
@@ -74,35 +76,12 @@ class Interviewlist extends Component
 
     }
 
-    public function toggleArchive()
-    {
-        $this->archive = !$this->archive;
-    }
-
-    public function getAssignedAssessments()
-    {
-        $query = AssignedAssessment::query();
-
-        if ($this->archive) {
-            $query->onlyTrashed(); 
-        }
-
-        return $query
-            ->when($this->search, function ($query) {
-                $query->where('title', 'like', '%' . $this->search . '%');
-            })
-            ->orderByDesc('created_at')
-            ->paginate(10);
-    }
-
-
-
-    public function loadAssignedAssessments()
+    public function loadAssignedOrals()
     {
         
-        return AssignedAssessment::with(['candidate', 'venue'])
-            ->selectRaw('assigned_assessments.*, 
-                        DATEDIFF(CURRENT_DATE, CONCAT(assigned_assessments.assigned_date, " ", assigned_assessments.assigned_time)) AS aging_days')
+        return AssignedOral::with(['candidate', 'venue'])
+            ->selectRaw('assigned_orals.*, 
+                        DATEDIFF(CURRENT_DATE, CONCAT(assigned_orals.assigned_date, " ", assigned_orals.assigned_time)) AS aging_days')
             ->when($this->search, function ($query) {
                 $query->where(function ($q) {
                     $q->where('title', 'like', '%' . $this->search . '%');
@@ -112,24 +91,27 @@ class Interviewlist extends Component
             ->paginate(10);
     }
 
-    public function createAssignedAssessment()
+    public function createAssignedOral()
     {
         try {
             $this->access_code = $this->generateUniqueAccessCode();
+            $newAssignedId = null;
 
-            DB::transaction(function () {
-                $assignedassessment = new AssignedAssessment();
-                $assignedassessment->candidate_id = $this->selectedcandidate['id'];
-                $assignedassessment->venue_id = $this->venue_id;
-                $assignedassessment->assigned_date = $this->assigned_date;
-                $assignedassessment->assigned_time = $this->assigned_time;
-                $assignedassessment->draft_status = $this->draft_status;
-                $assignedassessment->access_code = $this->access_code;
-                $assignedassessment->save();
+            DB::transaction(function () use (&$newAssignedId) {
+                $assignedoral = new AssignedOral();
+                $assignedoral->candidate_id = $this->selectedcandidate['id'];
+                $assignedoral->venue_id = $this->venue_id;
+                $assignedoral->assigned_date = $this->assigned_date;
+                $assignedoral->assigned_time = $this->assigned_time;
+                $assignedoral->draft_status = $this->draft_status;
+                $assignedoral->access_code = $this->access_code;
+                $assignedoral->save();
 
-                $assessmentScore = new AssessmentScore();
-                $assessmentScore->assigned_assessment_id = $assignedassessment->id;
-                $assessmentScore->save();
+                $newAssignedId = $assignedoral->id;
+
+                $oralScore = new OralScore();
+                $oralScore->assigned_oral_id = $assignedoral->id;
+                $oralScore->save();
 
                 $candidate = Candidate::findOrFail($this->selectedcandidate['id']);
                 $position = Position::find($candidate->position_id);
@@ -141,52 +123,12 @@ class Interviewlist extends Component
                         'item' => $position->item,
                     ]);
                 }
-
-                $positionSkills = PositionSkill::where('position_id', $candidate->position_id)->get();
-
-                $totalDuration = 0;
-
-                foreach ($positionSkills as $skill) {
-                    $assessmentScoreSkill = AssessmentScoreSkill::create([
-                        'assessment_scores_id' => $assessmentScore->id,
-                        'position_skill_id' => $skill->id,
-                    ]);
-
-                    $distribution = match ($skill->competency_level) {
-                        'basic' => ['basic' => 5, 'intermediate' => 2, 'advanced' => 1],
-                        'intermediate' => ['basic' => 2, 'intermediate' => 4, 'advanced' => 2],
-                        'advanced' => ['basic' => 1, 'intermediate' => 2, 'advanced' => 5],
-                        default => ['basic' => 0, 'intermediate' => 0, 'advanced' => 0],
-                    };
-
-                    foreach ($distribution as $level => $count) {
-                        $questions = AssessmentQuestion::where('position_skill_id', $skill->id)
-                            ->where('competency_level', $level)
-                            ->inRandomOrder()
-                            ->limit($count)
-                            ->get();
-
-                        foreach ($questions as $question) {
-                            AssessmentScoreSkillQuestion::create([
-                                'assessment_score_skill_id' => $assessmentScoreSkill->id,
-                                'assessmentquestion_id' => $question->id,
-                            ]);
-
-                            $totalDuration += $question->duration; // ⬅️ add each question's duration
-                        }
-                    }
-                }
-
-                $assessmentScore->total_duration = $totalDuration;
-                $assessmentScore->save();
             });
 
-            $this->clear();
-            $this->dispatch('hide-assignedAssessmentModal');
-            $this->dispatch('success', 'Schedule Created Successfully');
-
+            // $this->clear();
+            return redirect()->route('exam.oralscheduledquestions', $newAssignedId);
         } catch (\Exception $e) {
-            Log::error('Error creating assigned assessment: ' . $e->getMessage(), [
+            Log::error('Error creating assigned oral: ' . $e->getMessage(), [
                 'trace' => $e->getTraceAsString(),
                 'data' => [
                     'candidate' => $this->selectedcandidate,
@@ -201,6 +143,13 @@ class Interviewlist extends Component
         }
     }
 
+    public function updateOralQuestion($assignedInterviewId)
+    {
+        return redirect()->route('exam.oralscheduledquestionsupdate', $assignedInterviewId);
+    }
+
+
+
     private function loadDropdownData()
     {
         $this->venues = Venue::all();
@@ -210,7 +159,7 @@ class Interviewlist extends Component
     {
         do {
             $code = Str::upper(Str::random(5));
-        } while (AssignedAssessment::where('access_code', $code)->exists());
+        } while (AssignedOral::where('access_code', $code)->exists());
 
         return $code;
     }
@@ -224,21 +173,29 @@ class Interviewlist extends Component
         $this->loadDropdownData();
     }
 
-    public function readAssignedAssessment($skillId)
+    public function readAssignedOral($assignedOralId)
     {
         $this->loadDropdownData();
 
-        $skill = AssignedAssessment::withTrashed()->findOrFail($skillId);
+        $assigned_oral = AssignedOral::with('candidate')->findOrFail($assignedOralId);
 
-        $this->fill(
-            $skill->only(['title']) 
-        );
+        $this->fill([
+            'selected_candidate_id' => $assigned_oral->candidate_id,
+            'selected_candidate_name' => $assigned_oral->candidate->fullname ?? '',
+            'draft_status' => $assigned_oral->draft_status,
+            'assigned_date' => $assigned_oral->assigned_date,
+            'assigned_time' => $assigned_oral->assigned_time,
+            'venue_id' => $assigned_oral->venue_id,
+            'assignedoralId' =>$assigned_oral->id,
+        ]);
 
-        $this->skill_id = $skill->id;
+        $this->assigned_oral_id = $assigned_oral->id;
         $this->editMode = true;
-        $this->status = is_null($skill->deleted_at) ? 'yes' : 'no';
-        $this->dispatch('show-skillModal');
+
+        $this->dispatch('show-assignedOralModal');
     }
+
+
 
     public function selectCandidates()
     {
@@ -273,12 +230,12 @@ class Interviewlist extends Component
     
 
 
-    public function updateAssignedAssessment()
+    public function updateAssignedOral()
     {
         $this->validate();
 
         DB::transaction(function () {  
-            $skill = AssignedAssessment::withTrashed()->findOrFail($this->skill_id);
+            $skill = AssignedOral::withTrashed()->findOrFail($this->skill_id);
             
             $skill->title = $this->title;
             if ($this->status === 'no' && is_null($skill->deleted_at)) {
@@ -295,38 +252,12 @@ class Interviewlist extends Component
         $this->dispatch('success', 'Skill updated successfully.');
     }
 
-    public function confirmDelete($id)
-    {
-
-        $this->dispatch('confirm-delete', 
-            message: 'This skill will be sent to archive',
-            eventName: 'deleteSkill',
-            eventData: ['id' => $id]
-        );
-    }
-
-    
-    public function deleteAssignedAssessment($id)
-    {
-        AssignedAssessment::findOrFail($id)->delete();
-
-        $this->dispatch('success', 'Skill archived successfully');
-    }
-
-    public function restoreSkill($skill_id)
-    {
-        $skill = AssignedAssessment::withTrashed()->findOrFail($skill_id);
-        $skill->restore();
-    
-        $this->dispatch('success', 'Skill restored successfully.');
-    }
-
     public function showAddEditModal()
     {
         $this->clear();
         if (!$this->editMode) { 
             $this->status = 'yes'; 
         }
-        $this->dispatch('show-assignedAssessmentModal');
+        $this->dispatch('show-assignedOralModal');
     }
 }

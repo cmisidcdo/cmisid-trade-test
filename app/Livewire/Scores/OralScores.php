@@ -4,7 +4,7 @@ namespace App\Livewire\Scores;
 
 use Illuminate\Support\Facades\Log;
 use Livewire\Component;
-use App\Models\AssessmentScore;
+use App\Models\OralScore;
 
 class OralScores extends Component
 {
@@ -15,23 +15,23 @@ class OralScores extends Component
     public $search;
     public $filterStatus = 'all'; 
     public $title, $skill_id, $status;
-    public $assigned_date, $assessmentScores, $dateFinished, $timeFinished, $candidateName, $candidate_id, $assessorName, $access_code, $draft_status = 'draft';
+    public $assigned_date, $oralScores, $dateFinished, $timeFinished, $candidateName, $candidate_id, $assessorName, $access_code, $draft_status = 'draft';
 
-    public $venues = [], $assessmentscoreskills = [];
+    public $venues = [], $oralscoreskills = [];
     public $selectedcandidate;
 
-    public $assessmentScoreId; 
+    public $oralScoreId; 
 
     public function render()
     {
         return view('livewire.scores.oral-scores', [
-            'assessmentscores' => $this->loadAssessmentScores(),    
+            'oralscores' => $this->loadOralScores(),    
         ]);
     }
 
-    public function loadAssessmentScores()
+    public function loadOralScores()
     {
-        return AssessmentScore::with('candidate')
+        return OralScore::with('candidate')
             ->when($this->search, function ($query) {
                 $query->where('title', 'like', '%' . $this->search . '%')
                     ->orWhereHas('candidate', function ($q) {
@@ -45,21 +45,22 @@ class OralScores extends Component
             ->paginate(10);
     }
 
-    public function readAssessmentScore($assessmentscoreId)
+    public function readOralScore($oralscoreId)
     {
-        $assessmentscore = AssessmentScore::with('candidate') 
-            ->findOrFail($assessmentscoreId);
+        $oralscore = OralScore::with('candidate') 
+            ->findOrFail($oralscoreId);
         $this->fill([
-            'candidateName' => $assessmentscore->candidate?->fullname ?? 'N/A',
+            'candidateName' => $oralscore->candidate?->fullname ?? 'N/A',
             'assessorName' => 'N/A', 
-            'dateFinished' => $assessmentscore->date_finished ?? 'N/A',
-            'timeFinished' => $assessmentscore->time_finished ?? 'N/A',
-            'status' => $assessmentscore->status ?? 'N/A',
-            'assessmentscoreskills' => $assessmentscore->assessmentScoreSkills, 
+            'dateFinished' => $oralscore->date_finished ?? 'N/A',
+            'timeFinished' => $oralscore->time_finished ?? 'N/A',
+            'status' => $oralscore->status ?? 'N/A',
+            'oralscoreskills' => $oralscore->oralScoreSkills, 
         ]);
 
         $this->editMode = true;
 
-        $this->dispatch('show-assessmentScoreModal');
+        $this->dispatch('show-oralScoreModal');
     }
+
 }

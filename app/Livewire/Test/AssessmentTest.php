@@ -185,11 +185,11 @@ class AssessmentTest extends Component
     
     public function readAssessmentQuestion($positionId)
     {
+       
         $this->clear();
-    
         $this->editMode = true;
         $this->position_id = $positionId;
-    
+
         $this->updateSkills();
     
         $this->dispatch('show-assessmentquestionModal');
@@ -198,7 +198,6 @@ class AssessmentTest extends Component
     public function viewAssessmentQuestion($positionId)
     {
         $this->clear();
-    
         $this->viewMode = true;
         $this->position_id = $positionId;
     

@@ -101,7 +101,7 @@
                         </tbody>
                     </table>
                     <div>
-                        {{$venues->links()}}
+                        {{$venues->links(data: ['scrollTo' => false])}}
                       </div>
                 </div>
 
@@ -113,50 +113,51 @@
         </div>
 
         <div class="modal fade" id="venueModal" tabindex="-1" aria-labelledby="venueModalLabel" aria-hidden="true" wire:ignore.self>
-            <div class="modal-dialog modal-dialog-centered modal-lg">
+            <div class="modal-dialog modal-dialog-centered">
                 <div class="modal-content shadow">
                     <div class="modal-header bg-primary text-white py-2">
-                        <h5 class="modal-title fw-bold text-center w-100 fs-6" id="venueModalLabel">
-                            {{$editMode ? 'Update Venue' : 'Add New Venue'}}
+                        <h5 class="modal-title fs-6" id="venueModalLabel">
+                            {{$editMode ? 'Update Venue' : 'Add Venue'}}
                         </h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" wire:click='clear'></button>
+                        <button type="button" class="btn-close btn-sm btn-close-white" data-bs-dismiss="modal" aria-label="Close" wire:click='clear'></button>
                     </div>
-                    <div class="modal-body p-4">
+                    <div class="modal-body p-3">
                         <form class="needs-validation" wire:submit="{{$editMode ? 'updateVenue' : 'createVenue'}}">
-                            <div class="mb-4">
-                                <label for="venueName" class="form-label fw-medium">Venue Name</label>
-                                <input type="text" class="form-control form-control-lg {{$errors->has('name') ? 'is-invalid' : ''}}"
+                            <div class="mb-3">
+                                <label for="venueName" class="form-label small fw-medium">Venue Name</label>
+                                <input type="text" class="form-control {{$errors->has('name') ? 'is-invalid' : ''}}"
                                     id="venueName"
                                     wire:model="name"
                                     placeholder="Enter venue name"
                                     autocomplete="off">
                                 @error('name')
-                                <div class="invalid-feedback">
+                                <div class="invalid-feedback small">
                                     <i class="bi bi-exclamation-circle me-1"></i>
                                     {{$message}}
                                 </div>
                                 @enderror
                             </div>
-
-                            <div class="mb-4">
-                                <label for="venueLocation" class="form-label fw-medium">Venue Location</label>
-                                <input type="text" class="form-control form-control-lg {{$errors->has('location') ? 'is-invalid' : ''}}"
+        
+                            <div class="mb-3">
+                                <label for="venueLocation" class="form-label small fw-medium">Venue Location</label>
+                                <input type="text" class="form-control {{$errors->has('location') ? 'is-invalid' : ''}}"
                                     id="venueLocation"
                                     wire:model="location"
                                     placeholder="Enter venue location"
                                     autocomplete="off">
                                 @error('location')
-                                <div class="invalid-feedback">
+                                <div class="invalid-feedback small">
                                     <i class="bi bi-exclamation-circle me-1"></i>
                                     {{$message}}
                                 </div>
                                 @enderror
                             </div>
-                            <div class="d-grid gap-2 d-md-flex justify-content-md-end mt-4">
-                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" wire:click='clear'>
+                            
+                            <div class="d-flex justify-content-end gap-2 mt-3">
+                                <button type="button" class="btn btn-sm btn-outline-secondary" data-bs-dismiss="modal" wire:click='clear'>
                                     Cancel
                                 </button>
-                                <button type="submit" class="btn btn-primary px-4">
+                                <button type="submit" class="btn btn-sm btn-primary">
                                     {{ $editMode ? 'Update' : 'Save' }}
                                 </button>
                             </div>

@@ -121,7 +121,7 @@
                 </div>
 
                 <div class="d-flex justify-content-center mt-4 gap-3">
-                    {{ $positions->links() }}
+                    {{ $positions->links(data: ['scrollTo' => false]) }}
                 </div>
             </div>
         </div>
@@ -139,7 +139,7 @@
                         <form class="row g-4" wire:submit.prevent="{{$editMode ? 'updatePosition' : 'createPosition'}}">
 
                             <div class="row g-3">
-                                <div class="col-6">
+                                <div class="col-12">
                                     <label for="title" class="form-label fw-semibold">Title <span class="text-danger">*</span></label>
                                     <input
                                         type="text"
@@ -148,18 +148,6 @@
                                         wire:model="title"
                                         placeholder="Enter position title">
                                     @error('title')
-                                    <div class="invalid-feedback">{{$message}}</div>
-                                    @enderror
-                                </div>
-                                <div class="col-md-6">
-                                    <label for="salary_grade" class="form-label fw-semibold">Salary Grade <span class="text-danger">*</span></label>
-                                    <input
-                                        type="number"
-                                        id="salary_grade"
-                                        class="form-control @error('salary_grade') is-invalid @enderror"
-                                        wire:model="salary_grade"
-                                        placeholder="Enter grade (1-30)">
-                                    @error('salary_grade')
                                     <div class="invalid-feedback">{{$message}}</div>
                                     @enderror
                                 </div>
@@ -188,6 +176,36 @@
                                 @error('position_description')
                                     <div class="invalid-feedback">{{ $message }}</div>
                                 @enderror
+                            </div>
+
+                            <div class="row g-3">
+                                <div class="col-md-6">
+                                    <label for="salary_grade" class="form-label fw-semibold">Salary Grade <span class="text-danger">*</span></label>
+                                    <input
+                                        type="number"
+                                        id="salary_grade"
+                                        class="form-control @error('salary_grade') is-invalid @enderror"
+                                        wire:model="salary_grade"
+                                        placeholder="Enter grade (1-30)">
+                                    @error('salary_grade')
+                                    <div class="invalid-feedback">{{$message}}</div>
+                                    @enderror
+                                </div>
+
+                                <div class="col-md-6">
+                                    <label class="form-label fw-semibold">Items per Topic</label>
+                                    <div class="d-flex align-items-center gap-3">
+                                        <label class="form-check-label d-flex align-items-center">
+                                            <input type="radio" wire:model="item" value="8" class="form-check-input me-1" {{ $item === '8' || !$editMode ? 'checked' : '' }}> 8
+                                        </label>
+                                        <label class="form-check-label d-flex align-items-center">
+                                            <input type="radio" wire:model="item" value="10" class="form-check-input me-1" {{ $item === '10' ? 'checked' : '' }}> 10
+                                        </label>
+                                    </div>
+                                </div>
+                                
+                                
+                                
                             </div>
                             
                             
@@ -249,6 +267,11 @@
                                     </table>
                                 </div>
                             </div>
+
+                            
+
+
+
 
                             <div class="col-12 d-flex justify-content-end gap-2 mt-4">
                                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" wire:click='clear'>
@@ -458,32 +481,28 @@
         });
 
         $wire.on('hide-positionModal', () => {
-            console.log('Hiding position modal');
             bootstrap.Modal.getInstance(document.getElementById('positionModal')).hide();
         });
 
         $wire.on('show-positionModal', () => {
-            console.log('Showing position modal');
             new bootstrap.Modal(document.getElementById('positionModal')).show();
         });
 
         $wire.on('show-skillsModal', () => {
-            console.log('Showing skills modal');
             bootstrap.Modal.getInstance(document.getElementById('positionModal')).hide();
             new bootstrap.Modal(document.getElementById('skillsModal')).show();
         });
 
         $wire.on('hide-skillsModal', () => {
-            console.log('Hiding skills modal');
             new bootstrap.Modal(document.getElementById('positionModal')).show();
             bootstrap.Modal.getInstance(document.getElementById('skillsModal')).hide();
         });
+
         $wire.on('show-viewSkillsModal', () => {
-            console.log('Showing view skills modal');
             new bootstrap.Modal(document.getElementById('viewSkillsModal')).show();
         });
+
         $wire.on('hide-viewskillsModal', () => {
-            consols.log('Hiding view skills modal');
             bootstrap.Modal.getInstance(document.getElementById('viewSkillsModal')).hide();
         });
     </script>

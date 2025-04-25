@@ -346,6 +346,23 @@
               </li>
             </ul>
           </li>
+          <li>
+            <a class="nav-link {{ Request::routeIs('references.scoresheets.*') ? '' : 'collapsed' }}" data-bs-target="#scoresheet-nav" data-bs-toggle="collapse" href="#">
+              <i class="bi bi-list-check fs-5"></i><span>Score Sheets</span><i class="bi bi-chevron-down ms-auto fs-6"></i>
+            </a>
+            <ul id="scoresheet-nav" class="nav-content collapse {{ Request::routeIs('references.scoresheets.*') ? 'show' : '' }}" data-bs-parent="#references-nav" style="padding-left: 10px;">
+              <li>
+                <a class="{{ Request::routeIs('references.scoresheets.practical') ? 'active' : '' }}" href="{{ route('references.scoresheets.practical') }}">
+                  <i class="bi bi-tools fs-5"></i><span>Practical Exam Scoring</span>
+                </a>
+              </li>
+              <li>
+                <a class="{{ Request::routeIs('references.scoresheets.oral') ? 'active' : '' }}" href="{{ route('references.scoresheets.oral') }}">
+                  <i class="bi bi-mic-fill fs-5"></i><span>Oral  Interview Scoring</span>
+                </a>
+              </li>
+            </ul>
+          </li>
         </ul>
       </li><!-- End Tables Nav -->
     @endcan
@@ -380,12 +397,7 @@
         <a class="nav-link {{ Request::routeIs('exam.*') ? '' : 'collapsed' }}" data-bs-target="#exam-nav" data-bs-toggle="collapse" href="#">
           <i class="bi bi-clipboard-check-fill fs-5"></i><span>Exam Assigning</span><i class="bi bi-chevron-down ms-auto"></i>
         </a>
-        <ul id="exam-nav" class="nav-content collapse {{ Request::routeIs('exam.*') ? 'show' : '' }}" data-bs-parent="#sidebar-nav">
-          <li>
-            <a class="{{ Request::routeIs('exam.createschedule') ? 'active' : '' }}" href="{{ route('exam.createschedule') }}">
-              <i class="bi bi-calendar-check-fill fs-5"></i><span>Create Schedule</span>
-            </a>
-          </li>          
+        <ul id="exam-nav" class="nav-content collapse {{ Request::routeIs('exam.*') ? 'show' : '' }}" data-bs-parent="#sidebar-nav">        
           <li>
             <a class="{{ Request::routeIs('exam.assessmentlist') ? 'active' : '' }}" href="{{ route('exam.assessmentlist') }}">
               <i class="bi bi-clipboard-data-fill fs-5"></i><span>Assessment Test List</span>
@@ -424,6 +436,11 @@
         <li>
           <a class="{{ Request::routeIs('scores.oral') ? 'active' : '' }}" href="{{ route('scores.oral') }}">
             <i class="bi bi-wechat fs-5"></i><span>Oral Interview Scores & Notes</span>
+          </a>
+        </li>
+        <li>
+          <a class="{{ Request::routeIs('scores.candidatecompetency') ? 'active' : '' }}" href="{{ route('scores.candidatecompetency') }}">
+            <i class="bi bi-lightbulb fs-5"></i><span>Candidate Competency</span>
           </a>
         </li>
       </ul>

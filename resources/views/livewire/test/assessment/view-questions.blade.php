@@ -6,6 +6,10 @@
     <section class="section Add Assessment Questions">
         <div class="card shadow-sm border-0 rounded-3">
             <div class="card-body p-4">
+                <button type="button" class="btn {{ $archive ? 'btn-success' : 'btn-warning' }}" wire:click="toggleArchive">
+                    <i class="bi {{ $archive ? 'bi-box-arrow-in-up' : 'bi-archive' }} me-1"></i>
+                    {{ $archive ? 'General' : 'View Archive' }}
+                </button>
 
                 <div class="row align-items-center pt-3 pb-3">
                     <div class="col-md-6">
@@ -23,7 +27,7 @@
                     @foreach($questions as $index => $question)
                     <div class="question-set mb-4 p-3 border rounded-3" style="border: 2px solid #ddd;">
                         <div class="mb-2 d-flex justify-content-between align-items-center">
-                            <label for="question_{{ $index }}" class="form-label fw-bold fs-6 text-primary m-0">
+                            <label for="question_{{ $index }}" class="form-label fw-bold fs-6 {{$archive ? 'text-danger' : 'text-primary'}} m-0">
                                 <strong>Question {{ $loop->iteration }}</strong>
                             </label>
                         </div>
@@ -45,9 +49,14 @@
 
                         <div class="row mb-2">
                             <div class="col-6">
-                                <label for="points_{{ $index }}" class="form-label fw-bold fs-7">Point(s)</label>
-                                <input type="text" class="form-control form-control-sm fs-7" value="{{ $questions[$index]['points'] ?? '' }}" readonly>
-                            </div>
+                                <label for="competency_level_{{ $index }}" class="form-label fw-bold fs-7">Competency Level</label>
+                                <select class="form-select form-select-sm fs-7" id="competency_level_{{ $index }}" wire:model.defer="questions.{{ $index }}.competency_level" disabled>
+                                    <option value="">Select Level</option>
+                                    <option value="basic">Basic</option>
+                                    <option value="intermediate">Intermediate</option>
+                                    <option value="advanced">Advanced</option>
+                                </select>
+                            </div>    
                             <div class="col-6">
                                 <label for="timeDuration_{{ $index }}" class="form-label fw-bold fs-7">Time Duration (HH:MM:SS)</label>
                                 <div class="d-flex">

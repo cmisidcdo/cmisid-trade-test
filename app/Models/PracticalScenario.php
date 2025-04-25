@@ -60,6 +60,10 @@ class PracticalScenario extends Model
         return $this->belongsTo(PositionSkill::class, 'position_skill_id');
     }
 
+    public function practicalScoreSkillScenarios()
+    {
+        return $this->hasMany(PracticalScoreSkillScenario::class, 'practical_scenario_id');
+    }
 
 
 }

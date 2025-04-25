@@ -97,7 +97,7 @@
             </table>
         </div>
         <div>
-            {{$practicalscenarios->links()}}
+            {{$practicalscenarios->links(data: ['scrollTo' => false])}}
         </div>
     </div>
 
@@ -127,7 +127,11 @@
                                 <select class="form-select form-select-sm fs-7 @error('position_id') is-invalid @enderror" id="position_id" wire:model.live="position_id">
                                     <option value="">Select Position</option>
                                     @foreach($positions as $pos)
-                                        <option value="{{ $pos->id }}">{{ $pos->title }}</option>
+                                        <option 
+                                            value="{{ $pos->id }}" 
+                                            @if($position_id == $pos->id) selected @endif>
+                                            {{ $pos->title }}
+                                        </option>
                                     @endforeach
                                 </select>
                             </div>

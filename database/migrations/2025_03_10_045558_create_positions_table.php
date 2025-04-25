@@ -16,6 +16,7 @@ return new class extends Migration
             $table->string('title');
             $table->integer('salary_grade');
             $table->string('position_description')->nullable();
+            $table->tinyInteger('item')->default(8);
             $table->softDeletes();
             $table->timestamps();
         });

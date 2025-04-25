@@ -21,7 +21,7 @@ class Positions extends Component
 
     public $search;
     public $position_id;
-    public $title, $salary_grade, $competency_level, $position_description = '';
+    public $title, $salary_grade, $item = 8, $competency_level, $position_description = '';
     public $selectedskills = [];
     public $loadingSkillId = null;
 
@@ -72,21 +72,20 @@ class Positions extends Component
     // }
 
     public function addSkill($skillId)
-{
-    $this->loadingSkillId = $skillId;
+    {
+        $this->loadingSkillId = $skillId;
 
-    // Simulate logic
-    $skill = Skill::find($skillId);
-    if ($skill) {
-        $this->selectedskills[] = [
-            'id' => $skill->id,
-            'title' => $skill->title,
-            'competency_level' => 'basic',
-        ];
+        $skill = Skill::find($skillId);
+        if ($skill) {
+            $this->selectedskills[] = [
+                'id' => $skill->id,
+                'title' => $skill->title,
+                'competency_level' => 'basic',
+            ];
+        }
+
+        $this->loadingSkillId = null;
     }
-
-    $this->loadingSkillId = null;
-}
 
 
     public function updateCompetencyLevel($index, $level)
@@ -173,6 +172,7 @@ class Positions extends Component
             $position = new Position();
             $position->title = $this->title;
             $position->salary_grade = $this->salary_grade;
+            $position->item = $this->item;
             $position->position_description = $this->position_description;
             $position->save();
     
@@ -219,6 +219,7 @@ class Positions extends Component
         $this->fill([
             'title' => $position->title,
             'salary_grade' => $position->salary_grade,
+            'item' => $position->item,
             'position_description' => $position->position_description,
             'competency_level' => $position->competency_level,
         ]);
@@ -246,6 +247,7 @@ class Positions extends Component
             
             $position->title = $this->title;
             $position->salary_grade = $this->salary_grade;
+            $position->item = $this->item;
             $position->position_description = $this->position_description;
             $position->save();
     

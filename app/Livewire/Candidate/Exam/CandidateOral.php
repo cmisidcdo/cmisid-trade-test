@@ -8,6 +8,6 @@ class CandidateOral extends Component
 {
     public function render()
     {
-        return view('livewire.candidate.exam.candidate-oral')->layout('components.layouts.candidate-app');
+        return view('livewire.candidate.exam.candidate-oral')->layout('components.layouts.candidate-exam');
     }
 }

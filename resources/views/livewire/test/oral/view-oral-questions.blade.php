@@ -6,6 +6,10 @@
     <section class="section Add Interview Questions">
         <div class="card shadow-sm border-0 rounded-3">
             <div class="card-body p-4">
+                <button type="button" class="btn {{ $archive ? 'btn-success' : 'btn-warning' }}" wire:click="toggleArchive">
+                    <i class="bi {{ $archive ? 'bi-box-arrow-in-up' : 'bi-archive' }} me-1"></i>
+                    {{ $archive ? 'General' : 'View Archive' }}
+                </button>
 
                 <div class="row align-items-center pt-3 pb-3">
                     <div class="col-md-6">
@@ -23,8 +27,8 @@
                     @foreach($questions as $index => $question)
                     <div class="question-set mb-4 p-3 border rounded-3" style="border: 2px solid #ddd;">
                         <div class="mb-2 d-flex justify-content-between align-items-center">
-                            <label for="question_{{ $index }}" class="form-label fw-bold fs-6 text-primary m-0">
-                                <strong>question {{ $loop->iteration }}</strong>
+                            <label for="question_{{ $index }}" class="form-label fw-bold fs-6 {{$archive ? 'text-danger' : 'text-primary'}} m-0">
+                                <strong>Question {{ $loop->iteration }}</strong>
                             </label>
                         </div>
                                                

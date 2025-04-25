@@ -4,25 +4,27 @@ namespace App\Livewire\Candidate;
 
 use Livewire\Component;
 use App\Models\Candidate;
+use App\Models\AssignedAssessment;
 use Illuminate\Support\Facades\Session;
 
 class Login extends Component
 {
-    public $fullname;
+    public $fullname, $inputcode;
 
     public function login()
     {
-        $candidate = Candidate::whereRaw('LOWER(fullname) = ?', [strtolower($this->fullname)])->first();
+        $assigned = AssignedAssessment::where('access_code', $this->inputcode)->first();
 
-        if ($candidate) {
+        if ($assigned) {
+            $candidate = $assigned->candidate;
 
             Session::put('candidate_id', $candidate->id);
             Session::put('candidate_name', $candidate->fullname);
-            
+
             return redirect()->route('candidate.home');
         }
 
-        session()->flash('error', 'Invalid Name');
+        session()->flash('error', 'Invalid Code');
     }
 
     public function render()

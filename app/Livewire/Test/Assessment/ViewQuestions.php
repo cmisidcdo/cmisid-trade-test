@@ -21,17 +21,17 @@ class ViewQuestions extends Component
     public $choices = [['text' => '', 'status' => 'incorrect']];
     
     public $position_skill, $position_skill_id, $position, $position_id, $title, $skill, $skill_id, $question, $duration = 0, $status, $vduration;
-    public $points = 1;
+    public $points = 1, $competency_level = 'basic';
 
     public $hours = 0, $minutes = 0, $seconds = 0;
-    public $assessmentquestion_id;
+    public $assessmentquestion_id, $archive;
     public $deletedQuestions = [];
 
 
     public $questions = [
         [
             'question' => '',
-            'points' => 1,
+            'competency_level' => 'basic',
             'hours' => 0,
             'minutes' => 0,
             'seconds' => 0,
@@ -64,16 +64,21 @@ class ViewQuestions extends Component
         }
     }
 
-    public function loadAssessmentQuestions($position_skill_id)
+    public function loadAssessmentQuestions($position_skill_id, $archive = false)
     {
-        $this->questions = AssessmentQuestion::where('position_skill_id', $position_skill_id)
-            ->with('choices')
-            ->get()
+        $query = AssessmentQuestion::with('choices')
+            ->where('position_skill_id', $position_skill_id);
+    
+        if ($archive) {
+            $query->onlyTrashed();
+        }
+    
+        $this->questions = $query->get()
             ->map(function ($question) {
                 return [
                     'id' => $question->id,
                     'question' => $question->question,
-                    'points' => $question->points,
+                    'competency_level' => $question->competency_level,
                     'hours' => floor($question->duration / 3600),
                     'minutes' => floor(($question->duration % 3600) / 60),
                     'seconds' => $question->duration % 60,
@@ -86,6 +91,16 @@ class ViewQuestions extends Component
                 ];
             })->toArray();
     }
+
+    public function toggleArchive()
+    {
+        $this->archive = !$this->archive;
+
+        if ($this->position_skill_id) {
+            $this->loadAssessmentQuestions($this->position_skill_id, $this->archive);
+        }
+    }
+    
         
     public function render()
     {

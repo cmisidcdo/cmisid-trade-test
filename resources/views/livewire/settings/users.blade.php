@@ -72,7 +72,7 @@
       </div>
       
 
-        <table class="table table-hover table-bordered table-striped text-center global-table">
+        <table class="table table-hover table-bordered text-center global-table">
           <thead class="table-light">
             <tr>
               <th scope="col">#</th>
@@ -127,7 +127,7 @@
         </table>
 
         <div>
-          {{$users->links()}}
+          {{$users->links(data: ['scrollTo' => false])}}
         </div>
       </div>
     </div>

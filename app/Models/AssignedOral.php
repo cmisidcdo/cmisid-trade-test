@@ -21,6 +21,6 @@ class AssignedOral extends Model
 
     public function oralScore()
     {
-        return $this->belongsTo(OralScore::class);
+        return $this->hasOne(OralScore::class);
     }
 }

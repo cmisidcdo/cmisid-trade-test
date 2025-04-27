@@ -5,9 +5,15 @@
     <section class="section dashboard">
         <div class="card shadow-sm border-0 rounded-3">
             <div class="card-body p-4">
-
+                
                 <div class="row align-items-center pt-3 pb-3">
-                    <div class="d-flex justify-content-between align-items-center mb-3">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <button class="btn btn-primary me-2" data-bs-toggle="modal" data-bs-target="#criteriaModal">
+                                <i class="bi bi-card-list me-1"></i> View Criteria
+                            </button>
+                        </div>
+                
                         <div class="d-flex gap-2 ms-auto">
                             <div class="input-group input-group-sm">
                                 <span class="input-group-text bg-light border-end-0">
@@ -68,11 +74,16 @@
                     </div>
                 </div>
                 
+                
                 <div class="table-responsive">
                     <table class="table table-hover align-middle border global-table">
                         <thead style="border-collapse: collapse;">
                             <tr>
                                 <th scope="col" class="text-center" width="5%">#</th>
+                                <th scope="col" class="text-center" width="5%">
+                                    Note
+                                </th>
+                                
                                 <th>Candidate Name</th>
                                 <th>Date Finished</th>
                                 <th>Time Finished</th>
@@ -85,6 +96,11 @@
                             @forelse($oralscores as $item)
                             <tr>
                                 <td style="border: 1px solid black;">{{$loop->iteration}}</td>
+                                <td style="border: 1px solid black;">
+                                    <button type="button" class="btn btn-sm btn-outline-primary" wire:click="readNote({{ $item->id }})">
+                                        <i class="bi bi-stickies"></i>
+                                    </button>
+                                </td>
                                 <td style="border: 1px solid black;">{{ $item->candidate->fullname ?? 'N/A' }}</td>
                                 <td style="border: 1px solid black;">{{ $item->date_finished ?? 'N/A' }}</td>
                                 <td style="border: 1px solid black;">{{ $item->time_finished ?? 'N/A' }}</td>
@@ -248,6 +264,94 @@
             </div>
         </div>
     </section>
+
+    <div class="modal fade" id="criteriaModal" tabindex="-1" aria-labelledby="criteriaModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-lg">
+            <div class="modal-content ">
+                <div class="modal-header justify-content-center position-relative">
+                    <h5 class="modal-title fw-bold text-center" id="criteriaModalLabel">View oral Exam Criteria</h5>
+                    <button type="button" class="btn-close position-absolute end-0 me-3" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+
+                <div class="modal-body">
+                    <div class="table-responsive">
+                        <table class="table table-bordered text-center align-middle">
+                            <thead class="text-white" style="background-color: #0D0D4C;">
+                                <tr>
+                                    <th>Criteria Name</th>
+                                    <th>Description</th>
+                                    <th>Percent</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td class="fw-bold">Knowledge and Understanding</td>
+                                    <td>Evaluates the candidate’s grasp of the subject matter, technical knowledge, or job-specific expertise.</td>
+                                    <td class="fw-bold">30%</td>
+                                </tr>
+                                <tr>
+                                    <td class="fw-bold">Completeness and Relevance of Responses</td>
+                                    <td>Assess whether the candidate provides comprehensive answers that directly address the interview questions.</td>
+                                    <td class="fw-bold">30%</td>
+                                </tr>
+                                <tr>
+                                    <td class="fw-bold">Accuracy</td>
+                                    <td>Measures the correctness of the candidate’s answers, particularly for technical or factual questions.</td>
+                                    <td class="fw-bold">40%</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="modal-footer justify-content-start">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                        <i class="bi bi-arrow-left"></i> Go Back
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="noteModal" tabindex="-1" aria-labelledby="noteModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-lg">
+            <div class="modal-content">
+                <div class="modal-header justify-content-center position-relative">
+                    <h5 class="modal-title text-center fw-bold" id="noteModalLabel">View Note</h5>
+                    <button type="button" class="btn-close position-absolute end-0 me-3" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+    
+                <div class="modal-body" style="max-height: 70vh; overflow-y: auto;">
+                    @if ($oralscore && $oralscore->oralScoreSkills->isNotEmpty())
+                        @foreach ($oralscore->oralScoreSkills as $oralScoreSkill)
+                            <div class="mb-4">
+                                @php
+                                    $positionSkill = $oralScoreSkill->position_skill;
+                                    $skillTitle = $positionSkill ? $positionSkill->skill->title : 'N/A';
+                                @endphp
+    
+                                <h6 class="fw-bold">Skill Title: {{ $skillTitle }}</h6>
+    
+                                <div class="mb-3">
+                                    <label class="form-label fw-bold">Recommendation/s</label>
+                                    <textarea class="form-control" rows="4" readonly>{{ $oralScoreSkill->recommendation }}</textarea>
+                                </div>
+    
+                                <div class="mb-3">
+                                    <label class="form-label fw-bold">Comment/s</label>
+                                    <textarea class="form-control" rows="4" readonly>{{ $oralScoreSkill->comment }}</textarea>
+                                </div>
+                            </div>
+                            <hr>
+                        @endforeach
+                    @else
+                        <p>No oral score skills available.</p>
+                    @endif
+                </div>
+            </div>
+        </div>
+    </div>
+    
 </div>
 
 @script
@@ -272,6 +376,14 @@
 
     $wire.on('show-oralScoreModal', () => {
         $('#oralScoreModal').modal('show');
+    });
+
+    $wire.on('hide-noteModal', () => {
+        $('#noteModal').modal('hide');
+    });
+
+    $wire.on('show-noteModal', () => {
+        $('#noteModal').modal('show');
     });
 
     $wire.on('show-evaluationModal', () => {

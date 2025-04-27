@@ -105,16 +105,6 @@
                                         <span class="d-none d-md-inline ms-1">Edit</span>
                                     </button>
                                     @endcan
-
-                                    {{-- @can('delete reference')
-                                    <button class="btn btn-sm {{$item->deleted_at == Null ? 'btn-danger': 'btn-outline-success'}} rounded-2 px-2 py-1"
-                                        wire:click='{{$item->deleted_at == Null ? 'confirmDelete('.$item->id.')': 'restoreSkill('.$item->id.')'}}'
-                                        data-bs-toggle="tooltip"
-                                        data-bs-title="{{$item->deleted_at == Null ? 'Move to archive': 'Restore skill'}}">
-                                        <i class="bi {{$item->deleted_at == Null ? 'bi bi-archive-fill': 'bi-arrow-counterclockwise'}}"></i>
-                                        <span class="d-none d-md-inline ms-1">{{$item->deleted_at == Null ? 'Archive': 'Restore'}}</span>
-                                    </button>
-                                    @endcan --}}
                                 </td>
                             </tr>
                             @empty

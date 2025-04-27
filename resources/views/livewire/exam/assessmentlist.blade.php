@@ -117,6 +117,9 @@
                             @endforelse
                         </tbody>
                     </table>
+                    <div>
+                        {{ $assignedassessments->links(data: ['scrollTo' => false])}} 
+                    </div>     
                 </div>
                 
 

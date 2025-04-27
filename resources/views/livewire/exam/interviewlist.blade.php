@@ -117,6 +117,9 @@
                             @endforelse
                         </tbody>
                     </table>
+                    <div>
+                        {{ $assignedOrals->links(data: ['scrollTo' => false])}} 
+                    </div>     
                 </div>
                 
 

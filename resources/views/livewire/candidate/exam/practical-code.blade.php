@@ -16,9 +16,15 @@
                     </div>
                     <div class="col-md-6">
                         <div class="p-3">
+                            <form wire:submit.prevent="login">
                             <div class="mb-3">
                                 <label class="form-label">Enter the Code for Practical Exam</label>
-                                <input type="text" class="form-control form-control-lg mb-1" placeholder="">
+                                <input type="text" wire:model="inputcode" class="form-control form-control-lg rounded-3 bg-light fs-6 @error('code') is-invalid @enderror" placeholder="Enter Code" aria-label="Unique Code" required>  
+                                @if (session()->has('error'))
+                                    <div class="alert alert-danger">
+                                        {{ session('error') }}
+                                    </div>
+                                @endif
                             </div>
                             <div class="py-2 position-relative mb-3">
                                 <div style="border-top: 1px dotted rgba(255,255,255,0.5); position: absolute; top: 50%; left: 0; right: 0;"></div>
@@ -38,20 +44,19 @@
                             <div class="d-grid mt-4">
                                 <button class="btn btn-primary" id="startInterview">Start the Interview</button>
                             </div>
+                            </form>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
 
-        <!-- Logos -->
         <div class="logos col-lg-6 d-flex flex-column justify-content-center align-items-start text-start ps-3 mt-4">
             <img src="{{ asset('img/cdologo.png') }}" alt="logo" class="img-fluid">
         </div>
 
     </div>
 
-    <!-- Confirmation Modal -->
     <div class="modal fade" id="confirmationModal" tabindex="-1" aria-labelledby="confirmationModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content" style="border-radius: 12px; border: 2px solid #007BFF;">
@@ -89,7 +94,7 @@
         const startButton = document.getElementById('startInterview');
         const confirmButton = document.getElementById('confirmInterview');
 
-        startButton.addEventListener('click', function () {
+        Livewire.on('show-confirmationModal', function() {
             const confirmationModal = new bootstrap.Modal(document.getElementById('confirmationModal'));
             confirmationModal.show();
         });

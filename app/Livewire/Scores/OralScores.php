@@ -21,7 +21,7 @@ class OralScores extends Component
     public $venues = [], $evaluation = [], $oralscoreskills = [];
     public $selectedcandidate;
 
-    public $oralScoreId, $oral_skillId, $skillname; 
+    public $oralScoreId, $oral_skillId, $skillname, $oralscore; 
 
     public function render()
     {
@@ -59,10 +59,27 @@ class OralScores extends Component
             'oralscoreskills' => $oralscore->oralScoreSkills, 
         ]);
 
+        $this->oralScoreId = $oralscoreId;
         $this->editMode = true;
 
         $this->dispatch('show-oralScoreModal');
     }
+
+    public function readNote($oralscoreId)
+    {
+        $oralscore = OralScore::with('oralScoreSkills.position_skill.skill')
+                                        ->find($oralscoreId);
+
+        if (!$oralscore) {
+            session()->flash('error', 'oral Score not found!');
+            return redirect()->route('some.route');
+        }
+
+        $this->oralscore = $oralscore;
+
+        $this->dispatch('show-noteModal');
+    }
+
 
     public function evaluateSkill($oralskillId)
     {
@@ -119,8 +136,9 @@ class OralScores extends Component
             'comment' => $this->evaluation['comment'],
         ]);
 
+        $this->readOralScore($this->oralScoreId);
         $this->dispatch('hide-evaluationModal');
-        session()->flash('message', 'Evaluation submitted successfully.');
+        $this->dispatch('success', 'Evaluation submitted successfully.');
     }
 
 

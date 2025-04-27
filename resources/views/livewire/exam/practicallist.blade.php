@@ -117,6 +117,9 @@
                             @endforelse
                         </tbody>
                     </table>
+                    <div>
+                        {{ $assignedpracticals->links(data: ['scrollTo' => false])}} 
+                    </div>     
                 </div>
                 
 

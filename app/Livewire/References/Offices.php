@@ -65,21 +65,6 @@ class Offices extends Component
         $this->archive = !$this->archive;
     }
 
-    public function getOffices()
-    {
-        $query = Office::query();
-
-        if ($this->archive) {
-            $query->onlyTrashed(); 
-        }
-
-        return $query
-            ->when($this->search, function ($query) {
-                $query->where('title', 'like', '%' . $this->search . '%');
-            })
-            ->paginate(10);
-    }
-
     public function loadOffices()
     {
         return Office::withTrashed()

@@ -7,7 +7,7 @@
             <div class="card-body p-4">
 
                 <div class="row align-items-center pt-3 pb-3">
-                    <div class="d-flex justify-content-between align-items-center mb-3">
+                    <div class="d-flex justify-content-between align-items-center">
                         <div class="d-flex gap-2 ms-auto">
                             <div class="input-group input-group-sm">
                                 <span class="input-group-text bg-light border-end-0">
@@ -191,6 +191,8 @@
             </div>
         </div>
     </section>
+
+    
 </div>
 
 @script

@@ -111,7 +111,7 @@ class Assessmentlist extends Component
                 });
             })
             ->orderByDesc('created_at')
-            ->paginate(10);
+            ->paginate(10, ['*'], 'assignedassessmentsPage');
     }
 
     public function createAssignedAssessment()
@@ -270,7 +270,7 @@ class Assessmentlist extends Component
     {
         $query = Candidate::query();
     
-        return $query->paginate(5);
+        return $query->paginate(5, ['*'], 'candidatesPage');
     }
     
 

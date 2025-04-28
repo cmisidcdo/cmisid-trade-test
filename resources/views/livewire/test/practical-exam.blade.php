@@ -53,9 +53,9 @@
             <table class="table table-hover table-bordered text-center global-table">
                 <thead style="background-color: #f8f9fa;">
                     <tr>
-                        <th class="text-center" style="width: 5%;">#</th>
-                        <th class="text-center">Position</th>
-                        <th class="text-center" style="width: 15%;">Actions</th>
+                        <th style="width: 5%;">#</th>
+                        <th>Position</th>
+                        <th style="width: 5%;">Actions</th>
                     </tr>
                 </thead>
         
@@ -64,13 +64,12 @@
                     <tr>
                         <td class="text-center fw-medium align-middle">{{ $loop->iteration }}</td>
                         <td class="fw-bold align-middle">{{ $item->position_title }}</td>
-                        <td style="width: 15%;">
+                        <td>
                             <div class="d-flex align-items-center justify-content-center gap-2">
                                 <button class="btn btn-sm btn-info rounded-2"
                                     wire:click='viewPracticalScenario({{$item->position_id}})'
                                     data-bs-title="View Scenarios">
                                     <i class="bi bi-eye"></i>
-                                    <span class="d-none d-md-inline ms-1">View</span>
                                 </button>
         
                                 @can('update reference')
@@ -79,7 +78,6 @@
                                     data-bs-toggle="tooltip"
                                     data-bs-title="Edit Scenarios">
                                     <i class="bi bi-pencil-square"></i>
-                                    <span class="d-none d-md-inline ms-1">Edit</span>
                                 </button>
                                 @endcan
                             </div>

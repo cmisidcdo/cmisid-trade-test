@@ -73,16 +73,16 @@
                 </div>
 
                 <div class="table-responsive">
-                    <table class="table table-hover align-middle border global-table">
+                    <table class="table table-hover align-middle table-bordered global-table">
                         <thead class="table-light">
                             <tr>
                                 <th scope="col" class="text-center" width="5%">#</th>
-                                <th scope="col" width="20%">Full Name</th>
-                                <th scope="col" width="18%">Office Applied</th>
-                                <th scope="col" width="18%">Position Applied</th>
-                                <th scope="col" width="18%">Priority Group</th>
-                                <th scope="col" class="text-center" width="6%">Status</th>
-                                <th scope="col" class="text-center" width="15%">Actions</th>
+                                <th scope="col">Full Name</th>
+                                <th scope="col" width="15%">Office Applied</th>
+                                <th scope="col" width="15%">Position Applied</th>
+                                <th scope="col" width="10%">Priority Group</th>
+                                <th scope="col" class="text-center" width="5%">Status</th>
+                                <th scope="col" class="text-center" width="5%">Actions</th>
                             </tr>
                         </thead>
                         <tbody>

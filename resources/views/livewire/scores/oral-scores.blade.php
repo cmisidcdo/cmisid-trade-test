@@ -76,37 +76,44 @@
                 
                 
                 <div class="table-responsive">
-                    <table class="table table-hover align-middle border global-table">
-                        <thead style="border-collapse: collapse;">
+                    <table class="table table-hover table-bordered text-center global-table">
+                        <thead>
                             <tr>
-                                <th scope="col" class="text-center" width="5%">#</th>
-                                <th scope="col" class="text-center" width="5%">
+                                <th style="width: 5%">#</th>
+                                <th style="width: 5%">
                                     Note
                                 </th>
-                                
                                 <th>Candidate Name</th>
-                                <th>Date Finished</th>
-                                <th>Time Finished</th>
-                                <th>Status</th>
-                                <th>Score</th>
-                                <th>Action</th>
+                                <th style="width: 15%">Date Finished</th>
+                                <th style="width: 10%">Time Finished</th>
+                                <th style="width: 5%">Status</th>
+                                <th style="width: 5%">Score</th>
+                                <th style="width: 5%">Action</th>
                             </tr>
                         </thead>
-                        <tbody style="border: 1px solid #ccc; border-collapse: collapse;">
+                        <tbody>
                             @forelse($oralscores as $item)
                             <tr>
-                                <td style="border: 1px solid black;">{{$loop->iteration}}</td>
-                                <td style="border: 1px solid black;">
+                                <td>{{$loop->iteration}}</td>
+                                <td>
                                     <button type="button" class="btn btn-sm btn-outline-primary" wire:click="readNote({{ $item->id }})">
                                         <i class="bi bi-stickies"></i>
                                     </button>
                                 </td>
-                                <td style="border: 1px solid black;">{{ $item->candidate->fullname ?? 'N/A' }}</td>
-                                <td style="border: 1px solid black;">{{ $item->date_finished ?? 'N/A' }}</td>
-                                <td style="border: 1px solid black;">{{ $item->time_finished ?? 'N/A' }}</td>
-                                <td style="border: 1px solid black;">{{ $item->status ?? 'N/A' }}</td>
-                                <td style="border: 1px solid black;">{{ $item->total_score ?? 'N/A' }}</td>
-                                <td style="border: 1px solid black;">
+                                <td>{{ $item->candidate->fullname ?? 'N/A' }}</td>
+                                <td>{{ $item->date_finished ?? 'N/A' }}</td>
+                                <td>{{ $item->time_finished ?? 'N/A' }}</td>
+                                <td>
+                                    <span class="badge rounded-pill bg-{{ 
+                                        $item->status == 'done' ? 'success' : 
+                                        ($item->status == 'ongoing' ? 'primary' : 
+                                        ($item->status == 'pending' ? 'secondary' : 'secondary')) 
+                                    }}">
+                                        {{ $item->status ?? 'N/A' }}
+                                    </span>
+                                </td>
+                                <td>{{ $item->total_score ?? 'N/A' }}</td>
+                                <td>
                                     <button class="btn btn-sm btn-outline-primary me-1" wire:click='readOralScore({{$item->id}})' title="Edit">
                                         <i class="bi bi-pencil-square"></i>
                                     </button>
@@ -157,10 +164,10 @@
                                     </div>
                                 </div>
                 
-                                <table class="table table-hover align-middle border global-table">
-                                    <thead style="border-collapse: collapse;">
+                                <table class="table table-hover table-bordered text-center global-table">
+                                    <thead>
                                         <tr>
-                                            <th scope="col" class="text-center" width="5%">#</th>
+                                            <th width="5%">#</th>
                                             <th>Skills Assigned</th>
                                             <th>Competency Level</th>
                                             <th>Questions</th>
@@ -171,21 +178,21 @@
                                             <th>Action</th>
                                         </tr>
                                     </thead>
-                                    <tbody style="border: 1px solid #ccc; border-collapse: collapse;">
+                                    <tbody>
                                         @forelse($oralscoreskills as $item)
                                             <tr>
-                                                <td style="border: 1px solid black;">{{$loop->iteration}}</td>
-                                                <td style="border: 1px solid black;">{{ $item->skill->title ?? 'N/A' }}</td>
-                                                <td style="border: 1px solid black;">{{ $item->position_skill->competency_level ?? 'N/A' }}</td>
-                                                <td style="border: 1px solid black;">  
+                                                <td>{{$loop->iteration}}</td>
+                                                <td>{{ $item->skill->title ?? 'N/A' }}</td>
+                                                <td>{{ $item->position_skill->competency_level ?? 'N/A' }}</td>
+                                                <td>  
                                                     <button class="btn btn-sm btn-outline-dark me-1" wire:click='showQuestions({{$item->id}})' title="View">
                                                         <i class="bi bi-eye-fill"></i>
                                                     </button></td>
-                                                <td style="border: 1px solid black;">{{ $item->knowledge ?? 'N/A' }}</td>
-                                                <td style="border: 1px solid black;">{{ $item->completeness ?? 'N/A' }}</td>
-                                                <td style="border: 1px solid black;">{{ $item->problem_solving ?? 'N/A' }}</td>
-                                                <td style="border: 1px solid black;">{{ $item->score ?? 'N/A' }}</td>
-                                                <td style="border: 1px solid black;">
+                                                <td>{{ $item->knowledge ?? 'N/A' }}</td>
+                                                <td>{{ $item->completeness ?? 'N/A' }}</td>
+                                                <td>{{ $item->problem_solving ?? 'N/A' }}</td>
+                                                <td>{{ $item->score ?? 'N/A' }}</td>
+                                                <td>
                                                     <button class="btn btn-sm btn-outline-primary me-1" wire:click='evaluateSkill({{$item->id}})' title="Edit">
                                                         <i class="bi bi-pencil-square"></i>
                                                     </button>

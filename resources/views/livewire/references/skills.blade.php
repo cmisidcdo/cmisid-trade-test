@@ -76,12 +76,12 @@
                     <table class="table table-hover table-bordered text-center global-table">
                         <thead class="table-light">
                             <tr>
-                                <th scope="col">#</th>
+                                <th scope="col" style="width: 5%">#</th>
                                 <th scope="col">
                                     Title
                                 </th>
-                                <th scope="col">Status</th>
-                                <th scope="col">Actions</th>
+                                <th scope="col" style="width: 5%">Status</th>
+                                <th scope="col" style="width: 5%">Actions</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -102,7 +102,6 @@
                                         data-bs-toggle="tooltip"
                                         data-bs-title="Edit skill">
                                         <i class="bi bi-pencil-square"></i>
-                                        <span class="d-none d-md-inline ms-1">Edit</span>
                                     </button>
                                     @endcan
                                 </td>

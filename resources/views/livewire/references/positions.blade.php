@@ -49,31 +49,30 @@
                     <table class="table table-hover table-bordered text-center global-table">
                         <thead class="table-light">
                             <tr>
-                                <th scope="col" class="fw-semibold" style="width: 5%;">#</th>
-                                <th scope="col" class="fw-semibold">Title</th>
-                                <th scope="col" class="fw-semibold" style="width: 40%;">Description</th>
-                                <th scope="col" class="fw-semibold" style="width: 10%;">Salary Grade</th>
-                                <th scope="col" class="fw-semibold" style="width: 5%;">Status</th>
-                                
-                                <th scope="col" class="fw-semibold text-center" style="width: 15%;">Actions</th>
+                                <th style="width: 5%;">#</th>
+                                <th>Title</th>
+                                <th style="width: 40%;">Description</th>
+                                <th style="width: 8%;">Salary Grade</th>
+                                <th style="width: 5%;">Status</th>
+                                <th style="width: 10%;">Actions</th>
                             </tr>
                         </thead>
                         <tbody>
                             @forelse($positions as $item)
                             <tr class="position-row">
-                                <td scope="row"  class="text-center align-middle" style="width: 5%;">{{$loop->iteration}}</td>
-                                <td class="fw-medium align-middle" style="max-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;"">{{$item->title}}</td>
-                                <td class="fw-medium align-middle text-truncate" style="width: 40%; max-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
+                                <td scope="row"  class="text-center align-middle">{{$loop->iteration}}</td>
+                                <td class="fw-medium align-middle" style="max-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">{{$item->title}}</td>
+                                <td class="fw-medium align-middle text-truncate" style="max-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
                                     {{$item->position_description}}
                                 </td>                                
-                                <td class="fw-medium align-middle" style="width: 10%;">{{$item->salary_grade}}</td>
-                                <td class="fw-medium align-middle" style="width: 5%;">
+                                <td class="fw-medium align-middle">{{$item->salary_grade}}</td>
+                                <td class="fw-medium align-middle">
                                     <span class="badge rounded-pill {{$item->deleted_at == Null ? 'bg-success': 'bg-danger'}}">
                                         {{$item->deleted_at == Null ? 'Active': 'Inactive'}}
                                     </span>
                                 </td>
                                 
-                                <td style="width: 15%;">
+                                <td>
                                     <div class="d-flex align-items-center justify-content-center gap-2">
                                         <button
                                             class="btn btn-sm btn-info"

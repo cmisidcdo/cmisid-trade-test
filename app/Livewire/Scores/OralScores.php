@@ -18,7 +18,7 @@ class OralScores extends Component
     public $title, $skill_id, $status;
     public $assigned_date, $oralScores, $dateFinished, $timeFinished, $candidateName, $candidate_id, $assessorName, $access_code, $draft_status = 'draft';
 
-    public $venues = [], $evaluation = [], $oralscoreskills = [];
+    public $venues = [], $evaluation = [], $oralscoreskills = [], $oralscoreskill;
     public $selectedcandidate;
 
     public $oralScoreId, $oral_skillId, $skillname, $oralscore; 
@@ -139,6 +139,20 @@ class OralScores extends Component
         $this->readOralScore($this->oralScoreId);
         $this->dispatch('hide-evaluationModal');
         $this->dispatch('success', 'Evaluation submitted successfully.');
+    }
+
+    public function showQuestions($oralskillId)
+    {
+        try {
+            $this->oralscoreskill = OralScoreSkill::with('oralScoreSkillQuestions.oral_questions')->findOrFail($oralskillId);
+
+            $this->dispatch('show-questionModal');
+        } catch (\Exception $e) {
+            Log::error('Error fetching OralScoreSkill: ' . $e->getMessage(), [
+                'oralskill_id' => $oralskillId ?? null,
+            ]);
+            abort(500, 'Something went wrong.');
+        }
     }
 
 

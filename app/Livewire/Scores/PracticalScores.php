@@ -21,7 +21,7 @@ class PracticalScores extends Component
     public $venues = [], $evaluation = [], $practicalscoreskills = [];
     public $selectedcandidate;
 
-    public $practicalScoreId, $practical_skillId, $practicalscore;
+    public $practicalScoreId, $practical_skillId, $practicalscore, $practicalscoreskill;
     public $skillname;
 
     public function render()
@@ -144,5 +144,17 @@ class PracticalScores extends Component
     }       
 
 
+    public function showScenarios($practicalskillId)
+    {
+        try {
+            $this->practicalscoreskill = PracticalScoreSkill::with('practicalScoreSkillScenarios.practical_scenarios')->findOrFail($practicalskillId);
 
+            $this->dispatch('show-scenarioModal');
+        } catch (\Exception $e) {
+            Log::error('Error fetching practicalScoreSkill: ' . $e->getMessage(), [
+                'practicalskill_id' => $practicalskillId ?? null,
+            ]);
+            abort(500, 'Something went wrong.');
+        }
+    }
 }

@@ -178,7 +178,7 @@
                                                 <td style="border: 1px solid black;">{{ $item->skill->title ?? 'N/A' }}</td>
                                                 <td style="border: 1px solid black;">{{ $item->position_skill->competency_level ?? 'N/A' }}</td>
                                                 <td style="border: 1px solid black;">  
-                                                    <button class="btn btn-sm btn-outline-dark me-1" data-bs-toggle="modal" data-bs-target="#viewModal" data-bs-placement="top" title="View">
+                                                    <button class="btn btn-sm btn-outline-dark me-1" wire:click='showScenarios({{$item->id}})' title="View">
                                                         <i class="bi bi-eye-fill"></i>
                                                     </button></td>
                                                 <td style="border: 1px solid black;">{{ $item->task_completion ?? 'N/A' }}</td>
@@ -333,13 +333,11 @@
                         @if ($practicalscore && $practicalscore->practicalScoreSkills->isNotEmpty())
                             @foreach ($practicalscore->practicalScoreSkills as $practicalScoreSkill)
                                 <div class="mb-4">
-                                    <!-- Access the related PositionSkill using position_skill_id -->
                                     @php
-                                        $positionSkill = $practicalScoreSkill->position_skill; // Get the related PositionSkill
-                                        $skillTitle = $positionSkill ? $positionSkill->skill->title : 'N/A'; // Get the skill name
+                                        $positionSkill = $practicalScoreSkill->position_skill; 
+                                        $skillTitle = $positionSkill ? $positionSkill->skill->title : 'N/A';
                                     @endphp
         
-                                    <!-- Display Skill Name -->
                                     <h6 class="fw-bold">Skill Title: {{ $skillTitle }}</h6>
         
                                     <div class="mb-3">
@@ -351,6 +349,7 @@
                                         <label class="form-label fw-bold">Comment/s</label>
                                         <textarea class="form-control" rows="4" readonly>{{ $practicalScoreSkill->comment }}</textarea>
                                     </div>
+                                    
                                 </div>
                                 <hr>
                             @endforeach
@@ -362,7 +361,67 @@
             </div>
         </div>
         
+        <div class="modal fade" id="scenarioModal" tabindex="-1" aria-labelledby="scenarioModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered modal-lg">
+                <div class="modal-content">
+                    <div class="modal-header justify-content-center position-relative">
+                        <h5 class="modal-title text-center fw-bold" id="scenarioModalLabel">View Scenarios</h5>
+                        <button type="button" class="btn-close position-absolute end-0 me-3" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
         
+                    <div class="modal-body" style="max-height: 70vh; overflow-y: auto;">
+                        @if ($practicalscoreskill) 
+                            <div class="mb-4">
+                                @php
+                                    $positionSkill = $practicalscoreskill->position_skill;
+                                    $skillTitle = $positionSkill ? $positionSkill->skill->title : 'N/A';
+                                @endphp
+                    
+                                <h6 class="fw-bold">Skill Title: {{ $skillTitle }}</h6>
+                    
+                                @if ($practicalscoreskill->practicalscoreskillScenarios->isNotEmpty())
+                                    <div class="mt-4">
+                                        <h6 class="fw-bold">Scenarios:</h6>
+                                        <table class="table table-bordered global-table">
+                                            <thead>
+                                                <tr>
+                                                    <th>#</th>
+                                                    <th>Scenario</th>
+                                                    <th>Description</th>
+                                                    <th style="width: 20%;">Attachment</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                @foreach ($practicalscoreskill->practicalScoreSkillScenarios as $index => $skillScenario)
+                                                    <tr>
+                                                        <td>{{ $index + 1 }}</td>
+                                                        <td>{{ $skillScenario->practical_scenarios->scenario ?? 'N/A' }}</td>
+                                                        <td>{{ $skillScenario->practical_scenarios->description ?? 'No description' }}</td>
+                                                        <td>
+                                                            @if ($skillScenario->practical_scenarios->file_path)
+                                                                <a href="{{ Storage::url($skillScenario->practical_scenarios->file_path) }}" download class="btn btn-sm btn-outline-secondary ms-2">
+                                                                    <i class="bi bi-download"></i>
+                                                                </a>
+                                                            @else
+                                                                No attachment
+                                                            @endif
+                                                        </td>
+                                                    </tr>
+                                                @endforeach
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                @else
+                                    <p class="text-muted">No questions available for this skill.</p>
+                                @endif
+                            </div>
+                        @else
+                            <p>No practical score skills available.</p>
+                        @endif
+                    </div>                
+                </div>
+            </div>
+        </div>
         
 
     </section>
@@ -408,6 +467,14 @@
     $wire.on('hide-evaluationModal', () => {
         $('#practicalScoreModal').modal('show');
         $('#evaluationModal').modal('hide');
+    });
+    
+    $wire.on('show-scenarioModal', () => {
+        new bootstrap.Modal(document.getElementById('scenarioModal')).show();
+    });
+
+    $wire.on('hide-scenarioModal', () => {
+        bootstrap.Modal.getInstance(document.getElementById('scenarioModal')).hide();
     });
 
 </script>

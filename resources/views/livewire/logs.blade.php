@@ -1,4 +1,4 @@
-<div class="container mt-4">
+<div>
     <div class="card shadow-lg">
         <div class="card-header text-white text-center py-3" style="background-color: #1e1b4b; border-radius: 12px 12px 0 0;">
             <h2 class="fw-bold m-0">Activity Logs</h2>
@@ -30,7 +30,7 @@
             </div>
 
             <div class="table-responsive">
-                <table class="table table-striped table-hover">
+                <table class="table table-hover table-bordered text-center global-table">
                     <thead style="background-color: #f8f9fa;">
                         <tr>
                             <th>#</th>
@@ -74,14 +74,10 @@
                         @endforelse
                     </tbody>
                 </table>
-                {{-- <div>
-                    {{ $logs->links() }}
-                </div> --}}
-            </div>
-
-            <div class="d-flex justify-content-center mt-4">
-                    {{$logs->links()}}
+                <div>
+                    {{ $logs->links(data: ['scrollTo' => false]) }}
                 </div>
+            </div>    
         </div>
     </div>
 

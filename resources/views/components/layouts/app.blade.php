@@ -299,33 +299,8 @@
     </li>
   @endcan
 
-    @can('secretariat permission')
-      <li class="nav-item">
-        <a class="nav-link {{ Request::routeIs('eval.*') ? '' : 'collapsed' }}" data-bs-target="#eval-nav" data-bs-toggle="collapse" href="#">
-          <i class="bi bi-arrow-clockwise fs-5"></i><span>Ongoing Exams</span><i class="bi bi-chevron-down ms-auto"></i>
-        </a>
-        <ul id="eval-nav" class="nav-content collapse {{ Request::routeIs('eval.*') ? 'show' : '' }}" data-bs-parent="#sidebar-nav">
-          <li>
-            <a class="{{ Request::routeIs('eval.assessmentnotes') ? 'active' : '' }}" href="{{ route('eval.assessmentnotes') }}">
-              <i class="bi bi-card-text fs-5"></i><span>Assessment Notes Form</span>
-            </a>
-          </li>
-          <li>
-            <a class="{{ Request::routeIs('eval.ptestevaluations') ? 'active' : '' }}" href="{{ route('eval.ptestevaluations') }}">
-              <i class="bi bi-journal-medical fs-5"></i><span>Practical Test Evaluation Form</span>
-            </a>
-          </li>
-          <li>
-            <a class="{{ Request::routeIs('eval.otestevaluations') ? 'active' : '' }}" href="{{ route('eval.otestevaluations') }}">
-              <i class="bi bi-chat-text-fill fs-5"></i><span>Oral Test Evaluation Form</span>
-            </a>
-          </li>
-        </ul>
-      </li>
-    @endcan
 
-
-      <li class="nav-item">
+      {{-- <li class="nav-item">
         <a class="nav-link {{ Request::routeIs('reports.*') ? '' : 'collapsed' }}" data-bs-target="#reports-nav" data-bs-toggle="collapse" href="#">
           <i class="bi bi-file-bar-graph-fill fs-5"></i></i><span>Reports</span><i class="bi bi-chevron-down ms-auto"></i>
         </a>
@@ -341,7 +316,7 @@
             </a>
           </li>
         </ul>
-      </li>
+      </li> --}}
 
       <li class="nav-item">
         <a class="nav-link {{ Request::routeIs('logs') ? '' : 'collapsed' }}" href="{{ route('logs') }}">

@@ -48,11 +48,11 @@
                     <table class="table table-hover table-bordered text-center global-table">
                         <thead class="table-light">
                             <tr>
-                                <th scope="col">#</th>
-                                <th scope="col">Venue</th>
-                                <th scope="col">Location</th>
-                                <th scope="col">Status</th>
-                                <th scope="col">Actions</th>
+                                <th style="width: 5%">#</th>
+                                <th>Venue</th>
+                                <th>Location</th>
+                                <th style="width: 5%">Status</th>
+                                <th style="width: 5%">Actions</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -73,8 +73,7 @@
                                             wire:click='readVenue({{$item->id}})'
                                             data-bs-toggle="tooltip"
                                             data-bs-title="Edit venue">
-                                            <i class="bi bi-pencil-square me-1"></i>
-                                            <span class="d-none d-md-inline ms-1">Edit</span>
+                                            <i class="bi bi-pencil-square"></i>
                                         </button>
                                         @endcan
 
@@ -84,7 +83,6 @@
                                             data-bs-toggle="tooltip"
                                             data-bs-title="{{$item->deleted_at == Null ? 'Move to archive': 'Restore venue'}}">
                                             <i class="bi {{$item->deleted_at == Null ? 'bi bi-archive-fill': 'bi-arrow-counterclockwise'}}"></i>
-                                            <span class="d-none d-md-inline ms-1">{{$item->deleted_at == Null ? 'Archive': 'Restore'}}</span>
                                         </button>
                                         @endcan
                                     </div>

@@ -12,6 +12,12 @@ use Illuminate\Support\Str;
 use Livewire\Component;
 use Livewire\WithPagination;
 use Carbon\Carbon;
+use App\Models\AssessmentScore;
+use App\Models\Position;
+use App\Models\AssessmentScoreSkill;
+use App\Models\PositionSkill;
+use App\Models\AssessmentQuestion;
+use App\Models\AssessmentScoreSkillQuestion;
 
 class Assessmentlist extends Component
 {
@@ -87,6 +93,7 @@ class Assessmentlist extends Component
             ->when($this->search, function ($query) {
                 $query->where('title', 'like', '%' . $this->search . '%');
             })
+            ->orderByDesc('created_at')
             ->paginate(10);
     }
 
@@ -103,16 +110,13 @@ class Assessmentlist extends Component
                     $q->where('title', 'like', '%' . $this->search . '%');
                 });
             })
-            ->paginate(10);
+            ->orderByDesc('created_at')
+            ->paginate(10, ['*'], 'assignedassessmentsPage');
     }
-
-    
 
     public function createAssignedAssessment()
     {
         try {
-            // $this->validate();
-
             $this->access_code = $this->generateUniqueAccessCode();
 
             DB::transaction(function () {
@@ -124,12 +128,65 @@ class Assessmentlist extends Component
                 $assignedassessment->draft_status = $this->draft_status;
                 $assignedassessment->access_code = $this->access_code;
                 $assignedassessment->save();
+
+                $assessmentScore = new AssessmentScore();
+                $assessmentScore->assigned_assessment_id = $assignedassessment->id;
+                $assessmentScore->save();
+
+                $candidate = Candidate::findOrFail($this->selectedcandidate['id']);
+                $position = Position::find($candidate->position_id);
+
+                if ($position && in_array($position->item, [8, 10])) {
+                    Log::info('Candidate\'s position item is 8 or 10', [
+                        'candidate_id' => $candidate->id,
+                        'position_id' => $position->id,
+                        'item' => $position->item,
+                    ]);
+                }
+
+                $positionSkills = PositionSkill::where('position_id', $candidate->position_id)->get();
+
+                $totalDuration = 0;
+
+                foreach ($positionSkills as $skill) {
+                    $assessmentScoreSkill = AssessmentScoreSkill::create([
+                        'assessment_scores_id' => $assessmentScore->id,
+                        'position_skill_id' => $skill->id,
+                    ]);
+
+                    $distribution = match ($skill->competency_level) {
+                        'basic' => ['basic' => 5, 'intermediate' => 2, 'advanced' => 1],
+                        'intermediate' => ['basic' => 2, 'intermediate' => 4, 'advanced' => 2],
+                        'advanced' => ['basic' => 1, 'intermediate' => 2, 'advanced' => 5],
+                        default => ['basic' => 0, 'intermediate' => 0, 'advanced' => 0],
+                    };
+
+                    foreach ($distribution as $level => $count) {
+                        $questions = AssessmentQuestion::where('position_skill_id', $skill->id)
+                            ->where('competency_level', $level)
+                            ->inRandomOrder()
+                            ->limit($count)
+                            ->get();
+
+                        foreach ($questions as $question) {
+                            AssessmentScoreSkillQuestion::create([
+                                'assessment_score_skill_id' => $assessmentScoreSkill->id,
+                                'assessmentquestion_id' => $question->id,
+                            ]);
+
+                            $totalDuration += $question->duration; // ⬅️ add each question's duration
+                        }
+                    }
+                }
+
+                $assessmentScore->total_duration = $totalDuration;
+                $assessmentScore->save();
             });
 
             $this->clear();
             $this->dispatch('hide-assignedAssessmentModal');
             $this->dispatch('success', 'Schedule Created Successfully');
-            
+
         } catch (\Exception $e) {
             Log::error('Error creating assigned assessment: ' . $e->getMessage(), [
                 'trace' => $e->getTraceAsString(),
@@ -154,7 +211,7 @@ class Assessmentlist extends Component
     protected function generateUniqueAccessCode()
     {
         do {
-            $code = Str::upper(Str::random(8));
+            $code = Str::upper(Str::random(5));
         } while (AssignedAssessment::where('access_code', $code)->exists());
 
         return $code;
@@ -213,7 +270,7 @@ class Assessmentlist extends Component
     {
         $query = Candidate::query();
     
-        return $query->paginate(5);
+        return $query->paginate(5, ['*'], 'candidatesPage');
     }
     
 
@@ -238,32 +295,6 @@ class Assessmentlist extends Component
         $this->clear();
         $this->dispatch('hide-skillModal');
         $this->dispatch('success', 'Skill updated successfully.');
-    }
-
-    public function confirmDelete($id)
-    {
-
-        $this->dispatch('confirm-delete', 
-            message: 'This skill will be sent to archive',
-            eventName: 'deleteSkill',
-            eventData: ['id' => $id]
-        );
-    }
-
-    
-    public function deleteAssignedAssessment($id)
-    {
-        AssignedAssessment::findOrFail($id)->delete();
-
-        $this->dispatch('success', 'Skill archived successfully');
-    }
-
-    public function restoreSkill($skill_id)
-    {
-        $skill = AssignedAssessment::withTrashed()->findOrFail($skill_id);
-        $skill->restore();
-    
-        $this->dispatch('success', 'Skill restored successfully.');
     }
 
     public function showAddEditModal()

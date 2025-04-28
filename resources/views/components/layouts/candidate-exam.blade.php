@@ -42,17 +42,17 @@
 
 <body>
 
-  <header id="header" class="header fixed-top d-flex align-items-center">
+  {{-- <header id="header" class="header fixed-top d-flex align-items-center">
 
-  <div class="d-flex ">
-</div>
+    <div class="d-flex ">
+    </div>
 
 
     <nav class="header-nav ms-auto">
       <ul class="d-flex align-items-center">
 
        
-
+        
         <li class="nav-item dropdown pe-3">
 
           <a class="nav-link nav-profile d-flex align-items-center pe-0" href="#" data-bs-toggle="dropdown">
@@ -112,7 +112,7 @@
       </ul>
     </nav><!-- End Icons Navigation -->
 
-  </header><!-- End Header -->
+  </header><!-- End Header --> --}}
 
   <main id="main" class="main" style="padding-top: 0;"> 
     {{ $slot }} 

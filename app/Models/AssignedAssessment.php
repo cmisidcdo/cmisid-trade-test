@@ -20,4 +20,8 @@ class AssignedAssessment extends Model
     {
         return $this->belongsTo(Venue::class);
     }
+    public function assessmentScore()
+    {
+        return $this->hasOne(AssessmentScore::class);
+    }
 }

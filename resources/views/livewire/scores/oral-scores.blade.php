@@ -178,7 +178,7 @@
                                                 <td style="border: 1px solid black;">{{ $item->skill->title ?? 'N/A' }}</td>
                                                 <td style="border: 1px solid black;">{{ $item->position_skill->competency_level ?? 'N/A' }}</td>
                                                 <td style="border: 1px solid black;">  
-                                                    <button class="btn btn-sm btn-outline-dark me-1" data-bs-toggle="modal" data-bs-target="#viewModal" data-bs-placement="top" title="View">
+                                                    <button class="btn btn-sm btn-outline-dark me-1" wire:click='showQuestions({{$item->id}})' title="View">
                                                         <i class="bi bi-eye-fill"></i>
                                                     </button></td>
                                                 <td style="border: 1px solid black;">{{ $item->knowledge ?? 'N/A' }}</td>
@@ -351,6 +351,70 @@
             </div>
         </div>
     </div>
+
+    <div class="modal fade" id="questionModal" tabindex="-1" aria-labelledby="questionModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-lg">
+            <div class="modal-content">
+                <div class="modal-header justify-content-center position-relative">
+                    <h5 class="modal-title text-center fw-bold" id="questionModalLabel">View Questions</h5>
+                    <button type="button" class="btn-close position-absolute end-0 me-3" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+    
+                <div class="modal-body" style="max-height: 70vh; overflow-y: auto;">
+                    @if ($oralscoreskill) 
+                        <div class="mb-4">
+                            @php
+                                $positionSkill = $oralscoreskill->position_skill;
+                                $skillTitle = $positionSkill ? $positionSkill->skill->title : 'N/A';
+                            @endphp
+                
+                            <h6 class="fw-bold">Skill Title: {{ $skillTitle }}</h6>
+                
+                            @if ($oralscoreskill->oralscoreskillQuestions->isNotEmpty())
+                                <div class="mt-4">
+                                    <h6 class="fw-bold">Questions:</h6>
+                                    <table class="table table-bordered global-table">
+                                        <thead>
+                                            <tr>
+                                                <th>#</th>
+                                                <th>Question</th>
+                                                <th>Description</th>
+                                                <th style="width: 20%;">Attachment</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            @foreach ($oralscoreskill->oralScoreSkillQuestions as $index => $skillQuestion)
+                                                <tr>
+                                                    <td>{{ $index + 1 }}</td>
+                                                    <td>{{ $skillQuestion->oral_questions->question ?? 'N/A' }}</td>
+                                                    <td>{{ $skillQuestion->oral_questions->description ?? 'No description' }}</td>
+                                                    <td>
+                                                        @if ($skillQuestion->oral_questions->file_path)
+                                                            <a href="{{ Storage::url($skillQuestion->oral_questions->file_path) }}" download class="btn btn-sm btn-outline-secondary ms-2">
+                                                                <i class="bi bi-download"></i>
+                                                            </a>
+                                                        @else
+                                                            No attachment
+                                                        @endif
+                                                    </td>
+                                                </tr>
+                                            @endforeach
+                                        </tbody>
+                                    </table>
+                                </div>
+                            @else
+                                <p class="text-muted">No questions available for this skill.</p>
+                            @endif
+                        </div>
+                    @else
+                        <p>No oral score skills available.</p>
+                    @endif
+                </div>                
+            </div>
+        </div>
+    </div>
+    
+    
     
 </div>
 
@@ -394,6 +458,14 @@
     $wire.on('hide-evaluationModal', () => {
         new bootstrap.Modal(document.getElementById('oralScoreModal')).show();
         bootstrap.Modal.getInstance(document.getElementById('evaluationModal')).hide();
+    });
+
+    $wire.on('show-questionModal', () => {
+        new bootstrap.Modal(document.getElementById('questionModal')).show();
+    });
+
+    $wire.on('hide-questionModal', () => {
+        bootstrap.Modal.getInstance(document.getElementById('questionModal')).hide();
     });
 
 </script>

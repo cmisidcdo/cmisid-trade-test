@@ -107,8 +107,8 @@ class Assessmentlist extends Component
             ->selectRaw('assigned_assessments.*, 
                         DATEDIFF(CURRENT_DATE, CONCAT(assigned_assessments.assigned_date, " ", assigned_assessments.assigned_time)) AS aging_days')
             ->when($this->search, function ($query) {
-                $query->where(function ($q) {
-                    $q->where('title', 'like', '%' . $this->search . '%');
+                $query->whereHas('candidate', function ($q) {
+                    $q->where('fullname', 'like', '%' . $this->search . '%');
                 });
             })
             ->orderByDesc('created_at')

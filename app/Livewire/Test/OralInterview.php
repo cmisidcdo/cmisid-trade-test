@@ -77,10 +77,7 @@ class OralInterview extends Component
         $query = OralQuestion::withTrashed()
             ->with(['positionSkill.position'])
             ->when($this->search, function ($query) {
-                $query->where(function ($q) {
-                    $q->where('question', 'like', '%' . $this->search . '%')
-                        ->orWhere('duration', 'like', '%' . $this->search . '%');
-                });
+                $query->where('positions.title', 'like', '%' . $this->search . '%');
             });
     
         $grouped = $query

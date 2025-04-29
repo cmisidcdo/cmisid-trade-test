@@ -51,8 +51,8 @@
                             <tr>
                                 <th style="width: 5%;">#</th>
                                 <th>Title</th>
-                                <th style="width: 40%;">Description</th>
-                                <th style="width: 8%;">Salary Grade</th>
+                                <th style="width: 35%;">Description</th>
+                                <th style="width: 12%;">Salary Grade</th>
                                 <th style="width: 5%;">Status</th>
                                 <th style="width: 10%;">Actions</th>
                             </tr>

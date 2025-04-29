@@ -34,10 +34,9 @@ class OralScores extends Component
     {
         return OralScore::with('candidate')
             ->when($this->search, function ($query) {
-                $query->where('title', 'like', '%' . $this->search . '%')
-                    ->orWhereHas('candidate', function ($q) {
-                        $q->where('name', 'like', '%' . $this->search . '%');
-                    });
+                $query->whereHas('candidate', function ($q) {
+                    $q->where('fullname', 'like', '%' . $this->search . '%');
+                });
             })
             ->when($this->filterStatus !== 'all', function ($query) {
                 $query->where('status', $this->filterStatus);
@@ -136,9 +135,25 @@ class OralScores extends Component
             'comment' => $this->evaluation['comment'],
         ]);
 
+        $this->finalizeOralScore($this->oralScoreId);
         $this->readOralScore($this->oralScoreId);
         $this->dispatch('hide-evaluationModal');
         $this->dispatch('success', 'Evaluation submitted successfully.');
+    }
+
+    public function finalizeOralScore($oral_score_id)
+    {
+        $oralScoreSkills = OralScoreSkill::where('oral_score_id', $oral_score_id)->get();
+
+        if ($oralScoreSkills->contains(fn($skill) => is_null($skill->score))) {
+            return;
+        }
+
+        $averageScore = round($oralScoreSkills->avg('score'), 2);
+
+        OralScore::where('id', $oral_score_id)->update([
+            'total_score' => $averageScore,
+        ]);
     }
 
     public function showQuestions($oralskillId)

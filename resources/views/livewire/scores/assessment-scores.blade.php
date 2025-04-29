@@ -30,7 +30,7 @@
                             </div>
                 
                             <div class="dropdown">
-                                <button class="btn btn-outline-primary dropdown-toggle" type="button" id="filterDropdown"
+                                <button class="btn btn-primary dropdown-toggle" type="button" id="filterDropdown"
                                     data-bs-toggle="dropdown" aria-expanded="false">
                                     <i class="bi bi-funnel"></i> Filter
                                 </button>
@@ -58,7 +58,7 @@
                                     <span class="badge bg-secondary">
                                         <i class="bi bi-funnel"></i> 
                                         {{ $filterStatus === 'yes' ? 'Active' : 'Inactive' }}
-                                        <button class="btn btn-sm btn-outline-light border-0 ms-1" wire:click="$set('filterStatus', 'all')">
+                                        <button class="btn btn-sm btn-light border-0 ms-1" wire:click="$set('filterStatus', 'all')">
                                             <i class="bi bi-x"></i>
                                         </button>
                                     </span>
@@ -99,7 +99,7 @@
                                 </td>
                                 <td >{{ $item->total_score ?? 'N/A' }}</td>
                                 <td >
-                                    <button class="btn btn-sm btn-outline-primary me-1" wire:click='readAssessmentScore({{$item->id}})' title="Edit">
+                                    <button class="btn btn-sm btn-primary me-1" wire:click='readAssessmentScore({{$item->id}})' title="Edit">
                                         <i class="bi bi-pencil-square"></i>
                                     </button>
                                 </td>
@@ -168,13 +168,13 @@
                                                 <td >{{ $item->skill->title ?? 'N/A' }}</td>
                                                 <td >{{ $item->position_skill->competency_level ?? 'N/A' }}</td>
                                                 <td >  
-                                                    <button class="btn btn-sm btn-outline-dark me-1" data-bs-toggle="modal" data-bs-target="#viewModal" data-bs-placement="top" title="View">
+                                                    <button class="btn btn-sm btn-dark me-1" data-bs-toggle="modal" data-bs-target="#viewModal" data-bs-placement="top" title="View">
                                                         <i class="bi bi-eye-fill"></i>
                                                     </button></td>
                                                 <td >{{ $item->skill_score ?? 'N/A' }}</td>
                                                 <td >{{ $item->assessmentscore->total_score ?? 'N/A' }}</td>
                                                 <td >
-                                                    <button class="btn btn-sm btn-outline-primary me-1" data-bs-toggle="modal" data-bs-target="#assessmentScoreModal" title="Edit">
+                                                    <button class="btn btn-sm btn-primary me-1" data-bs-toggle="modal" data-bs-target="#assessmentScoreModal" title="Edit">
                                                         <i class="bi bi-pencil-square"></i>
                                                     </button>
                                                 </td>

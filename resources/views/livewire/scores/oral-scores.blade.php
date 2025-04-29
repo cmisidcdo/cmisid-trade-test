@@ -36,7 +36,7 @@
                             </div>
                 
                             <div class="dropdown">
-                                <button class="btn btn-outline-primary dropdown-toggle" type="button" id="filterDropdown"
+                                <button class="btn btn-primary dropdown-toggle" type="button" id="filterDropdown"
                                     data-bs-toggle="dropdown" aria-expanded="false">
                                     <i class="bi bi-funnel"></i> Filter
                                 </button>
@@ -64,7 +64,7 @@
                                     <span class="badge bg-secondary">
                                         <i class="bi bi-funnel"></i> 
                                         {{ $filterStatus === 'yes' ? 'Active' : 'Inactive' }}
-                                        <button class="btn btn-sm btn-outline-light border-0 ms-1" wire:click="$set('filterStatus', 'all')">
+                                        <button class="btn btn-sm btn-light border-0 ms-1" wire:click="$set('filterStatus', 'all')">
                                             <i class="bi bi-x"></i>
                                         </button>
                                     </span>
@@ -96,7 +96,7 @@
                             <tr>
                                 <td>{{$loop->iteration}}</td>
                                 <td>
-                                    <button type="button" class="btn btn-sm btn-outline-primary" wire:click="readNote({{ $item->id }})">
+                                    <button type="button" class="btn btn-sm btn-primary" wire:click="readNote({{ $item->id }})">
                                         <i class="bi bi-stickies"></i>
                                     </button>
                                 </td>
@@ -114,7 +114,7 @@
                                 </td>
                                 <td>{{ $item->total_score ?? 'N/A' }}</td>
                                 <td>
-                                    <button class="btn btn-sm btn-outline-primary me-1" wire:click='readOralScore({{$item->id}})' title="Edit">
+                                    <button class="btn btn-sm btn-primary me-1" wire:click='readOralScore({{$item->id}})' title="Edit">
                                         <i class="bi bi-pencil-square"></i>
                                     </button>
                                 </td>
@@ -185,7 +185,7 @@
                                                 <td>{{ $item->skill->title ?? 'N/A' }}</td>
                                                 <td>{{ $item->position_skill->competency_level ?? 'N/A' }}</td>
                                                 <td>  
-                                                    <button class="btn btn-sm btn-outline-dark me-1" wire:click='showQuestions({{$item->id}})' title="View">
+                                                    <button class="btn btn-sm btn-dark me-1" wire:click='showQuestions({{$item->id}})' title="View">
                                                         <i class="bi bi-eye-fill"></i>
                                                     </button></td>
                                                 <td>{{ $item->knowledge ?? 'N/A' }}</td>
@@ -193,7 +193,7 @@
                                                 <td>{{ $item->problem_solving ?? 'N/A' }}</td>
                                                 <td>{{ $item->score ?? 'N/A' }}</td>
                                                 <td>
-                                                    <button class="btn btn-sm btn-outline-primary me-1" wire:click='evaluateSkill({{$item->id}})' title="Edit">
+                                                    <button class="btn btn-sm btn-primary me-1" wire:click='evaluateSkill({{$item->id}})' title="Edit">
                                                         <i class="bi bi-pencil-square"></i>
                                                     </button>
                                                 </td>
@@ -397,7 +397,7 @@
                                                     <td>{{ $skillQuestion->oral_questions->description ?? 'No description' }}</td>
                                                     <td>
                                                         @if ($skillQuestion->oral_questions->file_path)
-                                                            <a href="{{ Storage::url($skillQuestion->oral_questions->file_path) }}" download class="btn btn-sm btn-outline-secondary ms-2">
+                                                            <a href="{{ Storage::url($skillQuestion->oral_questions->file_path) }}" download class="btn btn-sm btn-secondary ms-2">
                                                                 <i class="bi bi-download"></i>
                                                             </a>
                                                         @else

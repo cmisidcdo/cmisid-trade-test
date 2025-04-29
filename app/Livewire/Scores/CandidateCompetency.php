@@ -33,12 +33,11 @@ class CandidateCompetency extends Component
 
     public function loadTestsStatus()
     {
-        $assessmentScores = AssessmentScore::with('assignedAssessment') // Eager load the relationship
+        $assessmentScores = AssessmentScore::with('assignedAssessment') 
             ->when($this->search, function ($query) {
-                $query->where('title', 'like', '%' . $this->search . '%')
-                    ->orWhereHas('assignedAssessment.candidate', function ($q) {
-                        $q->where('name', 'like', '%' . $this->search . '%');
-                    });
+                $query->whereHas('candidate', function ($q) {
+                    $q->where('fullname', 'like', '%' . $this->search . '%');
+                });
             })
             ->when($this->filterStatus !== 'all', function ($query) {
                 $query->where('status', $this->filterStatus);
@@ -60,6 +59,7 @@ class CandidateCompetency extends Component
             $candidateId = $assignedAssessment ? $assignedAssessment->candidate_id : null;
     
             if ($candidateId) {
+                $assessmentScore->candidate_id = $candidateId; 
                 $assignedPractical = AssignedPractical::where('candidate_id', $candidateId)->first();
 
                 if ($assignedPractical) {
@@ -95,20 +95,6 @@ class CandidateCompetency extends Component
     
         return $assessmentScores;
     }
-    
-
-    
-
-
-
-
-
-
-
-
-    
-
-
 
     public function readAssessmentScore($assessmentscoreId)
     {
@@ -128,4 +114,8 @@ class CandidateCompetency extends Component
         $this->dispatch('show-assessmentScoreModal');
     }
 
+    public function seeResults($candidate_id)
+    {
+        return redirect()->route('scores.candidatecompetencyresults', $candidate_id);
+    }
 }

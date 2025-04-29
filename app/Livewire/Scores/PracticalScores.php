@@ -21,7 +21,7 @@ class PracticalScores extends Component
     public $venues = [], $evaluation = [], $practicalscoreskills = [];
     public $selectedcandidate;
 
-    public $practicalScoreId, $practical_skillId; 
+    public $practicalScoreId, $practical_skillId, $practicalscore, $practicalscoreskill;
     public $skillname;
 
     public function render()
@@ -60,10 +60,35 @@ class PracticalScores extends Component
             'practicalscoreskills' => $practicalscore->practicalScoreSkills, 
         ]);
 
+        $this->practicalScoreId = $practicalscoreId;
         $this->editMode = true;
 
         $this->dispatch('show-practicalScoreModal');
     }
+
+    public function readNote($practicalscoreId)
+    {
+        $practicalscore = PracticalScore::with('practicalScoreSkills.position_skill.skill')
+                                        ->find($practicalscoreId);
+
+        if (!$practicalscore) {
+            session()->flash('error', 'Practical Score not found!');
+            return redirect()->route('some.route');
+        }
+
+        $this->practicalscore = $practicalscore;
+
+        $this->dispatch('show-noteModal');
+    }
+
+    
+
+
+
+
+
+    
+        
 
     public function evaluateSkill($practicalskillId)
     {
@@ -113,10 +138,23 @@ class PracticalScores extends Component
             'comment' => $this->evaluation['comment'],
         ]);
 
+        $this->readPracticalScore($this->practicalScoreId);
         $this->dispatch('hide-evaluationModal');
-        session()->flash('message', 'Evaluation submitted successfully.');
+        $this->dispatch('success', 'Evaluation submitted successfully.');
+    }       
+
+
+    public function showScenarios($practicalskillId)
+    {
+        try {
+            $this->practicalscoreskill = PracticalScoreSkill::with('practicalScoreSkillScenarios.practical_scenarios')->findOrFail($practicalskillId);
+
+            $this->dispatch('show-scenarioModal');
+        } catch (\Exception $e) {
+            Log::error('Error fetching practicalScoreSkill: ' . $e->getMessage(), [
+                'practicalskill_id' => $practicalskillId ?? null,
+            ]);
+            abort(500, 'Something went wrong.');
+        }
     }
-
-
-
 }

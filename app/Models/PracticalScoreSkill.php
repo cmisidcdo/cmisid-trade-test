@@ -24,5 +24,10 @@ class PracticalScoreSkill extends Model
         return $this->belongsTo(PracticalScore::class, 'practical_score_id');
     }
 
+    public function practicalScoreSkillScenarios()
+    {
+        return $this->hasMany(PracticalScoreSkillScenario::class, 'practical_score_skill_id');
+    }
+
 
 }

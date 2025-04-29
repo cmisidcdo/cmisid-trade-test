@@ -66,21 +66,6 @@ class Skills extends Component
         $this->archive = !$this->archive;
     }
 
-    public function getSkills()
-    {
-        $query = Skill::query();
-
-        if ($this->archive) {
-            $query->onlyTrashed(); 
-        }
-
-        return $query
-            ->when($this->search, function ($query) {
-                $query->where('title', 'like', '%' . $this->search . '%');
-            })
-            ->paginate(10);
-    }
-
     public function loadSkills()
     {
         return Skill::withTrashed()

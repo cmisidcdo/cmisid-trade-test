@@ -2,6 +2,7 @@
 
 namespace App\Livewire\Exam;
 
+use App\Jobs\SendPracticalCodeEmailJob;
 use App\Models\AssignedPractical;
 use App\Models\Candidate;
 use App\Models\PracticalScenario;
@@ -18,7 +19,6 @@ use Livewire\WithPagination;
 use Carbon\Carbon;
 use App\Models\Position;
 use App\Models\PositionSkill;
-use App\Models\practicalQuestion;
 
 class Practicallist extends Component
 {
@@ -89,7 +89,7 @@ class Practicallist extends Component
                 });
             })
             ->orderByDesc('created_at')
-            ->paginate(10);
+            ->paginate(10, ['*'], 'assignedpracticalsPage');
     }
 
     public function createAssignedPractical()
@@ -123,6 +123,11 @@ class Practicallist extends Component
                         'position_id' => $position->id,
                         'item' => $position->item,
                     ]);
+                }
+
+                //emailing
+                if (isset($assignedpractical) && isset($candidate)) {
+                    SendPracticalCodeEmailJob::dispatch($assignedpractical, $candidate);
                 }
             });
 
@@ -224,31 +229,27 @@ class Practicallist extends Component
     {
         $query = Candidate::query();
     
-        return $query->paginate(5);
+        return $query->paginate(5, ['*'], 'candidatesPage');
     }
     
 
 
     public function updateAssignedPractical()
     {
-        $this->validate();
-
         DB::transaction(function () {  
-            $skill = AssignedPractical::withTrashed()->findOrFail($this->skill_id);
+            $assignedpractical = AssignedPractical::findOrFail($this->assignedpracticalId);
             
-            $skill->title = $this->title;
-            if ($this->status === 'no' && is_null($skill->deleted_at)) {
-                $skill->delete();
-            } elseif ($this->status === 'yes' && !is_null($skill->deleted_at)) {
-                $skill->restore();
-            } else {
-                $skill->save();
-            }
+            $assignedpractical->venue_id = $this->venue_id;
+            $assignedpractical->assigned_date = $this->assigned_date;
+            $assignedpractical->assigned_time = $this->assigned_time;
+            $assignedpractical->draft_status = $this->draft_status;
+            $assignedpractical->save();
+
         });
 
         $this->clear();
-        $this->dispatch('hide-skillModal');
-        $this->dispatch('success', 'Skill updated successfully.');
+        $this->dispatch('hide-assignedPracticalModal');
+        $this->dispatch('success', 'assignedpractical updated successfully.');
     }
 
     public function showAddEditModal()

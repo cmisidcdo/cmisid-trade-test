@@ -6,22 +6,15 @@
     <section class="section dashboard">
         <div class="card shadow-sm">
             <div class="card-body p-4">
-                <div class="row align-items-center pt-3 pb-3">
-                    <div class="d-flex justify-content-between align-items-center mb-3">
-                        <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addCriteriaModal">
-                            <i class="bi bi-plus"></i> Add Criteria
-                        </button>
-                    </div>
-                </div>
 
                 <div class="table-responsive">
-                    <table class="table table-hover table-bordered table-striped align-middle text-center">
+                    <table class="table table-hover table-bordered align-middle text-center global-table">
                         <thead class="table-light">
                             <tr>
                                 <th scope="col" class="text-center">Criteria Name</th>
                                 <th scope="col" class="text-center">Description</th>
-                                <th scope="col" class="text-center">Percentage</th>
-                                <th scope="col" class="text-center">Actions</th>
+                                <th scope="col" class="text-center" style="width: 5%">Percentage</th>
+                                <th scope="col" class="text-center" style="width: 5%">Actions</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -31,14 +24,10 @@
                                 <td scope="row" class="text-center">25%</td>
                                 <td class="text-center">
                                     <div class="btn-group" role="group" aria-label="Criteria Actions">
-                                        <button class="btn btn-sm btn-primary rounded-2 px-2 py-1 me-2" style="background-color: #00bcd4; color: black; border: none;" data-bs-toggle="modal" data-bs-target="#viewCriteriaModal1">
+                                        <button class="btn btn-sm btn-primary rounded-2 px-2 py-1 me-2" data-bs-toggle="modal" data-bs-target="#viewCriteriaModal1">
                                             <i class="bi bi-eye me-1"></i>
-                                            <span class="d-none d-md-inline ms-1">View</span>
+        
                                         </button>
-                                        <button class="btn btn-sm btn-primary rounded-2 px-2 py-1 me-2">
-                                            <i class="bi bi-pencil-square me-1"></i>
-                                            <span class="d-none d-md-inline ms-1">Edit</span>
-                                        </button> 
                                     </div>
                                 </td>
                             </tr>
@@ -48,14 +37,10 @@
                                 <td scope="row" class="text-center">40%</td>
                                 <td class="text-center">
                                     <div class="btn-group" role="group" aria-label="Criteria Actions">
-                                        <button class="btn btn-sm btn-primary rounded-2 px-2 py-1 me-2" style="background-color: #00bcd4; color: black; border: none;" data-bs-toggle="modal" data-bs-target="#viewCriteriaModal2">
+                                        <button class="btn btn-sm btn-primary rounded-2 px-2 py-1 me-2" data-bs-toggle="modal" data-bs-target="#viewCriteriaModal2">
                                             <i class="bi bi-eye me-1"></i>
-                                            <span class="d-none d-md-inline ms-1">View</span>
+        
                                         </button>
-                                        <button class="btn btn-sm btn-primary rounded-2 px-2 py-1 me-2">
-                                            <i class="bi bi-pencil-square me-1"></i>
-                                            <span class="d-none d-md-inline ms-1">Edit</span>
-                                        </button> 
                                     </div>
                                 </td>
                             </tr>
@@ -65,14 +50,10 @@
                                 <td scope="row" class="text-center">20%</td>
                                 <td class="text-center">
                                     <div class="btn-group" role="group" aria-label="Criteria Actions">
-                                        <button class="btn btn-sm btn-primary rounded-2 px-2 py-1 me-2" style="background-color: #00bcd4; color: black; border: none;" data-bs-toggle="modal" data-bs-target="#viewCriteriaModal3">
+                                        <button class="btn btn-sm btn-primary rounded-2 px-2 py-1 me-2" data-bs-toggle="modal" data-bs-target="#viewCriteriaModal3">
                                             <i class="bi bi-eye me-1"></i>
-                                            <span class="d-none d-md-inline ms-1">View</span>
+        
                                         </button>
-                                        <button class="btn btn-sm btn-primary rounded-2 px-2 py-1 me-2">
-                                            <i class="bi bi-pencil-square me-1"></i>
-                                            <span class="d-none d-md-inline ms-1">Edit</span>
-                                        </button> 
                                     </div>
                                 </td>
                             </tr>
@@ -82,14 +63,9 @@
                                 <td scope="row" class="text-center">15%</td>
                                 <td class="text-center">
                                     <div class="btn-group" role="group" aria-label="Criteria Actions">
-                                        <button class="btn btn-sm btn-primary rounded-2 px-2 py-1 me-2" style="background-color: #00bcd4; color: black; border: none;" data-bs-toggle="modal" data-bs-target="#viewCriteriaModal4">
-                                            <i class="bi bi-eye me-1"></i>
-                                            <span class="d-none d-md-inline ms-1">View</span>
+                                        <button class="btn btn-sm btn-primary rounded-2 px-2 py-1 me-2" data-bs-toggle="modal" data-bs-target="#viewCriteriaModal4">
+                                            <i class="bi bi-eye"></i>
                                         </button>
-                                        <button class="btn btn-sm btn-primary rounded-2 px-2 py-1 me-2">
-                                            <i class="bi bi-pencil-square me-1"></i>
-                                            <span class="d-none d-md-inline ms-1">Edit</span>
-                                        </button> 
                                     </div>
                                 </td>
                             </tr>
@@ -214,7 +190,6 @@
         </div>
     </div>
 
-    <!-- View Criteria Modal 4 -->
     <div class="modal fade" id="viewCriteriaModal4" tabindex="-1" aria-labelledby="viewCriteriaModalLabel4" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered modal-lg">
             <div class="modal-content shadow">
@@ -247,41 +222,6 @@
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <div class="modal fade" id="addCriteriaModal" tabindex="-1" aria-labelledby="addCriteriaModal" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered modal-lg">
-            <div class="modal-content shadow">
-                <div class="modal-header bg-primary text-white py-2">
-                    <h5 class="modal-title fw-bold text-center w-100 fs-6" id="addCriteriaModal">Criteria Details</h5>
-                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    <form>
-                        <div class="mb-3">
-                            <label for="criteriaName" class="form-label">Criteria Name</label>
-                            <input type="text" class="form-control" id="criteriaName" required>
-                        </div>
-                        <div class="mb-3">
-                            <label for="criteriaDescription" class="form-label">Description</label>
-                            <textarea class="form-control" id="criteriaDescription" rows="3" required></textarea>
-                        </div>
-                        <div class="mb-3">
-                            <label for="criteriaPercentage" class="form-label">Percentage</label>
-                            <input type="number" class="form-control" id="criteriaPercentage" min="1" max="100" required>
-                        </div>
-                        <div class="mb-3">
-                            <label for="criteriaRubric" class="form-label">Detailed Rubric</label>
-                            <textarea class="form-control" id="criteriaRubric" rows="5" placeholder="Enter each rubric point on a new line"></textarea>
-                        </div>
-                    </form>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                    <button type="button" class="btn btn-primary">Save Criteria</button>
                 </div>
             </div>
         </div>

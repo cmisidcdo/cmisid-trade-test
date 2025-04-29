@@ -76,12 +76,12 @@
                     <table class="table table-hover table-bordered text-center global-table">
                         <thead class="table-light">
                             <tr>
-                                <th scope="col">#</th>
+                                <th scope="col" style="width: 5%">#</th>
                                 <th scope="col">
                                     Title
                                 </th>
-                                <th scope="col">Status</th>
-                                <th scope="col">Actions</th>
+                                <th scope="col" style="width: 5%">Status</th>
+                                <th scope="col" style="width: 5%">Actions</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -102,19 +102,8 @@
                                         data-bs-toggle="tooltip"
                                         data-bs-title="Edit skill">
                                         <i class="bi bi-pencil-square"></i>
-                                        <span class="d-none d-md-inline ms-1">Edit</span>
                                     </button>
                                     @endcan
-
-                                    {{-- @can('delete reference')
-                                    <button class="btn btn-sm {{$item->deleted_at == Null ? 'btn-danger': 'btn-outline-success'}} rounded-2 px-2 py-1"
-                                        wire:click='{{$item->deleted_at == Null ? 'confirmDelete('.$item->id.')': 'restoreSkill('.$item->id.')'}}'
-                                        data-bs-toggle="tooltip"
-                                        data-bs-title="{{$item->deleted_at == Null ? 'Move to archive': 'Restore skill'}}">
-                                        <i class="bi {{$item->deleted_at == Null ? 'bi bi-archive-fill': 'bi-arrow-counterclockwise'}}"></i>
-                                        <span class="d-none d-md-inline ms-1">{{$item->deleted_at == Null ? 'Archive': 'Restore'}}</span>
-                                    </button>
-                                    @endcan --}}
                                 </td>
                             </tr>
                             @empty

@@ -21,6 +21,6 @@ class AssignedPractical extends Model
 
     public function practicalScore()
     {
-        return $this->belongsTo(PracticalScore::class);
+        return $this->hasOne(PracticalScore::class);
     }
 }

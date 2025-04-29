@@ -3,8 +3,8 @@
     <h2 class="fw-bold m-0">Users</h2>
   </div>
   <section class="section dashboard">
-    <div class="card">
-      <div class="card-body">
+    <div class="card shadow-sm border-0 rounded-3">
+      <div class="card-body p-4">
         <div class="row align-items-center pt-3 pb-3">
           <div class="d-flex justify-content-between align-items-center mb-3">
               <button class="btn btn-primary" wire:click="showAddEditModal">
@@ -75,11 +75,11 @@
         <table class="table table-hover table-bordered text-center global-table">
           <thead class="table-light">
             <tr>
-              <th scope="col">#</th>
+              <th scope="col" style="width: 5%">#</th>
               <th scope="col">Name</th>
-              <th scope="col">Email</th>
-              <th scope="col">Status</th>
-              <th scope="col">Actions</th>
+              <th scope="col" style="width: 25%">Email</th>
+              <th scope="col" style="width: 5%">Status</th>
+              <th scope="col" style="width: 5%">Actions</th>
             </tr>
           </thead>
           <tbody>
@@ -97,7 +97,6 @@
                 <button class="btn btn-sm btn-info rounded-2 px-2 py-1 me-2"
                   wire:click="viewUser({{$item->id}})">
                   <i class="bi bi-eye"></i>
-                  <span class="d-none d-md-inline ms-1">View</span>
                 </button>
 
 
@@ -105,7 +104,6 @@
                 <button class="btn btn-sm btn-primary rounded-2 px-2 py-1 me-2"
                   wire:click='readUser({{$item->id}})'>
                   <i class="bi bi-pencil-square"></i>
-                  <span class="d-none d-md-inline ms-1">Edit</span>
                 </button>
                 @endcan
 

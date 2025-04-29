@@ -73,32 +73,32 @@
                 </div>
 
                 <div class="table-responsive">
-                    <table class="table table-hover align-middle border global-table">
-                        <thead style="border-collapse: collapse;">
+                    <table class="table table-hover table-bordered text-center global-table">
+                        <thead>
                             <tr>
-                                <th scope="col" class="text-center" width="5%">#</th>
+                                <th style="width: 5%">#</th>
                                 <th>Candidate Name</th>
-                                <th>Access Code</th>
-                                <th>Date</th>
-                                <th>Time</th>
-                                <th>Venue</th>
-                                <th>Status</th>
-                                <th>Aging Days</th>
-                                <th>Action</th>
+                                <th style="width: 8%">Access Code</th>
+                                <th style="width: 8%">Date</th>
+                                <th style="width: 5%">Time</th>
+                                <th style="width: 20%">Venue</th>
+                                <th style="width: 5%">Status</th>
+                                <th style="width: 8%">Aging Days</th>
+                                <th style="width: 10%">Action</th>
                             </tr>
                         </thead>
-                        <tbody style="border: 1px solid #ccc; border-collapse: collapse;">
+                        <tbody>
                             @forelse($assignedOrals as $item)
                             <tr>
-                                <td style="border: 1px solid black;">{{$loop->iteration}}</td>
-                                <td style="border: 1px solid black;">{{ $item->candidate->fullname ?? 'N/A' }}</td>
-                                <td style="border: 1px solid black;">{{ $item->access_code ?? 'N/A' }}</td>
-                                <td style="border: 1px solid black;">{{ $item->assigned_date ?? 'N/A' }}</td>
-                                <td style="border: 1px solid black;">{{ $item->assigned_time ?? 'N/A' }}</td>
-                                <td style="border: 1px solid black;">{{ $item->venue->name ?? 'N/A' }}, {{ $item->venue->location ?? 'N/A' }}</td>
-                                <td style="border: 1px solid black;">{{ $item->draft_status ?? 'N/A' }}</td>
-                                <td style="border: 1px solid black;">{{ $item->aging_days ?? 'N/A' }}</td>
-                                <td style="border: 1px solid black;">
+                                <td>{{$loop->iteration}}</td>
+                                <td>{{ $item->candidate->fullname ?? 'N/A' }}</td>
+                                <td>{{ $item->access_code ?? 'N/A' }}</td>
+                                <td>{{ $item->assigned_date ?? 'N/A' }}</td>
+                                <td>{{ $item->assigned_time ?? 'N/A' }}</td>
+                                <td>{{ $item->venue->name ?? 'N/A' }}, {{ $item->venue->location ?? 'N/A' }}</td>
+                                <td>{{ $item->draft_status ?? 'N/A' }}</td>
+                                <td>{{ $item->aging_days ?? 'N/A' }}</td>
+                                <td>
                                     <button class="btn btn-sm btn-outline-dark me-1" data-bs-toggle="modal" data-bs-target="#viewModal" data-bs-placement="top" title="View">
                                         <i class="bi bi-eye-fill"></i>
                                     </button>
@@ -122,6 +122,9 @@
                             @endforelse
                         </tbody>
                     </table>
+                    <div>
+                        {{ $assignedOrals->links(data: ['scrollTo' => false])}} 
+                    </div>     
                 </div>
                 
 

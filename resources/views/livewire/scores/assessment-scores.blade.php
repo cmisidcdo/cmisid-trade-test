@@ -7,7 +7,7 @@
             <div class="card-body p-4">
 
                 <div class="row align-items-center pt-3 pb-3">
-                    <div class="d-flex justify-content-between align-items-center mb-3">
+                    <div class="d-flex justify-content-between align-items-center">
                         <div class="d-flex gap-2 ms-auto">
                             <div class="input-group input-group-sm">
                                 <span class="input-group-text bg-light border-end-0">
@@ -69,28 +69,36 @@
                 </div>
                 
                 <div class="table-responsive">
-                    <table class="table table-hover align-middle border global-table">
+                    <table class="table table-hover table-bordered text-center global-table">
                         <thead style="border-collapse: collapse;">
                             <tr>
-                                <th scope="col" class="text-center" width="5%">#</th>
+                                <th style="width: 5%">#</th>
                                 <th>Candidate Name</th>
-                                <th>Date Finished</th>
-                                <th>Time Finished</th>
-                                <th>Status</th>
-                                <th>Score</th>
-                                <th>Action</th>
+                                <th style="width: 15%">Date Finished</th>
+                                <th style="width: 10%">Time Finished</th>
+                                <th style="width: 5%">Status</th>
+                                <th style="width: 5%">Score</th>
+                                <th style="width: 5%">Action</th>
                             </tr>
                         </thead>
-                        <tbody style="border: 1px solid #ccc; border-collapse: collapse;">
+                        <tbody>
                             @forelse($assessmentscores as $item)
                             <tr>
-                                <td style="border: 1px solid black;">{{$loop->iteration}}</td>
-                                <td style="border: 1px solid black;">{{ $item->candidate->fullname ?? 'N/A' }}</td>
-                                <td style="border: 1px solid black;">{{ $item->date_finished ?? 'N/A' }}</td>
-                                <td style="border: 1px solid black;">{{ $item->time_finished ?? 'N/A' }}</td>
-                                <td style="border: 1px solid black;">{{ $item->status ?? 'N/A' }}</td>
-                                <td style="border: 1px solid black;">{{ $item->total_score ?? 'N/A' }}</td>
-                                <td style="border: 1px solid black;">
+                                <td >{{$loop->iteration}}</td>
+                                <td >{{ $item->candidate->fullname ?? 'N/A' }}</td>
+                                <td >{{ $item->date_finished ?? 'N/A' }}</td>
+                                <td >{{ $item->time_finished ?? 'N/A' }}</td>
+                                <td >
+                                    <span class="badge rounded-pill bg-{{ 
+                                        $item->status == 'done' ? 'success' : 
+                                        ($item->status == 'ongoing' ? 'primary' : 
+                                        ($item->status == 'pending' ? 'secondary' : 'secondary')) 
+                                    }}">
+                                        {{ $item->status ?? 'N/A' }}
+                                    </span>
+                                </td>
+                                <td >{{ $item->total_score ?? 'N/A' }}</td>
+                                <td >
                                     <button class="btn btn-sm btn-outline-primary me-1" wire:click='readAssessmentScore({{$item->id}})' title="Edit">
                                         <i class="bi bi-pencil-square"></i>
                                     </button>
@@ -141,31 +149,31 @@
                                     </div>
                                 </div>
                 
-                                <table class="table table-hover align-middle border global-table">
+                                <table class="table table-hover table-bordered text-center global-table">
                                     <thead style="border-collapse: collapse;">
                                         <tr>
-                                            <th scope="col" class="text-center" width="5%">#</th>
+                                            <th style="width: 5%">#</th>
                                             <th>Skills Assigned</th>
-                                            <th>Competency Level</th>
-                                            <th>Questions</th>
-                                            <th>Candidate Score</th>
-                                            <th>Final Score</th>
-                                            <th>Action</th>
+                                            <th style="width: 15%">Competency Level</th>
+                                            <th style="width: 5%">Questions</th>
+                                            <th style="width: 15%">Candidate Score</th>
+                                            <th style="width: 10%">Final Score</th>
+                                            <th style="width: 5%">Action</th>
                                         </tr>
                                     </thead>
-                                    <tbody style="border: 1px solid #ccc; border-collapse: collapse;">
+                                    <tbody>
                                         @forelse($assessmentscoreskills as $item)
                                             <tr>
-                                                <td style="border: 1px solid black;">{{$loop->iteration}}</td>
-                                                <td style="border: 1px solid black;">{{ $item->skill->title ?? 'N/A' }}</td>
-                                                <td style="border: 1px solid black;">{{ $item->position_skill->competency_level ?? 'N/A' }}</td>
-                                                <td style="border: 1px solid black;">  
+                                                <td >{{$loop->iteration}}</td>
+                                                <td >{{ $item->skill->title ?? 'N/A' }}</td>
+                                                <td >{{ $item->position_skill->competency_level ?? 'N/A' }}</td>
+                                                <td >  
                                                     <button class="btn btn-sm btn-outline-dark me-1" data-bs-toggle="modal" data-bs-target="#viewModal" data-bs-placement="top" title="View">
                                                         <i class="bi bi-eye-fill"></i>
                                                     </button></td>
-                                                <td style="border: 1px solid black;">{{ $item->skill_score ?? 'N/A' }}</td>
-                                                <td style="border: 1px solid black;">{{ $item->assessmentscore->total_score ?? 'N/A' }}</td>
-                                                <td style="border: 1px solid black;">
+                                                <td >{{ $item->skill_score ?? 'N/A' }}</td>
+                                                <td >{{ $item->assessmentscore->total_score ?? 'N/A' }}</td>
+                                                <td >
                                                     <button class="btn btn-sm btn-outline-primary me-1" data-bs-toggle="modal" data-bs-target="#assessmentScoreModal" title="Edit">
                                                         <i class="bi bi-pencil-square"></i>
                                                     </button>
@@ -191,6 +199,8 @@
             </div>
         </div>
     </section>
+
+    
 </div>
 
 @script

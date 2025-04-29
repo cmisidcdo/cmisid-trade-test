@@ -2,12 +2,12 @@
 
 namespace App\Livewire\Exam;
 
+use App\Jobs\SendOralCodeEmailJob;
 use App\Models\AssignedOral;
 use App\Models\Candidate;
 use App\Models\OralQuestion;
 use App\Models\OralScore;
 use App\Models\OralScoreSkill;
-use App\Models\OralScoreSkillScenario;
 use App\Models\Venue;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\DB;
@@ -88,7 +88,7 @@ class Interviewlist extends Component
                 });
             })
             ->orderByDesc('created_at')
-            ->paginate(10);
+            ->paginate(10, ['*'], 'assignedoralsPage');
     }
 
     public function createAssignedOral()
@@ -122,6 +122,12 @@ class Interviewlist extends Component
                         'position_id' => $position->id,
                         'item' => $position->item,
                     ]);
+                }
+
+                
+                //emailing
+                if (isset($assignedoral) && isset($candidate)) {
+                    SendOralCodeEmailJob::dispatch($assignedoral, $candidate);
                 }
             });
 
@@ -225,31 +231,27 @@ class Interviewlist extends Component
     {
         $query = Candidate::query();
     
-        return $query->paginate(5);
+        return $query->paginate(5, ['*'], 'candidatesPage');
     }
     
 
 
     public function updateAssignedOral()
     {
-        $this->validate();
-
         DB::transaction(function () {  
-            $skill = AssignedOral::withTrashed()->findOrFail($this->skill_id);
+            $assignedoral = AssignedOral::findOrFail($this->assignedoralId);
             
-            $skill->title = $this->title;
-            if ($this->status === 'no' && is_null($skill->deleted_at)) {
-                $skill->delete();
-            } elseif ($this->status === 'yes' && !is_null($skill->deleted_at)) {
-                $skill->restore();
-            } else {
-                $skill->save();
-            }
+            $assignedoral->venue_id = $this->venue_id;
+            $assignedoral->assigned_date = $this->assigned_date;
+            $assignedoral->assigned_time = $this->assigned_time;
+            $assignedoral->draft_status = $this->draft_status;
+            $assignedoral->save();
+
         });
 
         $this->clear();
-        $this->dispatch('hide-skillModal');
-        $this->dispatch('success', 'Skill updated successfully.');
+        $this->dispatch('hide-assignedOralModal');
+        $this->dispatch('success', 'assigned oral updated successfully.');
     }
 
     public function showAddEditModal()

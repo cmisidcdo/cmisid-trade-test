@@ -23,4 +23,10 @@ class OralScoreSkill extends Model
     {
         return $this->belongsTo(OralScore::class, 'oral_score_id');
     }
+
+    public function oralScoreSkillQuestions()
+    {
+        return $this->hasMany(OralScoreSkillQuestion::class, 'oral_score_skill_id');
+    }
+
 }

@@ -155,7 +155,7 @@ class Positions extends Component
             $query->whereNotIn('id', $selectedSkillIds);
         }
     
-        return $query->paginate(5);
+        return $query->paginate(5, ['*'], 'skillsPage');
     }
     
     public function removeSkill($index)

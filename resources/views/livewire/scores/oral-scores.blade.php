@@ -5,9 +5,15 @@
     <section class="section dashboard">
         <div class="card shadow-sm border-0 rounded-3">
             <div class="card-body p-4">
-
+                
                 <div class="row align-items-center pt-3 pb-3">
-                    <div class="d-flex justify-content-between align-items-center mb-3">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <button class="btn btn-primary me-2" data-bs-toggle="modal" data-bs-target="#criteriaModal">
+                                <i class="bi bi-card-list me-1"></i> View Criteria
+                            </button>
+                        </div>
+                
                         <div class="d-flex gap-2 ms-auto">
                             <div class="input-group input-group-sm">
                                 <span class="input-group-text bg-light border-end-0">
@@ -68,29 +74,46 @@
                     </div>
                 </div>
                 
+                
                 <div class="table-responsive">
-                    <table class="table table-hover align-middle border global-table">
-                        <thead style="border-collapse: collapse;">
+                    <table class="table table-hover table-bordered text-center global-table">
+                        <thead>
                             <tr>
-                                <th scope="col" class="text-center" width="5%">#</th>
+                                <th style="width: 5%">#</th>
+                                <th style="width: 5%">
+                                    Note
+                                </th>
                                 <th>Candidate Name</th>
-                                <th>Date Finished</th>
-                                <th>Time Finished</th>
-                                <th>Status</th>
-                                <th>Score</th>
-                                <th>Action</th>
+                                <th style="width: 15%">Date Finished</th>
+                                <th style="width: 10%">Time Finished</th>
+                                <th style="width: 5%">Status</th>
+                                <th style="width: 5%">Score</th>
+                                <th style="width: 5%">Action</th>
                             </tr>
                         </thead>
-                        <tbody style="border: 1px solid #ccc; border-collapse: collapse;">
+                        <tbody>
                             @forelse($oralscores as $item)
                             <tr>
-                                <td style="border: 1px solid black;">{{$loop->iteration}}</td>
-                                <td style="border: 1px solid black;">{{ $item->candidate->fullname ?? 'N/A' }}</td>
-                                <td style="border: 1px solid black;">{{ $item->date_finished ?? 'N/A' }}</td>
-                                <td style="border: 1px solid black;">{{ $item->time_finished ?? 'N/A' }}</td>
-                                <td style="border: 1px solid black;">{{ $item->status ?? 'N/A' }}</td>
-                                <td style="border: 1px solid black;">{{ $item->total_score ?? 'N/A' }}</td>
-                                <td style="border: 1px solid black;">
+                                <td>{{$loop->iteration}}</td>
+                                <td>
+                                    <button type="button" class="btn btn-sm btn-outline-primary" wire:click="readNote({{ $item->id }})">
+                                        <i class="bi bi-stickies"></i>
+                                    </button>
+                                </td>
+                                <td>{{ $item->candidate->fullname ?? 'N/A' }}</td>
+                                <td>{{ $item->date_finished ?? 'N/A' }}</td>
+                                <td>{{ $item->time_finished ?? 'N/A' }}</td>
+                                <td>
+                                    <span class="badge rounded-pill bg-{{ 
+                                        $item->status == 'done' ? 'success' : 
+                                        ($item->status == 'ongoing' ? 'primary' : 
+                                        ($item->status == 'pending' ? 'secondary' : 'secondary')) 
+                                    }}">
+                                        {{ $item->status ?? 'N/A' }}
+                                    </span>
+                                </td>
+                                <td>{{ $item->total_score ?? 'N/A' }}</td>
+                                <td>
                                     <button class="btn btn-sm btn-outline-primary me-1" wire:click='readOralScore({{$item->id}})' title="Edit">
                                         <i class="bi bi-pencil-square"></i>
                                     </button>
@@ -141,10 +164,10 @@
                                     </div>
                                 </div>
                 
-                                <table class="table table-hover align-middle border global-table">
-                                    <thead style="border-collapse: collapse;">
+                                <table class="table table-hover table-bordered text-center global-table">
+                                    <thead>
                                         <tr>
-                                            <th scope="col" class="text-center" width="5%">#</th>
+                                            <th width="5%">#</th>
                                             <th>Skills Assigned</th>
                                             <th>Competency Level</th>
                                             <th>Questions</th>
@@ -155,21 +178,21 @@
                                             <th>Action</th>
                                         </tr>
                                     </thead>
-                                    <tbody style="border: 1px solid #ccc; border-collapse: collapse;">
+                                    <tbody>
                                         @forelse($oralscoreskills as $item)
                                             <tr>
-                                                <td style="border: 1px solid black;">{{$loop->iteration}}</td>
-                                                <td style="border: 1px solid black;">{{ $item->skill->title ?? 'N/A' }}</td>
-                                                <td style="border: 1px solid black;">{{ $item->position_skill->competency_level ?? 'N/A' }}</td>
-                                                <td style="border: 1px solid black;">  
-                                                    <button class="btn btn-sm btn-outline-dark me-1" data-bs-toggle="modal" data-bs-target="#viewModal" data-bs-placement="top" title="View">
+                                                <td>{{$loop->iteration}}</td>
+                                                <td>{{ $item->skill->title ?? 'N/A' }}</td>
+                                                <td>{{ $item->position_skill->competency_level ?? 'N/A' }}</td>
+                                                <td>  
+                                                    <button class="btn btn-sm btn-outline-dark me-1" wire:click='showQuestions({{$item->id}})' title="View">
                                                         <i class="bi bi-eye-fill"></i>
                                                     </button></td>
-                                                <td style="border: 1px solid black;">{{ $item->knowledge ?? 'N/A' }}</td>
-                                                <td style="border: 1px solid black;">{{ $item->completeness ?? 'N/A' }}</td>
-                                                <td style="border: 1px solid black;">{{ $item->problem_solving ?? 'N/A' }}</td>
-                                                <td style="border: 1px solid black;">{{ $item->score ?? 'N/A' }}</td>
-                                                <td style="border: 1px solid black;">
+                                                <td>{{ $item->knowledge ?? 'N/A' }}</td>
+                                                <td>{{ $item->completeness ?? 'N/A' }}</td>
+                                                <td>{{ $item->problem_solving ?? 'N/A' }}</td>
+                                                <td>{{ $item->score ?? 'N/A' }}</td>
+                                                <td>
                                                     <button class="btn btn-sm btn-outline-primary me-1" wire:click='evaluateSkill({{$item->id}})' title="Edit">
                                                         <i class="bi bi-pencil-square"></i>
                                                     </button>
@@ -248,6 +271,158 @@
             </div>
         </div>
     </section>
+
+    <div class="modal fade" id="criteriaModal" tabindex="-1" aria-labelledby="criteriaModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-lg">
+            <div class="modal-content ">
+                <div class="modal-header justify-content-center position-relative">
+                    <h5 class="modal-title fw-bold text-center" id="criteriaModalLabel">View oral Exam Criteria</h5>
+                    <button type="button" class="btn-close position-absolute end-0 me-3" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+
+                <div class="modal-body">
+                    <div class="table-responsive">
+                        <table class="table table-bordered text-center align-middle">
+                            <thead class="text-white" style="background-color: #0D0D4C;">
+                                <tr>
+                                    <th>Criteria Name</th>
+                                    <th>Description</th>
+                                    <th>Percent</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td class="fw-bold">Knowledge and Understanding</td>
+                                    <td>Evaluates the candidate’s grasp of the subject matter, technical knowledge, or job-specific expertise.</td>
+                                    <td class="fw-bold">30%</td>
+                                </tr>
+                                <tr>
+                                    <td class="fw-bold">Completeness and Relevance of Responses</td>
+                                    <td>Assess whether the candidate provides comprehensive answers that directly address the interview questions.</td>
+                                    <td class="fw-bold">30%</td>
+                                </tr>
+                                <tr>
+                                    <td class="fw-bold">Accuracy</td>
+                                    <td>Measures the correctness of the candidate’s answers, particularly for technical or factual questions.</td>
+                                    <td class="fw-bold">40%</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="modal-footer justify-content-start">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                        <i class="bi bi-arrow-left"></i> Go Back
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="noteModal" tabindex="-1" aria-labelledby="noteModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-lg">
+            <div class="modal-content">
+                <div class="modal-header justify-content-center position-relative">
+                    <h5 class="modal-title text-center fw-bold" id="noteModalLabel">View Note</h5>
+                    <button type="button" class="btn-close position-absolute end-0 me-3" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+    
+                <div class="modal-body" style="max-height: 70vh; overflow-y: auto;">
+                    @if ($oralscore && $oralscore->oralScoreSkills->isNotEmpty())
+                        @foreach ($oralscore->oralScoreSkills as $oralScoreSkill)
+                            <div class="mb-4">
+                                @php
+                                    $positionSkill = $oralScoreSkill->position_skill;
+                                    $skillTitle = $positionSkill ? $positionSkill->skill->title : 'N/A';
+                                @endphp
+    
+                                <h6 class="fw-bold">Skill Title: {{ $skillTitle }}</h6>
+    
+                                <div class="mb-3">
+                                    <label class="form-label fw-bold">Recommendation/s</label>
+                                    <textarea class="form-control" rows="4" readonly>{{ $oralScoreSkill->recommendation }}</textarea>
+                                </div>
+    
+                                <div class="mb-3">
+                                    <label class="form-label fw-bold">Comment/s</label>
+                                    <textarea class="form-control" rows="4" readonly>{{ $oralScoreSkill->comment }}</textarea>
+                                </div>
+                            </div>
+                            <hr>
+                        @endforeach
+                    @else
+                        <p>No oral score skills available.</p>
+                    @endif
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="questionModal" tabindex="-1" aria-labelledby="questionModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-lg">
+            <div class="modal-content">
+                <div class="modal-header justify-content-center position-relative">
+                    <h5 class="modal-title text-center fw-bold" id="questionModalLabel">View Questions</h5>
+                    <button type="button" class="btn-close position-absolute end-0 me-3" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+    
+                <div class="modal-body" style="max-height: 70vh; overflow-y: auto;">
+                    @if ($oralscoreskill) 
+                        <div class="mb-4">
+                            @php
+                                $positionSkill = $oralscoreskill->position_skill;
+                                $skillTitle = $positionSkill ? $positionSkill->skill->title : 'N/A';
+                            @endphp
+                
+                            <h6 class="fw-bold">Skill Title: {{ $skillTitle }}</h6>
+                
+                            @if ($oralscoreskill->oralscoreskillQuestions->isNotEmpty())
+                                <div class="mt-4">
+                                    <h6 class="fw-bold">Questions:</h6>
+                                    <table class="table table-bordered global-table">
+                                        <thead>
+                                            <tr>
+                                                <th>#</th>
+                                                <th>Question</th>
+                                                <th>Description</th>
+                                                <th style="width: 20%;">Attachment</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            @foreach ($oralscoreskill->oralScoreSkillQuestions as $index => $skillQuestion)
+                                                <tr>
+                                                    <td>{{ $index + 1 }}</td>
+                                                    <td>{{ $skillQuestion->oral_questions->question ?? 'N/A' }}</td>
+                                                    <td>{{ $skillQuestion->oral_questions->description ?? 'No description' }}</td>
+                                                    <td>
+                                                        @if ($skillQuestion->oral_questions->file_path)
+                                                            <a href="{{ Storage::url($skillQuestion->oral_questions->file_path) }}" download class="btn btn-sm btn-outline-secondary ms-2">
+                                                                <i class="bi bi-download"></i>
+                                                            </a>
+                                                        @else
+                                                            No attachment
+                                                        @endif
+                                                    </td>
+                                                </tr>
+                                            @endforeach
+                                        </tbody>
+                                    </table>
+                                </div>
+                            @else
+                                <p class="text-muted">No questions available for this skill.</p>
+                            @endif
+                        </div>
+                    @else
+                        <p>No oral score skills available.</p>
+                    @endif
+                </div>                
+            </div>
+        </div>
+    </div>
+    
+    
+    
 </div>
 
 @script
@@ -274,6 +449,14 @@
         $('#oralScoreModal').modal('show');
     });
 
+    $wire.on('hide-noteModal', () => {
+        $('#noteModal').modal('hide');
+    });
+
+    $wire.on('show-noteModal', () => {
+        $('#noteModal').modal('show');
+    });
+
     $wire.on('show-evaluationModal', () => {
         bootstrap.Modal.getInstance(document.getElementById('oralScoreModal')).hide();
         new bootstrap.Modal(document.getElementById('evaluationModal')).show();
@@ -282,6 +465,14 @@
     $wire.on('hide-evaluationModal', () => {
         new bootstrap.Modal(document.getElementById('oralScoreModal')).show();
         bootstrap.Modal.getInstance(document.getElementById('evaluationModal')).hide();
+    });
+
+    $wire.on('show-questionModal', () => {
+        new bootstrap.Modal(document.getElementById('questionModal')).show();
+    });
+
+    $wire.on('hide-questionModal', () => {
+        bootstrap.Modal.getInstance(document.getElementById('questionModal')).hide();
     });
 
 </script>

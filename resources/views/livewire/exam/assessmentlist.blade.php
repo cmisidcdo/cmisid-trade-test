@@ -34,7 +34,7 @@
                             </div>
                 
                             <div class="dropdown">
-                                <button class="btn btn-outline-primary dropdown-toggle" type="button" id="filterDropdown"
+                                <button class="btn btn-primary dropdown-toggle" type="button" id="filterDropdown"
                                     data-bs-toggle="dropdown" aria-expanded="false">
                                     <i class="bi bi-funnel"></i> Filter
                                 </button>
@@ -62,7 +62,7 @@
                                     <span class="badge bg-secondary">
                                         <i class="bi bi-funnel"></i> 
                                         {{ $filterStatus === 'yes' ? 'Active' : 'Inactive' }}
-                                        <button class="btn btn-sm btn-outline-light border-0 ms-1" wire:click="$set('filterStatus', 'all')">
+                                        <button class="btn btn-sm btn-light border-0 ms-1" wire:click="$set('filterStatus', 'all')">
                                             <i class="bi bi-x"></i>
                                         </button>
                                     </span>
@@ -99,10 +99,10 @@
                                 <td>{{ $item->draft_status ?? 'N/A' }}</td>
                                 <td>{{ $item->aging_days ?? 'N/A' }}</td>
                                 <td>
-                                    <button class="btn btn-sm btn-outline-dark me-1" data-bs-toggle="modal" data-bs-target="#viewModal" data-bs-placement="top" title="View">
+                                    <button class="btn btn-sm btn-dark me-1" data-bs-toggle="modal" data-bs-target="#viewModal" data-bs-placement="top" title="View">
                                         <i class="bi bi-eye-fill"></i>
                                     </button>
-                                    <button class="btn btn-sm btn-outline-primary me-1" wire:click='readAssignedAssessment({{$item->id}})' title="Edit">
+                                    <button class="btn btn-sm btn-primary me-1" wire:click='readAssignedAssessment({{$item->id}})' title="Edit">
                                         <i class="bi bi-pencil-square"></i>
                                     </button>
                                 </td>
@@ -134,7 +134,7 @@
                                             <div class="col-md-6">
                                                 <div class="input-group">
                                                     <input type="text" id="selectedCandidate" class="form-control border-dark rounded-start-3" wire:model="{{$editMode ? 'selected_candidate_name' : 'selectedcandidate.fullname'}}" placeholder="Candidate Name" readonly>
-                                                    <button type="button" class="btn btn-outline-primary rounded-end-3 px-3" wire:click='selectCandidates' @if($editMode) disabled @endif>
+                                                    <button type="button" class="btn btn-primary rounded-end-3 px-3" wire:click='selectCandidates' @if($editMode) disabled @endif>
                                                         Select
                                                     </button>
                                                 </div>
@@ -171,7 +171,7 @@
 
                                         <div class="d-flex justify-content-between">
 
-                                            <button type="button" class="btn btn-outline-secondary btn-sm d-flex align-items-center px-3" data-bs-dismiss="modal">
+                                            <button type="button" class="btn btn-secondary btn-sm d-flex align-items-center px-3" data-bs-dismiss="modal">
                                                 <i class="bi bi-arrow-left me-2"></i> Back
                                             </button>
 

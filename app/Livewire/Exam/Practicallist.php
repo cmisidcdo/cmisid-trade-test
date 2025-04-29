@@ -84,8 +84,8 @@ class Practicallist extends Component
             ->selectRaw('assigned_practicals.*, 
                         DATEDIFF(CURRENT_DATE, CONCAT(assigned_practicals.assigned_date, " ", assigned_practicals.assigned_time)) AS aging_days')
             ->when($this->search, function ($query) {
-                $query->where(function ($q) {
-                    $q->where('title', 'like', '%' . $this->search . '%');
+                $query->whereHas('candidate', function ($q) {
+                    $q->where('fullname', 'like', '%' . $this->search . '%');
                 });
             })
             ->orderByDesc('created_at')

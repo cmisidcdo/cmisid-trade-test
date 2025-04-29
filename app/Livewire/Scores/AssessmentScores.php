@@ -35,10 +35,9 @@ class AssessmentScores extends Component
     {
         return AssessmentScore::with('candidate')
             ->when($this->search, function ($query) {
-                $query->where('title', 'like', '%' . $this->search . '%')
-                    ->orWhereHas('candidate', function ($q) {
-                        $q->where('name', 'like', '%' . $this->search . '%');
-                    });
+                $query->whereHas('candidate', function ($q) {
+                    $q->where('fullname', 'like', '%' . $this->search . '%');
+                });
             })
             ->when($this->filterStatus !== 'all', function ($query) {
                 $query->where('status', $this->filterStatus);

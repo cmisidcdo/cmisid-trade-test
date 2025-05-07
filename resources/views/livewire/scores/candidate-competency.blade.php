@@ -29,30 +29,6 @@
                                 </span>
                             </div>
                 
-                            <div class="dropdown">
-                                <button class="btn btn-primary dropdown-toggle" type="button" id="filterDropdown"
-                                    data-bs-toggle="dropdown" aria-expanded="false">
-                                    <i class="bi bi-funnel"></i> Filter
-                                </button>
-                                <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="filterDropdown">
-                                    <li>
-                                        <button class="dropdown-item" wire:click="$set('filterStatus', 'all')">
-                                            <i class="bi bi-list"></i> All candidates
-                                        </button>
-                                    </li>
-                                    <li>
-                                        <button class="dropdown-item" wire:click="$set('filterStatus', 'yes')">
-                                            <i class="bi bi-person-check"></i> Active candidates
-                                        </button>
-                                    </li>
-                                    <li>
-                                        <button class="dropdown-item" wire:click="$set('filterStatus', 'no')">
-                                            <i class="bi bi-person-x"></i> Inactive candidates
-                                        </button>
-                                    </li>
-                                </ul>
-                            </div>
-                
                             <div>
                                 @if($filterStatus !== 'all')
                                     <span class="badge bg-secondary">

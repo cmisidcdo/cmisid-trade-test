@@ -41,17 +41,17 @@
                                 <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="filterDropdown">
                                     <li>
                                         <button class="dropdown-item" wire:click="$set('filterStatus', 'all')">
-                                            <i class="bi bi-list"></i> All candidates
+                                            <i class="bi bi-list"></i> All Status
                                         </button>
                                     </li>
                                     <li>
-                                        <button class="dropdown-item" wire:click="$set('filterStatus', 'yes')">
-                                            <i class="bi bi-person-check"></i> Active candidates
+                                        <button class="dropdown-item" wire:click="$set('filterStatus', 'draft')">
+                                            <i class="bi bi-person-check"></i> Draft
                                         </button>
                                     </li>
                                     <li>
-                                        <button class="dropdown-item" wire:click="$set('filterStatus', 'no')">
-                                            <i class="bi bi-person-x"></i> Inactive candidates
+                                        <button class="dropdown-item" wire:click="$set('filterStatus', 'published')">
+                                            <i class="bi bi-person-x"></i> Published
                                         </button>
                                     </li>
                                 </ul>
@@ -61,7 +61,7 @@
                                 @if($filterStatus !== 'all')
                                     <span class="badge bg-secondary">
                                         <i class="bi bi-funnel"></i> 
-                                        {{ $filterStatus === 'yes' ? 'Active' : 'Inactive' }}
+                                        {{ $filterStatus }}
                                         <button class="btn btn-sm btn-light border-0 ms-1" wire:click="$set('filterStatus', 'all')">
                                             <i class="bi bi-x"></i>
                                         </button>

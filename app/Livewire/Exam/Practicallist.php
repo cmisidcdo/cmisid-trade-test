@@ -88,6 +88,9 @@ class Practicallist extends Component
                     $q->where('fullname', 'like', '%' . $this->search . '%');
                 });
             })
+            ->when($this->filterStatus !== 'all', function ($query) {
+                $query->where('draft_status', $this->filterStatus);
+            })
             ->orderByDesc('created_at')
             ->paginate(10, ['*'], 'assignedpracticalsPage');
     }

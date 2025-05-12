@@ -23,7 +23,6 @@
             </div>
         </div>
 
-        <!-- Logos -->
         <div class="logos col-lg-6 d-flex flex-column justify-content-center align-items-start text-start ps-3 mt-4">
             <img src="{{ asset('img/cdologo.png') }}" alt="logo" class="img-fluid">
         </div>
@@ -56,94 +55,16 @@
     
     <script>
         Livewire.on('openTestInNewTab', function () {
-            // Open the test route in a new tab
             window.open("{{ route('candidate.exam.assessment') }}", '_blank');
+        });
+
+        document.addEventListener('DOMContentLoaded', function () {
+            Livewire.on('go-back', function () {
+                window.history.back();
+            });
         });
     </script>
     
-
-    <!-- 3 Minute Warning Modal -->
-    <div class="modal fade" id="threeMinWarningModal" tabindex="-1" aria-labelledby="threeMinWarningModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered">
-            <div class="modal-content" style="border-radius: 12px; border: 3px solid #ff9800;">
-                <div class="modal-header" style="background-color: #ff9800; color: white;">
-                    <h5 class="modal-title fw-bold w-100 text-center" id="threeMinWarningModalLabel">⚠️ Time Warning!</h5>
-                </div>
-                <div class="modal-body text-center">
-                    <h4 class="mb-3">3 minutes remaining!</h4>
-                    <p>Please complete your test as soon as possible.</p>
-                </div>
-                <div class="modal-footer justify-content-center">
-                    <button type="button" class="btn btn-warning" data-bs-dismiss="modal">Continue Test</button>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- 1 Minute Warning Modal -->
-    <div class="modal fade" id="oneMinWarningModal" tabindex="-1" aria-labelledby="oneMinWarningModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered">
-            <div class="modal-content" style="border-radius: 12px; border: 3px solid #f44336;">
-                <div class="modal-header" style="background-color: #f44336; color: white;">
-                    <h5 class="modal-title fw-bold w-100 text-center" id="oneMinWarningModalLabel">⚠️ URGENT TIME WARNING!</h5>
-                </div>
-                <div class="modal-body text-center">
-                    <h4 class="mb-3">ONLY 1 MINUTE REMAINING!</h4>
-                    <p>Please finish your test immediately!</p>
-                </div>
-                <div class="modal-footer justify-content-center">
-                    <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Continue Test</button>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Time's Up Modal -->
-    <div class="modal fade" id="timesUpModal" tabindex="-1" aria-labelledby="timesUpModalLabel" aria-hidden="true" data-bs-backdrop="static" data-bs-keyboard="false">
-        <div class="modal-dialog modal-dialog-centered">
-            <div class="modal-content" style="border-radius: 12px; border: 3px solid #f44336;">
-                <div class="modal-header" style="background-color: #f44336; color: white;">
-                    <h5 class="modal-title fw-bold w-100 text-center" id="timesUpModalLabel">⏰ TIME'S UP!</h5>
-                </div>
-                <div class="modal-body text-center">
-                    <h4 class="mb-3">Your time has expired!</h4>
-                    <p>Your answers will now be automatically submitted.</p>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Submit Confirmation Modal - Added data-bs-backdrop="static" -->
-    <div class="modal fade" id="submitconfirmationModal" tabindex="-1" aria-labelledby="submitconfirmationModalLabel" aria-hidden="true" data-bs-backdrop="static" data-bs-keyboard="false">
-        <div class="modal-dialog modal-dialog-centered">
-            <div class="modal-content" style="border-radius: 12px;border: 2px solid #007BFF">
-                <div class="modal-header">
-                    <h5 class="text-center w-100 modal-title fw-bold" id="submitconfirmationModalLabel">Warning!</h5>
-                </div>
-                <div class="modal-body">
-                    <strong>Are you sure to submit your Assessment Test answers? All responses will be saved.</strong>
-                </div>
-                <div class="modal-footer d-flex justify-content-between mt-2">
-                    <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#testModal">Review</button>
-                    <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#successModal">
-                        Confirm Submission
-                    </button>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Success Modal - Will auto-close after showing -->
-    <div class="modal fade" id="successModal" tabindex="-1" aria-labelledby="successModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered">
-            <div class="modal-content text-center" style="border-radius: 12px; border: 2px solid #007BFF;">
-                <div class="modal-body py-5">
-                    <h3 class="fw-bold">Answers Submitted Successfully!</h3>
-                    <p class="text-muted">Redirecting to the Homepage. Please wait.</p>
-                </div>
-            </div>
-        </div>
-    </div>
     <style>
         .logos img {
             height: 150px;

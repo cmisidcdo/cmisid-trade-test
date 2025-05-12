@@ -96,13 +96,22 @@
                                 <td>{{ $item->assigned_date ?? 'N/A' }}</td>
                                 <td>{{ $item->assigned_time ?? 'N/A' }}</td>
                                 <td>{{ $item->venue->name ?? 'N/A' }}, {{ $item->venue->location ?? 'N/A' }}</td>
-                                <td>{{ $item->draft_status ?? 'N/A' }}</td>
+                                <td>
+                                    <span class="badge rounded-pill bg-{{ 
+                                        $item->draft_status == 'published' ? 'success' : 
+                                        ($item->draft_status == 'draft' ? 'warning' : 'secondary') 
+                                    }} text-{{ 
+                                        $item->draft_status == 'draft' ? 'dark' : 'white' 
+                                    }}">
+                                        {{ ucfirst($item->draft_status ?? 'N/A') }}
+                                    </span>
+                                </td>
                                 <td>{{ $item->aging_days ?? 'N/A' }}</td>
                                 <td>
-                                    <button class="btn btn-sm btn-dark me-1" data-bs-toggle="modal" data-bs-target="#viewModal" data-bs-placement="top" title="View">
+                                    <button class="btn btn-sm btn-info rounded-2" data-bs-toggle="modal" data-bs-target="#viewModal" data-bs-placement="top" title="View">
                                         <i class="bi bi-eye-fill"></i>
                                     </button>
-                                    <button class="btn btn-sm btn-primary me-1" wire:click='readAssignedOral({{$item->id}})' title="Edit">
+                                    <button class="btn btn-sm btn-primary" wire:click='readAssignedOral({{$item->id}})' title="Edit">
                                         <i class="bi bi-pencil-square"></i>
                                     </button>
                                 </td>

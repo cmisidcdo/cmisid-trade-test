@@ -29,4 +29,10 @@ class Skill extends Model
 
         return $logOptions;
     }
+    
+    public function positionSkills()
+    {
+        return $this->hasMany(PositionSkill::class);
+    }
+
 }

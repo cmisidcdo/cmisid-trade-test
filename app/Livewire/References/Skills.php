@@ -69,6 +69,7 @@ class Skills extends Component
     public function loadSkills()
     {
         return Skill::withTrashed()
+            ->withCount('positionSkills')
             ->when($this->filterStatus !== 'all', function ($query) {
                 if ($this->filterStatus === 'yes') {
                     $query->whereNull('deleted_at');

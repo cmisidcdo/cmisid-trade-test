@@ -72,17 +72,17 @@
 
                                 <td>
                                     <span class="badge rounded-pill {{ $statusClasses[$item->assessmentstatus ?? 'N/A'] }}">
-                                        {{ $item->assessmentstatus ?? 'N/A' }}
+                                        {{ ucfirst($item->assessmentstatus ?? 'N/A') }}
                                     </span>
                                 </td>
                                 <td>
                                     <span class="badge rounded-pill {{ $statusClasses[$item->practicalstatus ?? 'N/A'] }}">
-                                        {{ $item->practicalstatus ?? 'N/A' }}
+                                        {{ ucfirst($item->practicalstatus ?? 'N/A') }}
                                     </span>
                                 </td>
                                 <td>
                                     <span class="badge rounded-pill {{ $statusClasses[$item->oralstatus ?? 'N/A'] }}">
-                                        {{ $item->oralstatus ?? 'N/A' }}
+                                        {{ ucfirst($item->oralstatus ?? 'N/A') }}
                                     </span>
                                 </td>
                                 

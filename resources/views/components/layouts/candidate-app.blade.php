@@ -131,7 +131,7 @@
       </li><!-- End Dashboard Nav -->
 
    
-      <li class="nav-item">
+      {{-- <li class="nav-item">
         <a class="nav-link {{ Request::routeIs('candidate.*') ? '' : 'collapsed' }}" data-bs-target="#tests-nav" data-bs-toggle="collapse" href="#">
           <i class="bi bi-clipboard-check-fill fs-5"></i><span>Candidate</span><i class="bi bi-chevron-down ms-auto"></i>
         </a>
@@ -152,7 +152,7 @@
             </a>
           </li>
         </ul>
-      </li>
+      </li> --}}
 
 
    
@@ -216,25 +216,23 @@
         });
       });
 
-      Livewire.on('confirm-delete', (data = {}) => {
-          const { message = "Are you sure?", eventName, eventData = {} } = data;
-
-          Swal.fire({
-              title: "Confirm archive?",
-              text: message,
-              icon: "warning",
-              showCancelButton: true,
-              confirmButtonColor: "#3085d6",
-              cancelButtonColor: "#d33",
-              confirmButtonText: "Yes, archive it!"
-          }).then((result) => {
-              if (result.isConfirmed && eventName) {
-                  Livewire.dispatch(eventName, eventData);
+      Livewire.on('warning', (message) => {
+          const Toast = Swal.mixin({
+              toast: true,
+              position: "top-end",
+              showConfirmButton: false,
+              timer: 3000,
+              timerProgressBar: true,
+              didOpen: (toast) => {
+                  toast.onmouseenter = Swal.stopTimer;
+                  toast.onmouseleave = Swal.resumeTimer;
               }
           });
+          Toast.fire({
+              icon: "warning",
+              title: message
+          });
       });
-
-
     });
   </script>
 </body>

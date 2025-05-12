@@ -109,7 +109,7 @@
                                         ($item->status == 'ongoing' ? 'primary' : 
                                         ($item->status == 'pending' ? 'secondary' : 'secondary')) 
                                     }}">
-                                        {{ $item->status ?? 'N/A' }}
+                                        {{ ucfirst($item->status ?? 'N/A') }}
                                     </span>
                                 </td>
                                 <td>{{ $item->total_score ?? 'N/A' }}</td>

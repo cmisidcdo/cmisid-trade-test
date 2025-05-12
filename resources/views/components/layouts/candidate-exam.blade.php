@@ -41,79 +41,6 @@
 </head>
 
 <body>
-
-  {{-- <header id="header" class="header fixed-top d-flex align-items-center">
-
-    <div class="d-flex ">
-    </div>
-
-
-    <nav class="header-nav ms-auto">
-      <ul class="d-flex align-items-center">
-
-       
-        
-        <li class="nav-item dropdown pe-3">
-
-          <a class="nav-link nav-profile d-flex align-items-center pe-0" href="#" data-bs-toggle="dropdown">
-              <span class="d-none d-md-block dropdown-toggle ps-2">
-                  {{ session('candidate_name', 'Guest') }}
-              </span>
-          </a><!-- End Profile Image Icon -->
-          
-          <ul class="dropdown-menu dropdown-menu-end dropdown-menu-arrow profile">
-              <li class="dropdown-header">
-                  <h6>{{ session('candidate_name', 'Guest') }}</h6>
-                  <span>Candidate</span>
-              </li>
-              <li>
-                  <hr class="dropdown-divider">
-              </li>  
-
-            <li>
-              <a class="dropdown-item d-flex align-items-center" href="users-profile.html">
-                <i class="bi bi-person"></i>
-                <span>My Profile</span>
-              </a>
-            </li>
-            <li>
-              <hr class="dropdown-divider">
-            </li>
-
-            <li>
-              <a class="dropdown-item d-flex align-items-center" href="users-profile.html">
-                <i class="bi bi-gear"></i>
-                <span>Account Settings</span>
-              </a>
-            </li>
-            <li>
-              <hr class="dropdown-divider">
-            </li>
-            <li>
-              <hr class="dropdown-divider">
-            </li>
-
-            <li>
-              <a class="dropdown-item" href="{{ route('candidate.logout') }}"
-                 onclick="event.preventDefault();
-                          document.getElementById('candidate-logout-form').submit();">
-                  <i class="bi bi-box-arrow-right"></i> {{ __('Logout') }}
-              </a>
-          
-              <form id="candidate-logout-form" action="{{ route('candidate.logout') }}" method="POST" class="d-none">
-                  @csrf
-              </form>
-            </li>
-          
-
-          </ul><!-- End Profile Dropdown Items -->
-        </li><!-- End Profile Nav -->
-
-      </ul>
-    </nav><!-- End Icons Navigation -->
-
-  </header><!-- End Header --> --}}
-
   <main id="main" class="main" style="padding-top: 0;"> 
     {{ $slot }} 
   </main>
@@ -170,25 +97,23 @@
         });
       });
 
-      Livewire.on('confirm-delete', (data = {}) => {
-          const { message = "Are you sure?", eventName, eventData = {} } = data;
-
-          Swal.fire({
-              title: "Confirm archive?",
-              text: message,
-              icon: "warning",
-              showCancelButton: true,
-              confirmButtonColor: "#3085d6",
-              cancelButtonColor: "#d33",
-              confirmButtonText: "Yes, archive it!"
-          }).then((result) => {
-              if (result.isConfirmed && eventName) {
-                  Livewire.dispatch(eventName, eventData);
+      Livewire.on('warning', (message) => {
+          const Toast = Swal.mixin({
+              toast: true,
+              position: "top-end",
+              showConfirmButton: false,
+              timer: 3000,
+              timerProgressBar: true,
+              didOpen: (toast) => {
+                  toast.onmouseenter = Swal.stopTimer;
+                  toast.onmouseleave = Swal.resumeTimer;
               }
           });
-      });
-
-
+          Toast.fire({
+              icon: "warning",
+              title: message
+          });
+      })
     });
   </script>
 </body>

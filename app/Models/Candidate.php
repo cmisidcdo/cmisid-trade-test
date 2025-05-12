@@ -45,4 +45,20 @@ class Candidate extends Model
         return $logOptions;
     }
 
+    public function assignedAssessments()
+    {
+        return $this->hasMany(AssignedAssessment::class);
+    }
+
+    public function assignedPracticals()
+    {
+        return $this->hasMany(AssignedPractical::class);
+    }
+
+    public function assignedOrals()
+    {
+        return $this->hasMany(AssignedOral::class);
+    }
+
+
 }   

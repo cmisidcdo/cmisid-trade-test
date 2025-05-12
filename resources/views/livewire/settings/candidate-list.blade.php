@@ -108,12 +108,16 @@
                                         </button>
 
                                         @can('update candidate')
-                                        <button class="btn btn-icon btn-primary me-1" 
-                                            wire:click='readCandidate({{$item->id}})'
-                                            data-bs-toggle="tooltip"
-                                            data-bs-title="Edit">
-                                            <i class="bi bi-pencil"></i>
-                                        </button>
+                                            @php
+                                                $isUsed = $item->assignedAssessments->isNotEmpty() || $item->assignedPracticals->isNotEmpty() || $item->assignedOrals->isNotEmpty();
+                                            @endphp
+                                            <button class="btn btn-icon me-1 {{ $isUsed ? 'btn-secondary' : 'btn-primary' }}"
+                                                wire:click='readCandidate({{$item->id}})'
+                                                data-bs-toggle="tooltip"
+                                                data-bs-title="{{ $isUsed ? 'Editing disabled due to assignment' : 'Edit' }}"
+                                                @if($isUsed) disabled @endif>
+                                                <i class="bi bi-pencil"></i>
+                                            </button>
                                         @endcan
                                     </div>
                                 </td>

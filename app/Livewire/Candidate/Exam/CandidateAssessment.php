@@ -23,7 +23,7 @@ class CandidateAssessment extends Component
 
     public $questionsWithChoices = [];
     public $selectedAnswers = [];
-
+    public $hasSubmitted = false;
     public function mount()
     {
 
@@ -89,58 +89,26 @@ class CandidateAssessment extends Component
         
     }
 
-    // public function submitAnswers()
-    // {
-        
-    //     foreach ($this->selectedAnswers as $scoreSkillQuestionId => $choiceId) {
-    //         try {
-    //             $scoreQuestion = AssessmentScoreSkillQuestion::find($scoreSkillQuestionId);
-
-    //             if (!$scoreQuestion) {
-    //                 Log::warning("Score question not found for ID: $scoreSkillQuestionId");
-    //                 continue;
-    //             }
-
-    //             $isCorrect = AQChoice::where('id', $choiceId)->value('is_answer');
-
-    //             if ($isCorrect === null) {
-    //                 Log::warning("Choice ID: $choiceId not found or does not have 'is_answer'");
-    //             }
-
-    //             $scoreQuestion->update([
-    //                 'answer' => $choiceId,
-    //                 'is_correct' => $isCorrect ? 1 : 0,
-    //             ]);
-    //         } catch (\Exception $e) {
-    //             Log::error("Error updating score for score skill question ID: $scoreSkillQuestionId", [
-    //                 'choice_id' => $choiceId,
-    //                 'error' => $e->getMessage(),
-    //             ]);
-    //         }
-    //     }
-
-    //     try {
-    //         $this->score->update([
-    //             'status' => 'done',
-    //             'time_finished' => now()->toTimeString(),
-    //             'date_finished' => now()->toDateString(),
-    //         ]);
-    //     } catch (\Exception $e) {
-    //         Log::error("Error updating score status to 'done'", [
-    //             'score_id' => $this->score->id ?? 'unknown',
-    //             'error' => $e->getMessage(),
-    //         ]);
-    //     }
-
-    //     $this->dispatch('success', 'Answers Submitted Successfully!');
-    // }
-
     public function submitAnswers()
     {
+        $this->hasSubmitted = true;
+
+        $expectedQuestionIds = collect($this->questionsWithChoices)
+            ->pluck('score_skill_question_id')
+            ->toArray();
+
+        $unanswered = array_diff($expectedQuestionIds, array_keys($this->selectedAnswers));
+
+        if (!empty($unanswered)) {
+            $this->dispatch('scroll-to-question', reset($unanswered)); // Scroll to the first unanswered question
+            $this->dispatch('warning', 'Please answer all questions before submitting.');
+            return;
+        }
+
         $skillScores = []; 
         $totalQuestions = 0;
         $correctAnswers = 0;
-
+        
         foreach ($this->selectedAnswers as $scoreSkillQuestionId => $choiceId) {
             try {
                 $scoreQuestion = AssessmentScoreSkillQuestion::find($scoreSkillQuestionId);
@@ -236,6 +204,7 @@ class CandidateAssessment extends Component
         }
 
         $this->dispatch('success', 'Answers Submitted Successfully!');
+        $this->dispatch('start-redirect-countdown');
     }
 
 
@@ -245,4 +214,10 @@ class CandidateAssessment extends Component
         return view('livewire.candidate.exam.candidate-assessment')
             ->layout('components.layouts.candidate-exam');
     }
+
+    public function goBack()
+    {
+        return redirect()->route('candidate.home');
+    }
+
 }

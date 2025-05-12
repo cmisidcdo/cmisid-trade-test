@@ -68,6 +68,7 @@ class Offices extends Component
     public function loadOffices()
     {
         return Office::withTrashed()
+            ->withCount('candidates')
             ->when($this->filterStatus !== 'all', function ($query) {
                 if ($this->filterStatus === 'yes') {
                     $query->whereNull('deleted_at');

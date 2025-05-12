@@ -95,17 +95,22 @@
                                             {{$item->deleted_at == Null ? 'Active': 'Inactive'}}
                                         </span>
                                     </td>
-                                    <td class="text-center">
-                                        <div class="btn-group" role="group" aria-label="Office actions">
-                                            @can('update reference')
-                                            <button class="btn btn-sm btn-primary rounded-2 px-2 py-1"
-                                                wire:click='readOffice({{$item->id}})'
+                                    <td class="text-center">      
+                                        @php
+                                            $isUsed = $item->candidates_count > 0;
+                                        @endphp
+                                        
+                                        @can('update reference')
+                                            <button class="btn btn-sm {{ $isUsed ? 'btn-secondary' : 'btn-primary' }} rounded-2 px-2 py-1"
+                                                @if(!$isUsed)
+                                                    wire:click='readOffice({{$item->id}})'
+                                                @endif
                                                 data-bs-toggle="tooltip"
-                                                data-bs-title="Edit office">
+                                                data-bs-title="{{ $isUsed ? 'Edit disabled: office is in use by candidate(s)' : 'Edit office' }}"
+                                                @if($isUsed) disabled @endif>
                                                 <i class="bi bi-pencil-square"></i>
                                             </button>
-                                            @endcan
-                                        </div>
+                                        @endcan
                                     </td>
                                 </tr>
                                 @empty

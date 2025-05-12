@@ -72,24 +72,10 @@ class CandidateList extends Component
         $this->archive = !$this->archive;
     }
 
-    public function getCandidates()
-    {
-        $query = Candidate::with(['office', 'position', 'priorityGroup']); 
-        if ($this->archive) {
-            $query->onlyTrashed();
-        }
-
-        return $query
-            ->when($this->search, function ($query) {
-                $query->where('fullname', 'like', '%' . $this->search . '%');
-            })
-            ->paginate(10);
-    }
-
     public function loadCandidates()
     {
         return Candidate::withTrashed()
-            ->with(['office', 'position', 'priorityGroup'])
+            ->with(['office', 'position', 'priorityGroup', 'assignedAssessments', 'assignedPracticals', 'assignedOrals']) // added here
             ->when($this->filterStatus !== 'all', function ($query) {
                 if ($this->filterStatus === 'yes') {
                     $query->whereNull('deleted_at');
@@ -107,8 +93,7 @@ class CandidateList extends Component
             })
             ->paginate(10);
     }
-
-
+    
 
 
     public function createCandidate()

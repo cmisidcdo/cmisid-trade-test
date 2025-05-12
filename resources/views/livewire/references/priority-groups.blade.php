@@ -93,26 +93,23 @@
                                     </span>
                                 </td>
                                 <td class="text-center">
-                                    <div class="btn-group" role="group" aria-label="Priority Group actions">
-                                        @can('update reference')
-                                        <button class="btn btn-sm btn-primary rounded-2 px-2 py-1 me-2"
-                                            wire:click='readPriorityGroup({{$item->id}})'
-                                            data-bs-toggle="tooltip"
-                                            data-bs-title="Edit prioritygroup">
+                                    @php
+                                        $isUsed = $item->candidates_count > 0;
+                                    @endphp
+                                    
+                                    @can('update reference')
+                                        <button 
+                                            class="btn btn-sm {{ $isUsed ? 'btn-secondary' : 'btn-primary' }} rounded-2 px-2 py-1 me-2"
+                                            title="{{ $isUsed ? 'Edit disabled: group in use' : 'Edit priority group' }}"
+                                            @if (!$isUsed)
+                                                wire:click='readPriorityGroup({{ $item->id }})'
+                                            @else
+                                                disabled
+                                            @endif
+                                        >
                                             <i class="bi bi-pencil-square"></i>
                                         </button>
-                                        @endcan
-
-                                        {{-- @can('delete reference')
-                                        <button class="btn btn-sm {{$item->deleted_at == Null ? 'btn-danger' : 'btn-outline-success'}} rounded-2 px-2 py-1"
-                                            wire:click='{{$item->deleted_at == Null ? 'confirmDelete('.$item->id.')': 'restorePriorityGroup('.$item->id.')'}}'
-                                            data-bs-toggle="tooltip"
-                                            data-bs-title="{{$item->deleted_at == Null ? 'Move to archive': 'Restore prioritygroup'}}">
-                                            <i class="bi {{$item->deleted_at == Null ? 'bi bi-archive-fill': 'bi-arrow-counterclockwise'}}"></i>
-                                            <span class="d-none d-md-inline ms-1">{{$item->deleted_at == Null ? 'Archive': 'Restore'}}</span>
-                                        </button>
-                                        @endcan --}}
-                                    </div>
+                                    @endcan                                
                                 </td>
                             </tr>
                             @empty

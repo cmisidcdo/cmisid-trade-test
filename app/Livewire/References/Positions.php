@@ -56,21 +56,6 @@ class Positions extends Component
         $this->dispatch('hide-skillsModal');
     }
 
-    // public function addSkill($skillId)
-    // {
-    //     $skill = Skill::find($skillId);
-
-    //     if ($skill) {
-    //         $this->selectedskills[] = [
-    //             'id' => $skill->id,
-    //             'title' => $skill->title,
-    //             'competency_level' => 'basic',
-    //         ];
-    //     }
-
-    //     $this->dispatch('hide-skillsModal');
-    // }
-
     public function addSkill($skillId)
     {
         $this->loadingSkillId = $skillId;
@@ -133,7 +118,7 @@ class Positions extends Component
 
     public function getPositions()
     {
-        $query = Position::query();
+        $query = Position::withCount('candidates');
 
         if ($this->archive) {
             $query->onlyTrashed(); 

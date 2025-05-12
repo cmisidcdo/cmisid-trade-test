@@ -67,6 +67,7 @@ class PriorityGroups extends Component
     public function loadPriorityGroups()
     {
         return PriorityGroup::withTrashed()
+            ->withCount('candidates') 
             ->when($this->filterStatus !== 'all', function ($query) {
                 if ($this->filterStatus === 'yes') {
                     $query->whereNull('deleted_at');

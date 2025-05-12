@@ -96,14 +96,20 @@
                                 </td>
                                 
                                 <td class="d-flex justify-content-center">
+                                    @php
+                                        $isUsed = $item->positionSkills->isNotEmpty();
+                                    @endphp
+                                    
                                     @can('update reference')
-                                    <button class="btn btn-sm btn-primary rounded-2 px-2 py-1 me-2"
-                                        wire:click='readSkill({{$item->id}})'
-                                        data-bs-toggle="tooltip"
-                                        data-bs-title="Edit skill">
-                                        <i class="bi bi-pencil-square"></i>
-                                    </button>
+                                        <button class="btn btn-sm rounded-2 px-2 py-1 me-2 {{ $isUsed ? 'btn-secondary' : 'btn-primary' }}"
+                                            wire:click="readSkill({{ $item->id }})"
+                                            data-bs-toggle="tooltip"
+                                            data-bs-title="{{ $isUsed ? 'Editing disabled due to assignment' : 'Edit' }}"
+                                            @if($isUsed) disabled @endif>
+                                            <i class="bi bi-pencil-square"></i>
+                                        </button>
                                     @endcan
+                                          
                                 </td>
                             </tr>
                             @empty

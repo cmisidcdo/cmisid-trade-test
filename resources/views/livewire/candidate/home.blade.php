@@ -20,23 +20,27 @@
                             @endif
 
                             @if($assessment_completed && !$practical_completed)
-                                <div class="form-group">
-                                    <label for="practical_code" class="form-label text-white">Practical Code</label>
-                                    <input type="text" id="practical_code" name="practical_code" class="form-control" placeholder="Enter Practical Code" wire:model="practical_code">
-                                </div>
-                                <button class="btn btn-success btn-lg w-100" wire:click="submitPracticalCode">
-                                    Submit Practical Code
-                                </button>
+                                <form wire:submit.prevent="loginPractical">
+                                    <div class="form-group">
+                                        <label for="practical_code" class="form-label text-white">Practical Code</label>
+                                        <input type="text" id="practical_code" name="practical_code" class="form-control" placeholder="Enter Practical Code" wire:model="practical_code">
+                                    </div>
+                                    <button class="btn btn-success btn-lg w-100">
+                                        Submit Practical Code
+                                    </button>
+                                </form>
                             @endif
 
                             @if($practical_completed && !$oral_completed)
-                                <div class="form-group">
-                                    <label for="interview_code" class="form-label text-white">Interview Code</label>
-                                    <input type="text" id="interview_code" name="interview_code" class="form-control" placeholder="Enter Interview Code" wire:model="interview_code">
-                                </div>
-                                <button class="btn btn-primary btn-lg w-100" wire:click="submitInterviewCode">
-                                    Submit Interview Code
-                                </button>
+                                <form wire:submit.prevent="loginOral">
+                                    <div class="form-group">
+                                        <label for="interview_code" class="form-label text-white">Interview Code</label>
+                                        <input type="text" id="interview_code" name="interview_code" class="form-control" placeholder="Enter Interview Code" wire:model="interview_code">
+                                    </div>
+                                    <button class="btn btn-primary btn-lg w-100">
+                                        Submit Interview Code
+                                    </button>
+                                </form>
                             @endif
 
                             @if($assessment_completed && $practical_completed && $oral_completed)
@@ -97,17 +101,59 @@
             </div>
         </div>
     </div>
-    <script>
-        Livewire.on('openTestInNewTab', function () {
-            window.open("{{ route('candidate.exam.assessment') }}", '_blank');
-        });
 
-        document.addEventListener('DOMContentLoaded', function () {
-            Livewire.on('go-back', function () {
-                window.history.back();
+    <div class="modal fade" id="oralconfirmationModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content" style="border-radius: 12px;border: 2px solid #007BFF;">
+                <div class="modal-body p-4 text-center">
+                    <h5 class="modal-title mb-4">Proceed to Oral Interview Instructions??</h5>
+                    <div class="d-flex justify-content-between">
+                        <button class="btn btn-secondary px-4" data-bs-dismiss="modal">No</button>
+                        <button class="btn btn-primary px-4" id="confirmInterview">Yes</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="practicalconfirmationModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content" style="border-radius: 12px;border: 2px solid #007BFF;">
+                <div class="modal-body p-4 text-center">
+                    <h5 class="modal-title mb-4">Proceed to Practical Exam Instructions?</h5>
+                    <div class="d-flex justify-content-between">
+                        <button class="btn btn-secondary px-4" data-bs-dismiss="modal">No</button>
+                        <button class="btn btn-primary px-4" id="confirmPractical">Yes</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    @script
+    <script>
+          Livewire.on('show-practicalconfirmationModal', function() {
+                const practicalconfirmationModal = new bootstrap.Modal(document.getElementById('practicalconfirmationModal'));
+                practicalconfirmationModal.show();
             });
-        });
+
+            const practicalconfirmButton = document.getElementById('confirmPractical');
+
+            practicalconfirmButton.addEventListener('click', function () {
+                window.location.href = "{{ url('candidate/exam/practical') }}";
+            });
+
+            const oralconfirmButton = document.getElementById('confirmInterview');
+
+            Livewire.on('show-oralconfirmationModal', function() {
+                const confirmationModal = new bootstrap.Modal(document.getElementById('confirmationModal'));
+                confirmationModal.show();
+            });
+
+            oralconfirmButton.addEventListener('click', function () {
+                window.location.href = "{{ url('candidate/exam/oral') }}";
+            });
     </script>
+    @endscript
     <style>
         .homepage-container {
             display: flex;

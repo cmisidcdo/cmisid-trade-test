@@ -14,6 +14,7 @@ return new class extends Migration
         Schema::create('oral_scores', function (Blueprint $table) {
             $table->id();
             $table->foreignId('assigned_oral_id')->constrained('assigned_orals')->onDelete('cascade');
+            $table->foreignId('user_id')->nullable()->constrained()->onDelete('cascade');
             $table->date('date_finished')->nullable();
             $table->time('time_finished')->nullable();
             $table->decimal('total_score', 5, 2)->nullable();

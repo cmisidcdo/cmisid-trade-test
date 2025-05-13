@@ -59,4 +59,26 @@ class Home extends Component
     {
         $this->dispatch('openTestInNewTab');
     }
+
+    public function loginPractical()
+    {   
+        $assigned = AssignedPractical::where('access_code', $this->practical_code)->first();
+
+        if ($assigned) {
+            $this->dispatch('show-practicalconfirmationModal');
+        } else {
+            session()->flash('error', 'Invalid access code.');
+        }
+    }
+
+    public function loginOral()
+    {
+        $assigned = AssignedOral::where('access_code', $this->interview_code)->first();
+
+        if ($assigned) {
+            $this->dispatch('show-oralconfirmationModal');
+        } else {
+            session()->flash('error', 'Invalid access code.');
+        }
+    }
 }

@@ -2,52 +2,59 @@
 
 namespace App\Livewire\Scores;
 
-use App\Models\OralScoreSkill;
-use Illuminate\Support\Facades\Log;
-use Livewire\Component;
 use App\Models\OralScore;
+use Livewire\Component;
+use Illuminate\Support\Facades\Log;
+use App\Models\OralScoreSkill;
+use Carbon\Carbon;
 
-class OralScores extends Component
+class OralScoresEvaluation extends Component
 {
-    public $editMode;
+    public $oralscoreId;
+    public $candidateName;
+    public $assessorName;
+    public $dateFinished;
+    public $timeFinished;
+    public $status;
 
-    public $archive = false;
+    public $totalDuration = 0;
+    public $startTime = null;
+    public $pausedAt = null;
 
-    public $search;
-    public $filterStatus = 'all'; 
-    public $title, $skill_id, $status;
-    public $assigned_date, $oralScores, $dateFinished, $timeFinished, $candidateName, $candidate_id, $assessorName, $access_code, $draft_status = 'draft';
+    public $interviewStarted = false;
+    public $interviewPaused = false;
+
 
     public $venues = [], $evaluation = [], $oralscoreskills = [], $oralscoreskill;
     public $selectedcandidate;
 
-    public $oralScoreId, $oral_skillId, $skillname, $oralscore; 
+    public $oralScoreId, $oral_skillId, $skillname, $oralscore, $remainingTime, $total_duration; 
+
+   public function mount($oralscoreId)
+    {
+        $this->oralscoreId = $oralscoreId;
+        
+        $this->loadOralScoreData($oralscoreId);
+    }
+
+
+    public function loadOralScoreData($oralscoreId)
+    {
+        $oralscore = OralScore::with(['candidate', 'user'])->findOrFail($oralscoreId);
+        $this->totalDuration = $oralscore->total_duration;
+        $this->fill([
+            'candidateName' => $oralscore->candidate?->fullname ?? 'N/A',
+            'assessorName' => $oralscore->user?->name ?? 'N/A',
+            'dateFinished' => $oralscore->date_finished ?? 'N/A',
+            'timeFinished' => $oralscore->time_finished ?? 'N/A',
+            'status' => $oralscore->status ?? 'N/A',
+            'oralscoreskills' => $oralscore->oralScoreSkills,
+        ]);
+    }   
 
     public function render()
     {
-        return view('livewire.scores.oral-scores', [
-            'oralscores' => $this->loadOralScores(),    
-        ]);
-    }
-
-    public function loadOralScores()
-    {
-        return OralScore::with('candidate')
-            ->when($this->search, function ($query) {
-                $query->whereHas('candidate', function ($q) {
-                    $q->where('fullname', 'like', '%' . $this->search . '%');
-                });
-            })
-            ->when($this->filterStatus !== 'all', function ($query) {
-                $query->where('status', $this->filterStatus);
-            })
-            ->orderByDesc('created_at')
-            ->paginate(10);
-    }
-
-    public function readOralScore($oralscoreId)
-    {
-        return redirect()->route('scores.oralscoresevaluation', $oralscoreId);
+        return view('livewire.scores.oral-scores-evaluation');
     }
 
     public function readNote($oralscoreId)
@@ -63,6 +70,24 @@ class OralScores extends Component
         $this->oralscore = $oralscore;
 
         $this->dispatch('show-noteModal');
+    }
+
+    public function startInterview()
+    {
+        $this->interviewStarted = true;
+        $this->interviewPaused = false;
+    }
+
+    public function pauseInterview()
+    {
+        $this->interviewPaused = true;
+    }
+
+    public function completeInterview()
+    {
+        $this->interviewStarted = false;
+        $this->interviewCompleted = true;
+        $this->status = 'Completed';
     }
 
 
@@ -121,8 +146,8 @@ class OralScores extends Component
             'comment' => $this->evaluation['comment'],
         ]);
 
-        $this->finalizeOralScore($this->oralScoreId);
-        $this->readOralScore($this->oralScoreId);
+        $this->finalizeOralScore($this->oralscoreId);
+        $this->loadOralScoreData($this->oralscoreId);
         $this->dispatch('hide-evaluationModal');
         $this->dispatch('success', 'Evaluation submitted successfully.');
     }
@@ -130,15 +155,31 @@ class OralScores extends Component
     public function finalizeOralScore($oral_score_id)
     {
         $oralScoreSkills = OralScoreSkill::where('oral_score_id', $oral_score_id)->get();
+        $assessor_id = auth()->id();
+
+        Log::info('Finalizing Oral Score', [
+            'oral_score_id' => $oral_score_id,
+            'assessor_id' => $assessor_id,
+            'skills_count' => $oralScoreSkills->count(),
+            'null_scores_exist' => $oralScoreSkills->contains(fn($skill) => is_null($skill->score)),
+        ]);
 
         if ($oralScoreSkills->contains(fn($skill) => is_null($skill->score))) {
+            Log::warning("Oral score {$oral_score_id} has incomplete skill scores.");
             return;
         }
 
         $averageScore = round($oralScoreSkills->avg('score'), 2);
 
-        OralScore::where('id', $oral_score_id)->update([
+        $updated = OralScore::where('id', $oral_score_id)->update([
             'total_score' => $averageScore,
+            'user_id' => $assessor_id,
+        ]);
+
+        Log::info('Oral Score updated', [
+            'oral_score_id' => $oral_score_id,
+            'updated' => $updated,
+            'average_score' => $averageScore,
         ]);
     }
 
@@ -155,6 +196,4 @@ class OralScores extends Component
             abort(500, 'Something went wrong.');
         }
     }
-
-
 }

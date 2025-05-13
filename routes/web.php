@@ -19,7 +19,9 @@ use App\Livewire\Scores\AssessmentScores;
 use App\Livewire\Scores\CandidateCompetency;
 use App\Livewire\Scores\CandidateCompetencyResult;
 use App\Livewire\Scores\OralScores;
+use App\Livewire\Scores\OralScoresEvaluation;
 use App\Livewire\Scores\PracticalScores;
+use App\Livewire\Scores\PracticalScoresEvaluation;
 use App\Livewire\Settings\CandidateList;
 use App\Livewire\Exam\Assessmentlist;
 use App\Livewire\Exam\Interviewlist;
@@ -96,6 +98,8 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/scores/assessment', AssessmentScores::class )->name('scores.assessment');
     Route::get('/scores/practical', PracticalScores::class)->name('scores.practical');
     Route::get('/scores/oral', OralScores::class)->name('scores.oral');
+    Route::get('/scores/practical/{practicalscoreId}', PracticalScoresEvaluation::class)->name('scores.practicalscoresevaluation');
+    Route::get('/scores/oral/{oralscoreId}', OralScoresEvaluation::class)->name('scores.oralscoresevaluation');
     Route::get('/scores/candidatecompetency', CandidateCompetency::class)->name('scores.candidatecompetency');
     Route::get('/scores/candidatecompetencyresult/{candidateId}', CandidateCompetencyResult::class)->name('scores.candidatecompetencyresults');  
     Route::get('/test/assessment/addquestions', AddQuestions::class)->name('test.assessment.addquestions');

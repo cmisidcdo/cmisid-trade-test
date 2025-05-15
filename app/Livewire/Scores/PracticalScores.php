@@ -48,21 +48,7 @@ class PracticalScores extends Component
 
     public function readPracticalScore($practicalscoreId)
     {
-        $practicalscore = PracticalScore::with('candidate') 
-            ->findOrFail($practicalscoreId);
-        $this->fill([
-            'candidateName' => $practicalscore->candidate?->fullname ?? 'N/A',
-            'assessorName' => 'N/A', 
-            'dateFinished' => $practicalscore->date_finished ?? 'N/A',
-            'timeFinished' => $practicalscore->time_finished ?? 'N/A',
-            'status' => $practicalscore->status ?? 'N/A',
-            'practicalscoreskills' => $practicalscore->practicalScoreSkills, 
-        ]);
-
-        $this->practicalScoreId = $practicalscoreId;
-        $this->editMode = true;
-
-        $this->dispatch('show-practicalScoreModal');
+        return redirect()->route('scores.practicalscoresevaluation', $practicalscoreId);
     }
 
     public function readNote($practicalscoreId)

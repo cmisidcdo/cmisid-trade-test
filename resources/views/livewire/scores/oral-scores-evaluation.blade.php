@@ -8,6 +8,32 @@
         .btn[disabled] {
             opacity: 0.6 !important;
         }
+
+        #timer1 {
+            font-size: 4rem;
+            border-radius: 0.5rem;
+            padding: 0.75rem 1.5rem;
+            transition: background-color 0.3s ease, color 0.3s ease;
+            display: inline-block;
+            min-width: 160px;
+            text-align: center;
+        }
+
+        .timer-normal {
+            background-color: #2eff1b;
+            color: #000;
+        }
+
+        .timer-warning {
+            background-color: #fd7e14;
+            color: #000;
+        }
+
+        .timer-danger {
+            background-color: #dc3545;
+            color: #fff;
+        }
+
     </style>
 
     <div class="card-header text-white text-center py-3" style="background-color: #1a1851; border-radius: 12px 12px 0 0;">
@@ -29,28 +55,35 @@
         <i class="bi bi-clock-history me-2"></i> Interview Timer
     </h5>
 
-    <div class="d-flex justify-content-center mb-3">
+   <div class="d-flex justify-content-center mb-3">
         <h1 class="display-4 fw-semibold text-primary" id="timerDisplay">
-            {{ $totalDuration }}
+            @if($status === 'done')
+                <span class="px-4 py-2 rounded d-inline-block bg-success text-white">
+                    Complete
+                </span>
+            @else
+                <span id="timer1" class="px-4 py-2 rounded d-inline-block">
+                    {{ gmdate('H:i:s', $remainingTime) }}
+                </span>
+            @endif
         </h1>
     </div>
 
+
     <div class="d-flex justify-content-center gap-3 mt-4 flex-wrap">
         <button id="startButton" class="btn btn-success px-4 py-2"
-            wire:click="startInterview" {{ $interviewStarted ? 'disabled' : '' }}>
+            wire:click="startInterview"
+            {{ $status !== 'pending' ? 'disabled' : '' }}>
             <i class="bi bi-play-circle-fill me-1"></i> Start
         </button>
 
-        <button id="pauseButton" class="btn btn-warning px-4 py-2"
-            wire:click="pauseInterview" {{ !$interviewStarted || $interviewPaused ? 'disabled' : '' }}>
-            <i class="bi bi-pause-circle-fill me-1"></i> Pause
-        </button>
-
         <button id="completeButton" class="btn btn-danger px-4 py-2"
-            wire:click="completeInterview" {{ !$interviewStarted ? 'disabled' : '' }}>
+            wire:click="completeInterview"
+            {{ $status !== 'ongoing' ? 'disabled' : '' }}>
             <i class="bi bi-check-circle-fill me-1"></i> Complete
         </button>
     </div>
+
 </div>
 
 
@@ -265,6 +298,54 @@
                 });
             });
         });
+
+        let countdownInterval;
+
+    function initializeCountdownTimer(remainingTime) {
+        const timerEl = document.getElementById('timer1');
+
+        function formatTime(seconds) {
+            const hours = Math.floor(seconds / 3600);
+            const minutes = Math.floor((seconds % 3600) / 60);
+            const secs = seconds % 60;
+            return `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
+        }
+
+        function updateTimer() {
+            if (remainingTime > 0) {
+                timerEl.textContent = formatTime(remainingTime);
+
+                timerEl.classList.remove('timer-normal', 'timer-warning', 'timer-danger');
+
+                if (remainingTime <= 60) {
+                    timerEl.classList.add('timer-danger');
+                } else if (remainingTime <= 300) {
+                    timerEl.classList.add('timer-warning');
+                } else {
+                    timerEl.classList.add('timer-normal');
+                }
+
+                remainingTime--;
+            } else {
+                clearInterval(countdownInterval);
+                timerEl.textContent = '00:00:00';
+
+                timerEl.classList.remove('timer-normal', 'timer-warning');
+                timerEl.classList.add('timer-danger');
+            }
+        }
+
+
+        clearInterval(countdownInterval);
+        updateTimer();
+        countdownInterval = setInterval(updateTimer, 1000);
+    }
+
+    Livewire.on('startCountdown', () => {
+        const remainingTime = @json((int) $remainingTime);
+        initializeCountdownTimer(remainingTime);
+    });
+
 
         $wire.on('hide-noteModal', () => {
             $('#noteModal').modal('hide');

@@ -166,12 +166,21 @@
                                         {{ $item['question_count'] ?? 0 }}
                                     </td>
                                     <td style="width:15%">
-                                        <button
-                                            class="btn {{$editMode ? 'btn-primary' : ($viewMode ? 'btn-info' : 'btn-success')}} btn-sm"
-                                            wire:click="{{ $editMode ? 'updateQuestions(' . $position_id . ', ' . $item['id'] . ')' : ($viewMode ? 'viewQuestions(' . $position_id . ', ' . $item['id'] . ')' : 'addQuestions(' . $position_id . ', ' . $item['id'] . ')') }}">
-                                            <i class="bi {{ $editMode ? 'bi-pencil-fill' : ($viewMode ? 'bi-eye' : 'bi-plus-circle') }} me-1"></i>
-                                            {{ $editMode ? 'Update' : ($viewMode ? 'View' : 'Add') }}
-                                        </button>
+                                        <a
+                                        href="{{ $editMode 
+                                            ? route('test.assessment.updatequestions', ['position_id' => $position_id, 'skill_id' => $item['id']])
+                                            : ($viewMode 
+                                                ? route('test.assessment.viewquestions', ['position_id' => $position_id, 'skill_id' => $item['id']])
+                                                : route('test.assessment.addquestions', ['position_id' => $position_id, 'skill_id' => $item['id']])
+                                            )
+                                        }}"
+                                        target="_blank"
+                                        class="btn {{ $editMode ? 'btn-primary' : ($viewMode ? 'btn-info' : 'btn-success') }} btn-sm"
+                                    >
+                                        <i class="bi {{ $editMode ? 'bi-pencil-fill' : ($viewMode ? 'bi-eye' : 'bi-plus-circle') }} me-1"></i>
+                                        {{ $editMode ? 'Update' : ($viewMode ? 'View' : 'Add') }}
+                                    </a>
+
                                     </td>                                    
                                 </tr>
                             @empty
@@ -215,35 +224,5 @@
             console.log('Showing view modal');
             $('#viewModal').modal('show');
         });
-
-        Livewire.on('open-new-tab', (data = {}) => {
-            const { position_id, skill_id } = data;
-
-            if (position_id && skill_id) {
-                const newTab = window.open(`/test/assessment/addquestions?position_id=${position_id}&skill_id=${skill_id}`, '_blank');
-            } else {
-                console.log('Invalid data received.');
-            }
-        });  
-
-        Livewire.on('open-new-update-tab', (data = {}) => {
-            const { position_id, skill_id } = data;
-
-            if (position_id && skill_id) {
-                const newTab = window.open(`/test/assessment/updatequestions?position_id=${position_id}&skill_id=${skill_id}`, '_blank');
-            } else {
-                console.log('Invalid data received.');
-            }
-        });      
-
-        Livewire.on('open-new-view-tab', (data = {}) => {
-            const { position_id, skill_id } = data;
-
-            if (position_id && skill_id) {
-                const newTab = window.open(`/test/assessment/viewquestions?position_id=${position_id}&skill_id=${skill_id}`, '_blank');
-            } else {
-                console.log('Invalid data received.');
-            }
-        }); 
     </script>
     @endscript

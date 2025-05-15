@@ -60,7 +60,7 @@ class Venues extends Component
 
     public function getVenues()
     {
-        $query = Venue::query();
+        $query = Venue::with(['assignedAssessments', 'assignedPracticals', 'assignedOrals']);
 
         if ($this->archive) {
             $query->onlyTrashed(); 
@@ -69,10 +69,11 @@ class Venues extends Component
         return $query
             ->when($this->search, function ($query) {
                 $query->where('name', 'like', '%' . $this->search . '%')
-                ->orWhere('location','like','%'. $this->search .'%');
+                    ->orWhere('location','like','%'. $this->search .'%');
             })
             ->paginate(10);
     }
+
 
     public function createVenue()
     {

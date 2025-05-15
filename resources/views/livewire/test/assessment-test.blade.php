@@ -56,11 +56,9 @@
                 <table class="table table-hover table-bordered text-center global-table">
                     <thead style="background-color: #f8f9fa;">
                         <tr>
-                            <th class="text-center" style="width: 5%;">#</th>
-                            <th class="text-center">Position</th>
-                            {{-- <th class="text-center" style="width: 15%;">Total Duration</th>
-                            <th class="text-center" style="width: 15%;">Total Questions</th> --}}
-                            <th class="text-center" style="width: 15%;">Actions</th>
+                            <th style="width: 5%;">#</th>
+                            <th>Position</th>
+                            <th style="width: 5%;">Actions</th>
                         </tr>
                     </thead>
             
@@ -69,15 +67,12 @@
                         <tr>
                             <td class="text-center fw-medium align-middle">{{ $loop->iteration }}</td>
                             <td class="fw-bold align-middle">{{ $item->position_title }}</td>
-                            {{-- <td class="fw-medium align-middle">{{ $item->formatted_duration }}</td>
-                            <td class="fw-medium align-middle">{{ $item->total_questions }}</td> --}}
-                            <td style="width: 15%;">
+                            <td>
                                 <div class="d-flex align-items-center justify-content-center gap-2">
                                     <button class="btn btn-sm btn-info rounded-2"
                                         wire:click='viewAssessmentQuestion({{$item->position_id}})'
                                         data-bs-title="View Question">
                                         <i class="bi bi-eye"></i>
-                                        <span class="d-none d-md-inline ms-1">View</span>
                                     </button>
             
                                     @can('update reference')
@@ -86,7 +81,6 @@
                                         data-bs-toggle="tooltip"
                                         data-bs-title="Edit Question">
                                         <i class="bi bi-pencil-square"></i>
-                                        <span class="d-none d-md-inline ms-1">Edit</span>
                                     </button>
                                     @endcan
                                 </div>
@@ -159,7 +153,7 @@
                             <tbody>
                                 @forelse($skills as $item)
                                 <tr>
-                                    <td scope="row" class="text-center" style="width:5%">{{ $loop->iteration }}</td>
+                                    <td scope="row" style="width:5%">{{ $loop->iteration }}</td>
                                     <td class="fw-medium">{{ $item['title'] }}</td> 
                                     <td class="fw-medium" style="width:20%">
                                         <span class="badge rounded-pill 
@@ -171,13 +165,22 @@
                                     <td class="fw-medium text-center" style="width:20%">
                                         {{ $item['question_count'] ?? 0 }}
                                     </td>
-                                    <td class="text-center" style="width:15%">
-                                        <button
-                                            class="btn {{$editMode ? 'btn-primary' : ($viewMode ? 'btn-info' : 'btn-success')}} btn-sm"
-                                            wire:click="{{ $editMode ? 'updateQuestions(' . $position_id . ', ' . $item['id'] . ')' : ($viewMode ? 'viewQuestions(' . $position_id . ', ' . $item['id'] . ')' : 'addQuestions(' . $position_id . ', ' . $item['id'] . ')') }}">
-                                            <i class="bi {{ $editMode ? 'bi-pencil-fill' : ($viewMode ? 'bi-eye' : 'bi-plus-circle') }} me-1"></i>
-                                            {{ $editMode ? 'Update' : ($viewMode ? 'View' : 'Add') }}
-                                        </button>
+                                    <td style="width:15%">
+                                        <a
+                                        href="{{ $editMode 
+                                            ? route('test.assessment.updatequestions', ['position_id' => $position_id, 'skill_id' => $item['id']])
+                                            : ($viewMode 
+                                                ? route('test.assessment.viewquestions', ['position_id' => $position_id, 'skill_id' => $item['id']])
+                                                : route('test.assessment.addquestions', ['position_id' => $position_id, 'skill_id' => $item['id']])
+                                            )
+                                        }}"
+                                        target="_blank"
+                                        class="btn {{ $editMode ? 'btn-primary' : ($viewMode ? 'btn-info' : 'btn-success') }} btn-sm"
+                                    >
+                                        <i class="bi {{ $editMode ? 'bi-pencil-fill' : ($viewMode ? 'bi-eye' : 'bi-plus-circle') }} me-1"></i>
+                                        {{ $editMode ? 'Update' : ($viewMode ? 'View' : 'Add') }}
+                                    </a>
+
                                     </td>                                    
                                 </tr>
                             @empty
@@ -221,35 +224,5 @@
             console.log('Showing view modal');
             $('#viewModal').modal('show');
         });
-
-        Livewire.on('open-new-tab', (data = {}) => {
-            const { position_id, skill_id } = data;
-
-            if (position_id && skill_id) {
-                const newTab = window.open(`/test/assessment/addquestions?position_id=${position_id}&skill_id=${skill_id}`, '_blank');
-            } else {
-                console.log('Invalid data received.');
-            }
-        });  
-
-        Livewire.on('open-new-update-tab', (data = {}) => {
-            const { position_id, skill_id } = data;
-
-            if (position_id && skill_id) {
-                const newTab = window.open(`/test/assessment/updatequestions?position_id=${position_id}&skill_id=${skill_id}`, '_blank');
-            } else {
-                console.log('Invalid data received.');
-            }
-        });      
-
-        Livewire.on('open-new-view-tab', (data = {}) => {
-            const { position_id, skill_id } = data;
-
-            if (position_id && skill_id) {
-                const newTab = window.open(`/test/assessment/viewquestions?position_id=${position_id}&skill_id=${skill_id}`, '_blank');
-            } else {
-                console.log('Invalid data received.');
-            }
-        }); 
     </script>
     @endscript

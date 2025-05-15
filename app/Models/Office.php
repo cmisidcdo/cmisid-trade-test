@@ -29,4 +29,9 @@ class Office extends Model
 
         return $logOptions;
     }
+
+    public function candidates()
+    {
+        return $this->hasMany(Candidate::class);
+    }
 }

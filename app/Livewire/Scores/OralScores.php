@@ -18,7 +18,7 @@ class OralScores extends Component
     public $title, $skill_id, $status;
     public $assigned_date, $oralScores, $dateFinished, $timeFinished, $candidateName, $candidate_id, $assessorName, $access_code, $draft_status = 'draft';
 
-    public $venues = [], $evaluation = [], $oralscoreskills = [];
+    public $venues = [], $evaluation = [], $oralscoreskills = [], $oralscoreskill;
     public $selectedcandidate;
 
     public $oralScoreId, $oral_skillId, $skillname, $oralscore; 
@@ -34,10 +34,9 @@ class OralScores extends Component
     {
         return OralScore::with('candidate')
             ->when($this->search, function ($query) {
-                $query->where('title', 'like', '%' . $this->search . '%')
-                    ->orWhereHas('candidate', function ($q) {
-                        $q->where('name', 'like', '%' . $this->search . '%');
-                    });
+                $query->whereHas('candidate', function ($q) {
+                    $q->where('fullname', 'like', '%' . $this->search . '%');
+                });
             })
             ->when($this->filterStatus !== 'all', function ($query) {
                 $query->where('status', $this->filterStatus);
@@ -48,21 +47,7 @@ class OralScores extends Component
 
     public function readOralScore($oralscoreId)
     {
-        $oralscore = OralScore::with('candidate') 
-            ->findOrFail($oralscoreId);
-        $this->fill([
-            'candidateName' => $oralscore->candidate?->fullname ?? 'N/A',
-            'assessorName' => 'N/A', 
-            'dateFinished' => $oralscore->date_finished ?? 'N/A',
-            'timeFinished' => $oralscore->time_finished ?? 'N/A',
-            'status' => $oralscore->status ?? 'N/A',
-            'oralscoreskills' => $oralscore->oralScoreSkills, 
-        ]);
-
-        $this->oralScoreId = $oralscoreId;
-        $this->editMode = true;
-
-        $this->dispatch('show-oralScoreModal');
+        return redirect()->route('scores.oralscoresevaluation', $oralscoreId);
     }
 
     public function readNote($oralscoreId)
@@ -136,9 +121,39 @@ class OralScores extends Component
             'comment' => $this->evaluation['comment'],
         ]);
 
+        $this->finalizeOralScore($this->oralScoreId);
         $this->readOralScore($this->oralScoreId);
         $this->dispatch('hide-evaluationModal');
         $this->dispatch('success', 'Evaluation submitted successfully.');
+    }
+
+    public function finalizeOralScore($oral_score_id)
+    {
+        $oralScoreSkills = OralScoreSkill::where('oral_score_id', $oral_score_id)->get();
+
+        if ($oralScoreSkills->contains(fn($skill) => is_null($skill->score))) {
+            return;
+        }
+
+        $averageScore = round($oralScoreSkills->avg('score'), 2);
+
+        OralScore::where('id', $oral_score_id)->update([
+            'total_score' => $averageScore,
+        ]);
+    }
+
+    public function showQuestions($oralskillId)
+    {
+        try {
+            $this->oralscoreskill = OralScoreSkill::with('oralScoreSkillQuestions.oral_questions')->findOrFail($oralskillId);
+
+            $this->dispatch('show-questionModal');
+        } catch (\Exception $e) {
+            Log::error('Error fetching OralScoreSkill: ' . $e->getMessage(), [
+                'oralskill_id' => $oralskillId ?? null,
+            ]);
+            abort(500, 'Something went wrong.');
+        }
     }
 
 

@@ -73,16 +73,16 @@
                 </div>
 
                 <div class="table-responsive">
-                    <table class="table table-hover align-middle border global-table">
+                    <table class="table table-hover align-middle table-bordered global-table">
                         <thead class="table-light">
                             <tr>
                                 <th scope="col" class="text-center" width="5%">#</th>
-                                <th scope="col" width="20%">Full Name</th>
-                                <th scope="col" width="18%">Office Applied</th>
-                                <th scope="col" width="18%">Position Applied</th>
-                                <th scope="col" width="18%">Priority Group</th>
-                                <th scope="col" class="text-center" width="6%">Status</th>
-                                <th scope="col" class="text-center" width="15%">Actions</th>
+                                <th scope="col">Full Name</th>
+                                <th scope="col" width="15%">Office Applied</th>
+                                <th scope="col" width="15%">Position Applied</th>
+                                <th scope="col" width="10%">Priority Group</th>
+                                <th scope="col" class="text-center" width="5%">Status</th>
+                                <th scope="col" class="text-center" width="5%">Actions</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -108,12 +108,16 @@
                                         </button>
 
                                         @can('update candidate')
-                                        <button class="btn btn-icon btn-primary me-1" 
-                                            wire:click='readCandidate({{$item->id}})'
-                                            data-bs-toggle="tooltip"
-                                            data-bs-title="Edit">
-                                            <i class="bi bi-pencil"></i>
-                                        </button>
+                                            @php
+                                                $isUsed = $item->assignedAssessments->isNotEmpty() || $item->assignedPracticals->isNotEmpty() || $item->assignedOrals->isNotEmpty();
+                                            @endphp
+                                            <button class="btn btn-icon me-1 {{ $isUsed ? 'btn-secondary' : 'btn-primary' }}"
+                                                wire:click='readCandidate({{$item->id}})'
+                                                data-bs-toggle="tooltip"
+                                                data-bs-title="{{ $isUsed ? 'Editing disabled due to assignment' : 'Edit' }}"
+                                                @if($isUsed) disabled @endif>
+                                                <i class="bi bi-pencil"></i>
+                                            </button>
                                         @endcan
                                     </div>
                                 </td>

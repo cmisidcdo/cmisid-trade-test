@@ -55,7 +55,7 @@
                     <tr>
                         <th class="text-center" style="width: 5%;">#</th>
                         <th class="text-center">Position</th>
-                        <th class="text-center" style="width: 15%;">Actions</th>
+                        <th class="text-center" style="width: 5%;">Actions</th>
                     </tr>
                 </thead>
         
@@ -64,13 +64,12 @@
                     <tr>
                         <td class="text-center fw-medium align-middle">{{ $loop->iteration }}</td>
                         <td class="fw-bold align-middle">{{ $item->position_title }}</td>
-                        <td style="width: 15%;">
+                        <td>
                             <div class="d-flex align-items-center justify-content-center gap-2">
                                 <button class="btn btn-sm btn-info rounded-2"
                                     wire:click='viewOralQuestion({{$item->position_id}})'
                                     data-bs-title="View Questions">
                                     <i class="bi bi-eye"></i>
-                                    <span class="d-none d-md-inline ms-1">View</span>
                                 </button>
         
                                 @can('update reference')
@@ -79,7 +78,6 @@
                                     data-bs-toggle="tooltip"
                                     data-bs-title="Edit Questions">
                                     <i class="bi bi-pencil-square"></i>
-                                    <span class="d-none d-md-inline ms-1">Edit</span>
                                 </button>
                                 @endcan
                             </div>
@@ -163,12 +161,20 @@
                                         {{ $item['question_count'] ?? 0 }}
                                     </td>
                                     <td class="text-center" style="width:15%">
-                                        <button
-                                            class="btn {{$editMode ? 'btn-primary' : ($viewMode ? 'btn-info' : 'btn-success')}} btn-sm"
-                                            wire:click="{{ $editMode ? 'updateQuestions(' . $position_id . ', ' . $item['id'] . ')' : ($viewMode ? 'viewQuestions(' . $position_id . ', ' . $item['id'] . ')' : 'addQuestions(' . $position_id . ', ' . $item['id'] . ')') }}">
-                                            <i class="bi {{ $editMode ? 'bi-pencil-fill' : ($viewMode ? 'bi-eye' : 'bi-plus-circle') }} me-1"></i>
-                                            {{ $editMode ? 'Update' : ($viewMode ? 'View' : 'Add') }}
-                                        </button>
+                                         <a
+                                        href="{{ $editMode 
+                                            ? route('test.oral.updateoralquestions', ['position_id' => $position_id, 'skill_id' => $item['id']])
+                                            : ($viewMode 
+                                                ? route('test.oral.vieworalquestions', ['position_id' => $position_id, 'skill_id' => $item['id']])
+                                                : route('test.oral.addoralquestions', ['position_id' => $position_id, 'skill_id' => $item['id']])
+                                            )
+                                        }}"
+                                        target="_blank"
+                                        class="btn {{ $editMode ? 'btn-primary' : ($viewMode ? 'btn-info' : 'btn-success') }} btn-sm"
+                                    >
+                                        <i class="bi {{ $editMode ? 'bi-pencil-fill' : ($viewMode ? 'bi-eye' : 'bi-plus-circle') }} me-1"></i>
+                                        {{ $editMode ? 'Update' : ($viewMode ? 'View' : 'Add') }}
+                                    </a>
                                     </td>                                    
                                 </tr>
                             @empty
@@ -203,36 +209,6 @@
     $wire.on('show-oralQuestionModal', () => {
         $('#oralQuestionModal').modal('show');
     });
-
-        Livewire.on('open-new-tab', (data = {}) => {
-            const { position_id, skill_id } = data;
-
-            if (position_id && skill_id) {
-                const newTab = window.open(`/test/oral/addoralquestions?position_id=${position_id}&skill_id=${skill_id}`, '_blank');
-            } else {
-                console.log('Invalid data received.');
-            }
-        });  
-
-        Livewire.on('open-new-update-tab', (data = {}) => {
-            const { position_id, skill_id } = data;
-
-            if (position_id && skill_id) {
-                const newTab = window.open(`/test/oral/updateoralquestions?position_id=${position_id}&skill_id=${skill_id}`, '_blank');
-            } else {
-                console.log('Invalid data received.');
-            }
-        });      
-
-        Livewire.on('open-new-view-tab', (data = {}) => {
-            const { position_id, skill_id } = data;
-
-            if (position_id && skill_id) {
-                const newTab = window.open(`/test/oral/vieworalquestions?position_id=${position_id}&skill_id=${skill_id}`, '_blank');
-            } else {
-                console.log('Invalid data received.');
-            }
-        }); 
 </script>
 @endscript
 

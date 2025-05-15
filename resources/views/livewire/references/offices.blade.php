@@ -77,12 +77,12 @@
                         <table class="table table-hover table-bordered text-center global-table">
                             <thead class="table-light">
                                 <tr>
-                                    <th scope="col" class="text-center">#</th>
-                                    <th scope="col" class="text-center">
+                                    <th style="width: 5%">#</th>
+                                    <th>
                                         Title
                                     </th>
-                                    <th scope="col" class="text-center">Status</th>
-                                    <th scope="col" class="text-center">Actions</th>
+                                    <th style="width: 5%">Status</th>
+                                    <th style="width: 5%">Actions</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -95,28 +95,22 @@
                                             {{$item->deleted_at == Null ? 'Active': 'Inactive'}}
                                         </span>
                                     </td>
-                                    <td class="text-center">
-                                        <div class="btn-group" role="group" aria-label="Office actions">
-                                            @can('update reference')
-                                            <button class="btn btn-sm btn-primary rounded-2 px-2 py-1 me-2"
-                                                wire:click='readOffice({{$item->id}})'
+                                    <td class="text-center">      
+                                        @php
+                                            $isUsed = $item->candidates_count > 0;
+                                        @endphp
+                                        
+                                        @can('update reference')
+                                            <button class="btn btn-sm {{ $isUsed ? 'btn-secondary' : 'btn-primary' }} rounded-2 px-2 py-1"
+                                                @if(!$isUsed)
+                                                    wire:click='readOffice({{$item->id}})'
+                                                @endif
                                                 data-bs-toggle="tooltip"
-                                                data-bs-title="Edit office">
-                                                <i class="bi bi-pencil-square me-1"></i>
-                                                <span class="d-none d-md-inline ms-1">Edit</span>
+                                                data-bs-title="{{ $isUsed ? 'Edit disabled: office is in use by candidate(s)' : 'Edit office' }}"
+                                                @if($isUsed) disabled @endif>
+                                                <i class="bi bi-pencil-square"></i>
                                             </button>
-                                            @endcan
-
-                                            {{-- @can('delete reference')
-                                            <button class="btn btn-sm {{$item->deleted_at == Null ? 'btn-danger' : 'btn-success'}} rounded-2 px-2 py-1"
-                                                wire:click='{{$item->deleted_at == Null ? 'confirmDelete('.$item->id.')': 'restoreOffice('.$item->id.')'}}'
-                                                data-bs-toggle="tooltip"
-                                                data-bs-title="{{$item->deleted_at == Null ? 'Move to Archive': 'Restore office'}}">
-                                                <i class="bi {{$item->deleted_at == Null ? 'bi bi-archive-fill': 'bi-arrow-counterclockwise'}}"></i>
-                                                <span class="d-none d-md-inline ms-1">{{$item->deleted_at == Null ? 'Archive': 'Restore'}}</span>
-                                            </button>
-                                            @endcan --}}
-                                        </div>
+                                        @endcan
                                     </td>
                                 </tr>
                                 @empty

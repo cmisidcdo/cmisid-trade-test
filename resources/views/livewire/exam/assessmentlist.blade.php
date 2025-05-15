@@ -34,24 +34,24 @@
                             </div>
                 
                             <div class="dropdown">
-                                <button class="btn btn-outline-primary dropdown-toggle" type="button" id="filterDropdown"
+                                <button class="btn btn-primary dropdown-toggle" type="button" id="filterDropdown"
                                     data-bs-toggle="dropdown" aria-expanded="false">
                                     <i class="bi bi-funnel"></i> Filter
                                 </button>
                                 <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="filterDropdown">
                                     <li>
                                         <button class="dropdown-item" wire:click="$set('filterStatus', 'all')">
-                                            <i class="bi bi-list"></i> All candidates
+                                            <i class="bi bi-list"></i> All Status
                                         </button>
                                     </li>
                                     <li>
-                                        <button class="dropdown-item" wire:click="$set('filterStatus', 'yes')">
-                                            <i class="bi bi-person-check"></i> Active candidates
+                                        <button class="dropdown-item" wire:click="$set('filterStatus', 'draft')">
+                                            <i class="bi bi-person-check"></i> Draft
                                         </button>
                                     </li>
                                     <li>
-                                        <button class="dropdown-item" wire:click="$set('filterStatus', 'no')">
-                                            <i class="bi bi-person-x"></i> Inactive candidates
+                                        <button class="dropdown-item" wire:click="$set('filterStatus', 'published')">
+                                            <i class="bi bi-person-x"></i> Published
                                         </button>
                                     </li>
                                 </ul>
@@ -61,8 +61,8 @@
                                 @if($filterStatus !== 'all')
                                     <span class="badge bg-secondary">
                                         <i class="bi bi-funnel"></i> 
-                                        {{ $filterStatus === 'yes' ? 'Active' : 'Inactive' }}
-                                        <button class="btn btn-sm btn-outline-light border-0 ms-1" wire:click="$set('filterStatus', 'all')">
+                                        {{ $filterStatus }}
+                                        <button class="btn btn-sm btn-light border-0 ms-1" wire:click="$set('filterStatus', 'all')">
                                             <i class="bi bi-x"></i>
                                         </button>
                                     </span>
@@ -73,36 +73,45 @@
                 </div>
 
                 <div class="table-responsive">
-                    <table class="table table-hover align-middle border global-table">
-                        <thead style="border-collapse: collapse;">
+                    <table class="table table-hover table-bordered text-center global-table">
+                        <thead >
                             <tr>
-                                <th scope="col" class="text-center" width="5%">#</th>
+                                <th style="width: 5%">#</th>
                                 <th>Candidate Name</th>
-                                <th>Access Code</th>
-                                <th>Date</th>
-                                <th>Time</th>
-                                <th>Venue</th>
-                                <th>Status</th>
-                                <th>Aging Days</th>
-                                <th>Action</th>
+                                <th style="width: 8%">Access Code</th>
+                                <th style="width: 8%">Date</th>
+                                <th style="width: 5%">Time</th>
+                                <th style="width: 20%">Venue</th>
+                                <th style="width: 5%">Status</th>
+                                <th style="width: 8%">Aging Days</th>
+                                <th style="width: 10%">Action</th>
                             </tr>
                         </thead>
-                        <tbody style="border: 1px solid #ccc; border-collapse: collapse;">
+                        <tbody>
                             @forelse($assignedassessments as $item)
                             <tr>
-                                <td style="border: 1px solid black;">{{$loop->iteration}}</td>
-                                <td style="border: 1px solid black;">{{ $item->candidate->fullname ?? 'N/A' }}</td>
-                                <td style="border: 1px solid black;">{{ $item->access_code ?? 'N/A' }}</td>
-                                <td style="border: 1px solid black;">{{ $item->assigned_date ?? 'N/A' }}</td>
-                                <td style="border: 1px solid black;">{{ $item->assigned_time ?? 'N/A' }}</td>
-                                <td style="border: 1px solid black;">{{ $item->venue->name ?? 'N/A' }}, {{ $item->venue->location ?? 'N/A' }}</td>
-                                <td style="border: 1px solid black;">{{ $item->draft_status ?? 'N/A' }}</td>
-                                <td style="border: 1px solid black;">{{ $item->aging_days ?? 'N/A' }}</td>
-                                <td style="border: 1px solid black;">
-                                    <button class="btn btn-sm btn-outline-dark me-1" data-bs-toggle="modal" data-bs-target="#viewModal" data-bs-placement="top" title="View">
+                                <td>{{$loop->iteration}}</td>
+                                <td>{{ $item->candidate->fullname ?? 'N/A' }}</td>
+                                <td>{{ $item->access_code ?? 'N/A' }}</td>
+                                <td>{{ $item->assigned_date ?? 'N/A' }}</td>
+                                <td>{{ $item->assigned_time ?? 'N/A' }}</td>
+                                <td>{{ $item->venue->name ?? 'N/A' }}, {{ $item->venue->location ?? 'N/A' }}</td>
+                                <td>
+                                    <span class="badge rounded-pill bg-{{ 
+                                        $item->draft_status == 'published' ? 'success' : 
+                                        ($item->draft_status == 'draft' ? 'warning' : 'secondary') 
+                                    }} text-{{ 
+                                        $item->draft_status == 'draft' ? 'dark' : 'white' 
+                                    }}">
+                                        {{ ucfirst($item->draft_status ?? 'N/A') }}
+                                    </span>
+                                </td>
+                                <td>{{ $item->aging_days ?? 'N/A' }}</td>
+                                <td>
+                                    <button class="btn btn-sm btn-info rounded-2" data-bs-toggle="modal" data-bs-target="#viewModal" data-bs-placement="top" title="View">
                                         <i class="bi bi-eye-fill"></i>
                                     </button>
-                                    <button class="btn btn-sm btn-outline-primary me-1" data-bs-toggle="modal" data-bs-target="#assignedAssessmentModal" title="Edit">
+                                    <button class="btn btn-sm btn-primary" wire:click='readAssignedAssessment({{$item->id}})' title="Edit">
                                         <i class="bi bi-pencil-square"></i>
                                     </button>
                                 </td>
@@ -127,14 +136,14 @@
                         <div class="modal-dialog modal-dialog-centered modal-lg">
                             <div class="modal-content" style="border-radius: 12px;">
                                 <div class="modal-body p-4">
-                                    <h5 class="text-center mb-4 fw-bold text-dark">Add Schedule for Assessment Test</h5>
+                                    <h5 class="text-center mb-4 fw-bold text-dark">{{$editMode ? 'Update Schedule for Assessment Test' : 'Add Schedule for Assessment Test'}}</h5>
                                     <form wire:submit.prevent="{{$editMode ? 'updateAssignedAssessment' : 'createAssignedAssessment'}}">
                                         <div class="row g-3">
                     
                                             <div class="col-md-6">
                                                 <div class="input-group">
-                                                    <input type="text" id="selectedCandidate" class="form-control border-dark rounded-start-3" wire:model="selectedcandidate.fullname" placeholder="Candidate Name" readonly>
-                                                    <button type="button" class="btn btn-outline-primary rounded-end-3 px-3" wire:click='selectCandidates'>
+                                                    <input type="text" id="selectedCandidate" class="form-control border-dark rounded-start-3" wire:model="{{$editMode ? 'selected_candidate_name' : 'selectedcandidate.fullname'}}" placeholder="Candidate Name" readonly>
+                                                    <button type="button" class="btn btn-primary rounded-end-3 px-3" wire:click='selectCandidates' @if($editMode) disabled @endif>
                                                         Select
                                                     </button>
                                                 </div>
@@ -171,12 +180,12 @@
 
                                         <div class="d-flex justify-content-between">
 
-                                            <button type="button" class="btn btn-outline-secondary btn-sm d-flex align-items-center px-3" data-bs-dismiss="modal">
+                                            <button type="button" class="btn btn-secondary btn-sm d-flex align-items-center px-3" data-bs-dismiss="modal">
                                                 <i class="bi bi-arrow-left me-2"></i> Back
                                             </button>
 
                                             <button type="submit" class="btn btn-primary btn-sm d-flex align-items-center px-3">
-                                                <i class="bi bi-check-circle me-2"></i> Create Schedule
+                                                <i class="bi bi-check-circle me-2"></i>{{ $editMode ? 'Update Schedule' : 'Create Schedule'}}
                                             </button>
                                         </div>
                                     </form>

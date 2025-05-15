@@ -29,36 +29,12 @@
                                 </span>
                             </div>
                 
-                            <div class="dropdown">
-                                <button class="btn btn-outline-primary dropdown-toggle" type="button" id="filterDropdown"
-                                    data-bs-toggle="dropdown" aria-expanded="false">
-                                    <i class="bi bi-funnel"></i> Filter
-                                </button>
-                                <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="filterDropdown">
-                                    <li>
-                                        <button class="dropdown-item" wire:click="$set('filterStatus', 'all')">
-                                            <i class="bi bi-list"></i> All candidates
-                                        </button>
-                                    </li>
-                                    <li>
-                                        <button class="dropdown-item" wire:click="$set('filterStatus', 'yes')">
-                                            <i class="bi bi-person-check"></i> Active candidates
-                                        </button>
-                                    </li>
-                                    <li>
-                                        <button class="dropdown-item" wire:click="$set('filterStatus', 'no')">
-                                            <i class="bi bi-person-x"></i> Inactive candidates
-                                        </button>
-                                    </li>
-                                </ul>
-                            </div>
-                
                             <div>
                                 @if($filterStatus !== 'all')
                                     <span class="badge bg-secondary">
                                         <i class="bi bi-funnel"></i> 
                                         {{ $filterStatus === 'yes' ? 'Active' : 'Inactive' }}
-                                        <button class="btn btn-sm btn-outline-light border-0 ms-1" wire:click="$set('filterStatus', 'all')">
+                                        <button class="btn btn-sm btn-light border-0 ms-1" wire:click="$set('filterStatus', 'all')">
                                             <i class="bi bi-x"></i>
                                         </button>
                                     </span>
@@ -69,8 +45,8 @@
                 </div>
                 
                 <div class="table-responsive">
-                    <table class="table table-hover align-middle border global-table">
-                        <thead style="border-collapse: collapse;">
+                    <table class="table table-hover table-bordered text-center global-table">
+                        <thead>
                             <tr>
                                 <th class="text-center" width="5%">#</th>
                                 <th>Candidate Name</th>
@@ -80,11 +56,11 @@
                                 <th class="text-center" width="8%">See Result</th>
                             </tr>
                         </thead>
-                        <tbody style="border: 1px solid #ccc; border-collapse: collapse;">
+                        <tbody>
                             @forelse($assessmentScores as $item)
                             <tr>
-                                <td style="border: 1px solid black;">{{$loop->iteration}}</td>
-                                <td style="border: 1px solid black;">{{ $item->assignedassessment->candidate->fullname ?? 'N/A' }}</td>
+                                <td>{{$loop->iteration}}</td>
+                                <td>{{ $item->assignedassessment->candidate->fullname ?? 'N/A' }}</td>
                                 @php
                                     $statusClasses = [
                                         'N/A' => 'bg-danger',
@@ -94,25 +70,25 @@
                                     ];
                                 @endphp
 
-                                <td style="border: 1px solid black;">
-                                    <span class="badge {{ $statusClasses[$item->assessmentstatus ?? 'N/A'] }}">
-                                        {{ $item->assessmentstatus ?? 'N/A' }}
+                                <td>
+                                    <span class="badge rounded-pill {{ $statusClasses[$item->assessmentstatus ?? 'N/A'] }}">
+                                        {{ ucfirst($item->assessmentstatus ?? 'N/A') }}
                                     </span>
                                 </td>
-                                <td style="border: 1px solid black;">
-                                    <span class="badge {{ $statusClasses[$item->practicalstatus ?? 'N/A'] }}">
-                                        {{ $item->practicalstatus ?? 'N/A' }}
+                                <td>
+                                    <span class="badge rounded-pill {{ $statusClasses[$item->practicalstatus ?? 'N/A'] }}">
+                                        {{ ucfirst($item->practicalstatus ?? 'N/A') }}
                                     </span>
                                 </td>
-                                <td style="border: 1px solid black;">
-                                    <span class="badge {{ $statusClasses[$item->oralstatus ?? 'N/A'] }}">
-                                        {{ $item->oralstatus ?? 'N/A' }}
+                                <td>
+                                    <span class="badge rounded-pill {{ $statusClasses[$item->oralstatus ?? 'N/A'] }}">
+                                        {{ ucfirst($item->oralstatus ?? 'N/A') }}
                                     </span>
                                 </td>
                                 
-                                <td style="border: 1px solid black;">
-                                    <button class="btn btn-sm btn-outline-primary me-1" wire:click='readAssessmentScore({{$item->id}})' title="Edit">
-                                        <i class="bi bi-pencil-square"></i>
+                                <td>
+                                    <button class="btn btn-sm btn-primary me-1" wire:click='seeResults({{$item->candidate_id}})' title="Edit">
+                                        <i class="bi bi-bar-chart"></i>
                                     </button>
                                 </td>
                             </tr>
@@ -163,8 +139,8 @@
                                     </div>
                                 </div>
                 
-                                <table class="table table-hover align-middle border global-table">
-                                    <thead style="border-collapse: collapse;">
+                                <table class="table table-hover table-bordered text-center global-table">
+                                    <thead>
                                         <tr>
                                             <th scope="col" class="text-center" width="5%">#</th>
                                             <th>Skills Assigned</th>
@@ -175,20 +151,20 @@
                                             <th>Action</th>
                                         </tr>
                                     </thead>
-                                    <tbody style="border: 1px solid #ccc; border-collapse: collapse;">
+                                    <tbody>
                                         @forelse($assessmentscoreskills as $item)
                                             <tr>
-                                                <td style="border: 1px solid black;">{{$loop->iteration}}</td>
-                                                <td style="border: 1px solid black;">{{ $item->skill->title ?? 'N/A' }}</td>
-                                                <td style="border: 1px solid black;">{{ $item->position_skill->competency_level ?? 'N/A' }}</td>
-                                                <td style="border: 1px solid black;">  
-                                                    <button class="btn btn-sm btn-outline-dark me-1" data-bs-toggle="modal" data-bs-target="#viewModal" data-bs-placement="top" title="View">
+                                                <td>{{$loop->iteration}}</td>
+                                                <td>{{ $item->skill->title ?? 'N/A' }}</td>
+                                                <td>{{ $item->position_skill->competency_level ?? 'N/A' }}</td>
+                                                <td>  
+                                                    <button class="btn btn-sm btn-dark me-1" data-bs-toggle="modal" data-bs-target="#viewModal" data-bs-placement="top" title="View">
                                                         <i class="bi bi-eye-fill"></i>
                                                     </button></td>
-                                                <td style="border: 1px solid black;">{{ $item->skill_score ?? 'N/A' }}</td>
-                                                <td style="border: 1px solid black;">{{ $item->assessmentscore->total_score ?? 'N/A' }}</td>
-                                                <td style="border: 1px solid black;">
-                                                    <button class="btn btn-sm btn-outline-primary me-1" data-bs-toggle="modal" data-bs-target="#assessmentScoreModal" title="Edit">
+                                                <td>{{ $item->skill_score ?? 'N/A' }}</td>
+                                                <td>{{ $item->assessmentscore->total_score ?? 'N/A' }}</td>
+                                                <td>
+                                                    <button class="btn btn-sm btn-primary me-1" data-bs-toggle="modal" data-bs-target="#assessmentScoreModal" title="Edit">
                                                         <i class="bi bi-pencil-square"></i>
                                                     </button>
                                                 </td>

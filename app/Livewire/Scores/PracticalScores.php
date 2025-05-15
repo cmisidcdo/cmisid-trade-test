@@ -21,7 +21,7 @@ class PracticalScores extends Component
     public $venues = [], $evaluation = [], $practicalscoreskills = [];
     public $selectedcandidate;
 
-    public $practicalScoreId, $practical_skillId, $practicalscore;
+    public $practicalScoreId, $practical_skillId, $practicalscore, $practicalscoreskill;
     public $skillname;
 
     public function render()
@@ -35,10 +35,9 @@ class PracticalScores extends Component
     {
         return PracticalScore::with('candidate')
             ->when($this->search, function ($query) {
-                $query->where('title', 'like', '%' . $this->search . '%')
-                    ->orWhereHas('candidate', function ($q) {
-                        $q->where('name', 'like', '%' . $this->search . '%');
-                    });
+                $query->whereHas('candidate', function ($q) {
+                    $q->where('fullname', 'like', '%' . $this->search . '%');
+                });
             })
             ->when($this->filterStatus !== 'all', function ($query) {
                 $query->where('status', $this->filterStatus);
@@ -138,11 +137,39 @@ class PracticalScores extends Component
             'comment' => $this->evaluation['comment'],
         ]);
 
+        $this->finalizePracticalScore($this->practicalScoreId);
         $this->readPracticalScore($this->practicalScoreId);
         $this->dispatch('hide-evaluationModal');
         $this->dispatch('success', 'Evaluation submitted successfully.');
     }       
 
+    public function finalizePracticalScore($practical_score_id)
+    {
+        $practicalScoreSkills = PracticalScoreSkill::where('practical_score_id', $practical_score_id)->get();
+
+        if ($practicalScoreSkills->contains(fn($skill) => is_null($skill->score))) {
+            return;
+        }
+
+        $averageScore = round($practicalScoreSkills->avg('score'), 2);
+
+        PracticalScore::where('id', $practical_score_id)->update([
+            'total_score' => $averageScore,
+        ]);
+    }
 
 
+    public function showScenarios($practicalskillId)
+    {
+        try {
+            $this->practicalscoreskill = PracticalScoreSkill::with('practicalScoreSkillScenarios.practical_scenarios')->findOrFail($practicalskillId);
+
+            $this->dispatch('show-scenarioModal');
+        } catch (\Exception $e) {
+            Log::error('Error fetching practicalScoreSkill: ' . $e->getMessage(), [
+                'practicalskill_id' => $practicalskillId ?? null,
+            ]);
+            abort(500, 'Something went wrong.');
+        }
+    }
 }

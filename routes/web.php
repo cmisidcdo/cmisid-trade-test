@@ -17,8 +17,11 @@ use App\Livewire\References\Scoresheets\OralScoring;
 use App\Livewire\References\Scoresheets\PracticalScoring;
 use App\Livewire\Scores\AssessmentScores;
 use App\Livewire\Scores\CandidateCompetency;
+use App\Livewire\Scores\CandidateCompetencyResult;
 use App\Livewire\Scores\OralScores;
+use App\Livewire\Scores\OralScoresEvaluation;
 use App\Livewire\Scores\PracticalScores;
+use App\Livewire\Scores\PracticalScoresEvaluation;
 use App\Livewire\Settings\CandidateList;
 use App\Livewire\Exam\Assessmentlist;
 use App\Livewire\Exam\Interviewlist;
@@ -42,9 +45,6 @@ use App\Livewire\Test\Practical\UpdateScenarios;
 use App\Livewire\Test\Practical\ViewScenarios;
 use Illuminate\Support\Facades\Route;
 use App\Livewire\Dashboard;
-use App\Livewire\Eval\AssessmentNotes;
-use App\Livewire\Eval\OralTestEvaluation;
-use App\Livewire\Eval\PracticalTestEvaluation;
 use App\Livewire\Logs;
 use App\Livewire\Permissions;
 use App\Livewire\Reports;
@@ -79,9 +79,6 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/test/assessmenttests', AssessmentTest::class)->name('test.assessment');
     Route::get('/test/practicalexams', PracticalExam::class)->name('test.practical');
     Route::get('/test/oralinterveiws', OralInterview::class)->name('test.interview');
-    Route::get('/eval/assessmentnotes', AssessmentNotes::class)->name('eval.assessmentnotes');
-    Route::get('/eval/ptestevaluation', PracticalTestEvaluation::class)->name('eval.ptestevaluations');
-    Route::get('/eval/otestevaluation', OralTestEvaluation::class)->name('eval.otestevaluations');
     Route::get('/logs', Logs::class)->name('logs');
     Route::get('/reports', Reports::class)->name('reports');
     Route::get('/permissions', Permissions::class)->name('permissions');
@@ -101,7 +98,10 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/scores/assessment', AssessmentScores::class )->name('scores.assessment');
     Route::get('/scores/practical', PracticalScores::class)->name('scores.practical');
     Route::get('/scores/oral', OralScores::class)->name('scores.oral');
+    Route::get('/scores/practical/{practicalscoreId}', PracticalScoresEvaluation::class)->name('scores.practicalscoresevaluation');
+    Route::get('/scores/oral/{oralscoreId}', OralScoresEvaluation::class)->name('scores.oralscoresevaluation');
     Route::get('/scores/candidatecompetency', CandidateCompetency::class)->name('scores.candidatecompetency');
+    Route::get('/scores/candidatecompetencyresult/{candidateId}', CandidateCompetencyResult::class)->name('scores.candidatecompetencyresults');  
     Route::get('/test/assessment/addquestions', AddQuestions::class)->name('test.assessment.addquestions');
     Route::get('/test/assessment/updatequestions', UpdateQuestions::class)->name('test.assessment.updatequestions');
     Route::get('/test/assessment/viewquestions', ViewQuestions::class)->name('test.assessment.viewquestions');
@@ -114,13 +114,15 @@ Route::middleware(['auth'])->group(function () {
 });
 
 Route::get('/candidate/login', Login::class)->name('candidate.login');
-Route::get('/candidate/home', Home::class)->name('candidate.home');
-Route::get('/candidate/exam/assessment', CandidateAssessment::class)->name('candidate.exam.assessment');
-Route::get('/candidate/exam/practical', CandidatePractical::class)->name('candidate.exam.practical');
-Route::get('/candidate/exam/oral', CandidateOral::class)->name('candidate.exam.oral');
-Route::get('/candidate/exam/assessment-instructions', AssessmentInstructions::class)->name('candidate.exam.assessmentinstructions');
-Route::get('/candidate/exam/practical-code', PracticalCode::class)->name('candidate.exam.practicalcode');
-Route::get('/candidate/exam/oral-code', OralCode::class)->name('candidate.exam.oralcode');
+Route::middleware('candidate.auth')->group(function () {
+    Route::get('/candidate/home', Home::class)->name('candidate.home');
+    Route::get('/candidate/exam/assessment', CandidateAssessment::class)->name('candidate.exam.assessment');
+    Route::get('/candidate/exam/practical', CandidatePractical::class)->name('candidate.exam.practical');
+    Route::get('/candidate/exam/oral', CandidateOral::class)->name('candidate.exam.oral');
+    Route::get('/candidate/exam/assessment-instructions', AssessmentInstructions::class)->name('candidate.exam.assessmentinstructions');
+    Route::get('/candidate/exam/practical-code', PracticalCode::class)->name('candidate.exam.practicalcode');
+    Route::get('/candidate/exam/oral-code', OralCode::class)->name('candidate.exam.oralcode');
+});
 
 Route::post('/candidate-logout', function (Request $request) {
     $request->session()->forget(['candidate_id', 'candidate_name']); 

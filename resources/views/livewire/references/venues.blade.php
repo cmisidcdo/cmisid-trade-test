@@ -48,11 +48,11 @@
                     <table class="table table-hover table-bordered text-center global-table">
                         <thead class="table-light">
                             <tr>
-                                <th scope="col">#</th>
-                                <th scope="col">Venue</th>
-                                <th scope="col">Location</th>
-                                <th scope="col">Status</th>
-                                <th scope="col">Actions</th>
+                                <th style="width: 5%">#</th>
+                                <th>Venue</th>
+                                <th>Location</th>
+                                <th style="width: 5%">Status</th>
+                                <th style="width: 5%">Actions</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -68,25 +68,32 @@
                                 </td>
                                 <td class="text-center">
                                     <div class="btn-group" role="group" aria-label="Venue actions">
+                                        @php
+                                            $isUsed = $item->assignedAssessments->isNotEmpty() || $item->assignedPracticals->isNotEmpty() || $item->assignedOrals->isNotEmpty();
+                                        @endphp
+
                                         @can('update reference')
-                                        <button class="btn btn-sm btn-primary rounded-2 px-2 py-1 me-2"
-                                            wire:click='readVenue({{$item->id}})'
+                                        <button class="btn btn-sm rounded-2 px-2 py-1 me-2 {{ $isUsed ? 'btn-secondary' : 'btn-primary' }}"
+                                            wire:click="readVenue({{ $item->id }})"
                                             data-bs-toggle="tooltip"
-                                            data-bs-title="Edit venue">
-                                            <i class="bi bi-pencil-square me-1"></i>
-                                            <span class="d-none d-md-inline ms-1">Edit</span>
+                                            data-bs-title="{{ $isUsed ? 'Editing disabled due to assignment' : 'Edit' }}"
+                                            @if($isUsed) disabled @endif>
+                                            <i class="bi bi-pencil"></i>
                                         </button>
                                         @endcan
 
                                         @can('delete reference')
-                                        <button class="btn btn-sm {{$item->deleted_at == Null ? 'btn-danger' : 'btn-outline-success'}} rounded-2 px-2 py-1"
-                                            wire:click='{{$item->deleted_at == Null ? 'confirmDelete('.$item->id.')': 'restoreVenue('.$item->id.')'}}'
-                                            data-bs-toggle="tooltip"
-                                            data-bs-title="{{$item->deleted_at == Null ? 'Move to archive': 'Restore venue'}}">
-                                            <i class="bi {{$item->deleted_at == Null ? 'bi bi-archive-fill': 'bi-arrow-counterclockwise'}}"></i>
-                                            <span class="d-none d-md-inline ms-1">{{$item->deleted_at == Null ? 'Archive': 'Restore'}}</span>
-                                        </button>
-                                        @endcan
+                                            <button class="btn btn-sm rounded-2 px-2 py-1 me-2 {{ $item->deleted_at == null ? ($isUsed ? 'btn-secondary' : 'btn-danger') : 'btn-outline-success' }}"
+                                                @if(!$isUsed)
+                                                    wire:click="{{ $item->deleted_at == Null ? 'confirmDelete('.$item->id.')' : 'restoreVenue('.$item->id.')' }}"
+                                                @endif
+                                                data-bs-toggle="tooltip"
+                                                data-bs-title="{{ $isUsed ? 'Action disabled: venue is in use' : ($item->deleted_at == Null ? 'Move to archive' : 'Restore venue') }}"
+                                                @if($isUsed) disabled @endif>
+                                                <i class="bi {{ $item->deleted_at == Null ? 'bi-archive-fill' : 'bi-arrow-counterclockwise' }}"></i>
+                                            </button>
+                                        @endcan 
+                                    
                                     </div>
                                 </td>
                             </tr>

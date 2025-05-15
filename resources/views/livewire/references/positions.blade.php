@@ -49,31 +49,30 @@
                     <table class="table table-hover table-bordered text-center global-table">
                         <thead class="table-light">
                             <tr>
-                                <th scope="col" class="fw-semibold" style="width: 5%;">#</th>
-                                <th scope="col" class="fw-semibold">Title</th>
-                                <th scope="col" class="fw-semibold" style="width: 40%;">Description</th>
-                                <th scope="col" class="fw-semibold" style="width: 10%;">Salary Grade</th>
-                                <th scope="col" class="fw-semibold" style="width: 5%;">Status</th>
-                                
-                                <th scope="col" class="fw-semibold text-center" style="width: 15%;">Actions</th>
+                                <th style="width: 5%;">#</th>
+                                <th>Title</th>
+                                <th style="width: 35%;">Description</th>
+                                <th style="width: 12%;">Salary Grade</th>
+                                <th style="width: 5%;">Status</th>
+                                <th style="width: 10%;">Actions</th>
                             </tr>
                         </thead>
                         <tbody>
                             @forelse($positions as $item)
                             <tr class="position-row">
-                                <td scope="row"  class="text-center align-middle" style="width: 5%;">{{$loop->iteration}}</td>
-                                <td class="fw-medium align-middle" style="max-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;"">{{$item->title}}</td>
-                                <td class="fw-medium align-middle text-truncate" style="width: 40%; max-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
+                                <td scope="row"  class="text-center align-middle">{{$loop->iteration}}</td>
+                                <td class="fw-medium align-middle" style="max-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">{{$item->title}}</td>
+                                <td class="fw-medium align-middle text-truncate" style="max-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
                                     {{$item->position_description}}
                                 </td>                                
-                                <td class="fw-medium align-middle" style="width: 10%;">{{$item->salary_grade}}</td>
-                                <td class="fw-medium align-middle" style="width: 5%;">
+                                <td class="fw-medium align-middle">{{$item->salary_grade}}</td>
+                                <td class="fw-medium align-middle">
                                     <span class="badge rounded-pill {{$item->deleted_at == Null ? 'bg-success': 'bg-danger'}}">
                                         {{$item->deleted_at == Null ? 'Active': 'Inactive'}}
                                     </span>
                                 </td>
                                 
-                                <td style="width: 15%;">
+                                <td>
                                     <div class="d-flex align-items-center justify-content-center gap-2">
                                         <button
                                             class="btn btn-sm btn-info"
@@ -82,23 +81,37 @@
                                             <i class="bi bi-eye me-0"></i>
                                         </button>
                                 
-                                        @can('update reference')
+                                        @php
+                                        $isUsed = $item->candidates_count > 0;
+                                    @endphp
+                                    
+                                    @can('update reference')
                                         <button
-                                            class="btn btn-sm btn-primary"
-                                            wire:click='readPosition({{$item->id}})'
-                                            title="Edit position">
+                                            class="btn btn-sm {{ $isUsed ? 'btn-secondary' : 'btn-primary' }}"
+                                            title="{{ $isUsed ? 'Edit disabled: position in use' : 'Edit position' }}"
+                                            @if(!$isUsed)
+                                                wire:click='readPosition({{$item->id}})'
+                                            @else
+                                                disabled
+                                            @endif
+                                        >
                                             <i class="bi bi-pencil-square me-0"></i>
                                         </button>
-                                        @endcan
-                                
-                                        @can('delete reference')
+                                    @endcan
+                                    
+                                    @can('delete reference')
                                         <button
-                                            class="btn btn-sm {{$item->deleted_at == Null ? 'btn-danger': 'btn-outline-success'}}"
-                                            wire:click='{{$item->deleted_at == Null ? 'confirmDelete('.$item->id.')': 'restorePosition('.$item->id.')'}}'
-                                            title="{{$item->deleted_at == Null ? 'Move to archive' : 'Restore position'}}">
-                                            <i class="bi {{$item->deleted_at == Null ? 'bi-archive' : 'bi-arrow-counterclockwise'}} me-0"></i>
+                                            class="btn btn-sm {{ $item->deleted_at == null ? ($isUsed ? 'btn-secondary' : 'btn-danger') : 'btn-outline-success' }}"
+                                            title="{{ $item->deleted_at == null ? ($isUsed ? 'Cannot archive: in use' : 'Move to archive') : 'Restore position' }}"
+                                            @if($item->deleted_at == null && $isUsed)
+                                                disabled
+                                            @else
+                                                wire:click='{{$item->deleted_at == null ? "confirmDelete($item->id)" : "restorePosition($item->id)"}}'
+                                            @endif
+                                        >
+                                            <i class="bi {{ $item->deleted_at == null ? 'bi-archive' : 'bi-arrow-counterclockwise' }} me-0"></i>
                                         </button>
-                                        @endcan
+                                    @endcan                                    
                                     </div>
                                 </td>
                                 

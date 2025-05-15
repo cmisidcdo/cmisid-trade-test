@@ -5,28 +5,57 @@
     <div class="homepage-container">
         <div class="container d-flex flex-column justify-content-between">
             <div class="row">
-                <!-- Left Column -->
-                <div class="col-lg-6 d-flex flex-column text-center text-lg-start">
+                <div class="col-lg-6 d-flex flex-column text-center text-lg-start justify-content-center">
                     <div>
-                        <h1 class="text-white text-center welcome-title">WELCOME!</h1>
-                        <p class="text-white text-center lead">
-                            To Assessment and <br> Candidate Management System (ACMS)
+                        <h1 class="text-white welcome-title">WELCOME!</h1>
+                        <p class="text-white lead mb-4">
+                            To the <strong>Assessment and Candidate Management System (ACMS)</strong>
                         </p>
 
-                        <div class="mt-5 action-buttons d-grid gap-3">
-                            <a href="{{ route('candidate.exam.assessmentinstructions') }}" class="btn btn-primary btn-lg w-100">
-                                Take The Assessment Test Now!
-                            </a>
+                        <div class="action-buttons d-grid gap-3">
+                            @if(!$assessment_completed)
+                                <button data-bs-toggle="modal" data-bs-target="#warningModal" class="btn btn-primary btn-lg w-100">
+                                    Take the Assessment Test Now!
+                                </button>
+                            @endif
+
+                            @if($assessment_completed && !$practical_completed)
+                                <form wire:submit.prevent="loginPractical">
+                                    <div class="form-group">
+                                        <label for="practical_code" class="form-label text-white">Practical Code</label>
+                                        <input type="text" id="practical_code" name="practical_code" class="form-control" placeholder="Enter Practical Code" wire:model="practical_code">
+                                    </div>
+                                    <button class="btn btn-success btn-lg w-100">
+                                        Submit Practical Code
+                                    </button>
+                                </form>
+                            @endif
+
+                            @if($practical_completed && !$oral_completed)
+                                <form wire:submit.prevent="loginOral">
+                                    <div class="form-group">
+                                        <label for="interview_code" class="form-label text-white">Interview Code</label>
+                                        <input type="text" id="interview_code" name="interview_code" class="form-control" placeholder="Enter Interview Code" wire:model="interview_code">
+                                    </div>
+                                    <button class="btn btn-primary btn-lg w-100">
+                                        Submit Interview Code
+                                    </button>
+                                </form>
+                            @endif
+
+                            @if($assessment_completed && $practical_completed && $oral_completed)
+                                <div class="alert alert-success text-center fw-bold">
+                                    🎉 All Tests Completed!
+                                </div>
+                            @endif
                         </div>
                     </div>
                 </div>
 
-                <!-- Right Column -->
                 <div class="mt-5 col-lg-6 d-flex justify-content-lg-end justify-content-center">
                     <div class="text-center text-lg-end" style="max-width: 600px;">
                         <img src="{{ asset('img/cityhall.png') }}" alt="Profile" class="profile-image img-fluid " style="width: 100%; max-width: 600px; height: auto;">
 
-                        <!-- About Us Section -->
                         <div class="text-center about-section mx-lg-0 mx-auto" style="border: 2px solid #007BFF; border-radius: 12px; padding: 15px; max-width: 800px;">
                             <div class="about-text">
                                 <h4 class="text-center fw-bold" style="color:#1a1851;">About Us!</h4>
@@ -39,7 +68,6 @@
                     </div>
                 </div>
             </div>
-            <!-- Logos -->
             <div class="logos col-lg-6 d-flex flex-column justify-content-center align-items-start text-start ps-3 mt-4">
                 <img src="{{ asset('img/cdologo.png') }}" alt="logo" class="img-fluid">
             </div>
@@ -48,8 +76,85 @@
 
     </div>
 
+    <div class="modal fade" id="warningModal" tabindex="-1" aria-labelledby="warningModalLabel" aria-hidden="true" data-bs-backdrop="static" data-bs-keyboard="false">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content" style="border-radius: 12px;border: 2px solid #007BFF">
+                <div class="modal-header d-flex justify-content-center">
+                    <h5 class="modal-title fw-bold text-center" id="warningModalLabel">⚠️Warning before taking the Test!</h5>
+                </div>
+    
+                <div class="modal-body">
+                    <p>Before proceeding with the examination, please read and agree to the following oath</p>
+                    <p><strong>I solemnly affirm that:</strong></p>
+                    <ul>
+                        <li>I will not use any external devices, software, or tools that may provide an unfair advantage.</li>
+                        <li>I will not engage in cheating, plagiarism, or any form of academic dishonesty during this examination.</li>
+                        <li>I understand that any violation of these rules may result in disqualification, cancellation of my results, or further disciplinary action.</li>
+                    </ul>
+                </div>
+                <div class="modal-footer d-flex justify-content-between mt-2">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-primary" onclick="window.location.href='{{ route('candidate.exam.assessment') }}'">
+                        I Agree and Take the Test
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="oralconfirmationModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content" style="border-radius: 12px;border: 2px solid #007BFF;">
+                <div class="modal-body p-4 text-center">
+                    <h5 class="modal-title mb-4">Proceed to Oral Interview Instructions??</h5>
+                    <div class="d-flex justify-content-between">
+                        <button class="btn btn-secondary px-4" data-bs-dismiss="modal">No</button>
+                        <button class="btn btn-primary px-4" id="confirmInterview">Yes</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="practicalconfirmationModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content" style="border-radius: 12px;border: 2px solid #007BFF;">
+                <div class="modal-body p-4 text-center">
+                    <h5 class="modal-title mb-4">Proceed to Practical Exam Instructions?</h5>
+                    <div class="d-flex justify-content-between">
+                        <button class="btn btn-secondary px-4" data-bs-dismiss="modal">No</button>
+                        <button class="btn btn-primary px-4" id="confirmPractical">Yes</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    @script
+    <script>
+          Livewire.on('show-practicalconfirmationModal', function() {
+                const practicalconfirmationModal = new bootstrap.Modal(document.getElementById('practicalconfirmationModal'));
+                practicalconfirmationModal.show();
+            });
+
+            const practicalconfirmButton = document.getElementById('confirmPractical');
+
+            practicalconfirmButton.addEventListener('click', function () {
+                window.location.href = "{{ url('candidate/exam/practical') }}";
+            });
+
+            const oralconfirmButton = document.getElementById('confirmInterview');
+
+            Livewire.on('show-oralconfirmationModal', function() {
+                const confirmationModal = new bootstrap.Modal(document.getElementById('confirmationModal'));
+                confirmationModal.show();
+            });
+
+            oralconfirmButton.addEventListener('click', function () {
+                window.location.href = "{{ url('candidate/exam/oral') }}";
+            });
+    </script>
+    @endscript
     <style>
-        /* General Styles */
         .homepage-container {
             display: flex;
             align-items: center;
@@ -58,9 +163,7 @@
             font-family: Arial, sans-serif;
             padding: 40px;
             height: 100vh;
-            /* Full viewport height */
             overflow: hidden;
-            /* Prevent scrolling */
         }
 
         .welcome-title {
@@ -95,7 +198,6 @@
             text-align: center;
         }
 
-        /* Responsive Adjustments */
         @media (max-width: 1200px) {
             .homepage-container {
                 padding: 30px;

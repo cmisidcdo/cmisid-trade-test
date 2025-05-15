@@ -2,6 +2,7 @@
 
 namespace App\Livewire\Exam;
 
+use App\Jobs\SendAssessmentCodeEmailJob;
 use App\Models\AssignedAssessment;
 use App\Models\Candidate;
 use App\Models\Venue;
@@ -33,8 +34,8 @@ class Assessmentlist extends Component
     public $assigned_date, $assigned_time, $venue_id, $candidate_id, $candidate_name, $access_code, $draft_status = 'draft';
 
     public $venues = [];
-    public $selectedcandidate;
-
+    public $selectedcandidate, $assigned_assessment_id;
+    public $selected_candidate_name;
 
     public function render()
     {
@@ -106,9 +107,12 @@ class Assessmentlist extends Component
             ->selectRaw('assigned_assessments.*, 
                         DATEDIFF(CURRENT_DATE, CONCAT(assigned_assessments.assigned_date, " ", assigned_assessments.assigned_time)) AS aging_days')
             ->when($this->search, function ($query) {
-                $query->where(function ($q) {
-                    $q->where('title', 'like', '%' . $this->search . '%');
+                $query->whereHas('candidate', function ($q) {
+                    $q->where('fullname', 'like', '%' . $this->search . '%');
                 });
+            })
+            ->when($this->filterStatus !== 'all', function ($query) {
+                $query->where('draft_status', $this->filterStatus);
             })
             ->orderByDesc('created_at')
             ->paginate(10, ['*'], 'assignedassessmentsPage');
@@ -134,7 +138,7 @@ class Assessmentlist extends Component
                 $assessmentScore->save();
 
                 $candidate = Candidate::findOrFail($this->selectedcandidate['id']);
-                $position = Position::find($candidate->position_id);
+                $position = Position::find( $candidate->position_id);
 
                 if ($position && in_array($position->item, [8, 10])) {
                     Log::info('Candidate\'s position item is 8 or 10', [
@@ -174,14 +178,21 @@ class Assessmentlist extends Component
                                 'assessmentquestion_id' => $question->id,
                             ]);
 
-                            $totalDuration += $question->duration; // ⬅️ add each question's duration
+                            $totalDuration += $question->duration;
                         }
                     }
                 }
 
                 $assessmentScore->total_duration = $totalDuration;
                 $assessmentScore->save();
+
+                //emailing
+                if (isset($assignedassessment) && isset($candidate)) {
+                    SendAssessmentCodeEmailJob::dispatch($assignedassessment, $candidate);
+                }
             });
+
+           
 
             $this->clear();
             $this->dispatch('hide-assignedAssessmentModal');
@@ -226,20 +237,26 @@ class Assessmentlist extends Component
         $this->loadDropdownData();
     }
 
-    public function readAssignedAssessment($skillId)
+    public function readAssignedAssessment($assignedAssessmentId)
     {
         $this->loadDropdownData();
 
-        $skill = AssignedAssessment::withTrashed()->findOrFail($skillId);
+        $assigned_assessment = AssignedAssessment::with('candidate')->findOrFail($assignedAssessmentId);
 
-        $this->fill(
-            $skill->only(['title']) 
-        );
+        $this->fill([
+            'selected_candidate_id' => $assigned_assessment->candidate_id,
+            'selected_candidate_name' => $assigned_assessment->candidate->fullname ?? '',
+            'draft_status' => $assigned_assessment->draft_status,
+            'assigned_date' => $assigned_assessment->assigned_date,
+            'assigned_time' => $assigned_assessment->assigned_time,
+            'venue_id' => $assigned_assessment->venue_id,
+            'assignedoralId' =>$assigned_assessment->id,
+        ]);
 
-        $this->skill_id = $skill->id;
+        $this->assigned_assessment_id = $assigned_assessment->id;
         $this->editMode = true;
-        $this->status = is_null($skill->deleted_at) ? 'yes' : 'no';
-        $this->dispatch('show-skillModal');
+
+        $this->dispatch('show-assignedAssessmentModal');
     }
 
     public function selectCandidates()
@@ -277,24 +294,20 @@ class Assessmentlist extends Component
 
     public function updateAssignedAssessment()
     {
-        $this->validate();
-
         DB::transaction(function () {  
-            $skill = AssignedAssessment::withTrashed()->findOrFail($this->skill_id);
+            $assignedassessment = AssignedAssessment::findOrFail($this->assigned_assessment_id);
             
-            $skill->title = $this->title;
-            if ($this->status === 'no' && is_null($skill->deleted_at)) {
-                $skill->delete();
-            } elseif ($this->status === 'yes' && !is_null($skill->deleted_at)) {
-                $skill->restore();
-            } else {
-                $skill->save();
-            }
+            $assignedassessment->venue_id = $this->venue_id;
+            $assignedassessment->assigned_date = $this->assigned_date;
+            $assignedassessment->assigned_time = $this->assigned_time;
+            $assignedassessment->draft_status = $this->draft_status;
+            $assignedassessment->save();
+
         });
 
         $this->clear();
-        $this->dispatch('hide-skillModal');
-        $this->dispatch('success', 'Skill updated successfully.');
+        $this->dispatch('hide-assignedAssessmentModal');
+        $this->dispatch('success', 'assignedassessment updated successfully.');
     }
 
     public function showAddEditModal()

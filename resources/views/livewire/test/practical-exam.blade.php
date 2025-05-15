@@ -161,12 +161,21 @@
                                         {{ $item['scenario_count'] ?? 0 }}
                                     </td>
                                     <td class="text-center" style="width:15%">
-                                        <button
-                                            class="btn {{$editMode ? 'btn-primary' : ($viewMode ? 'btn-info' : 'btn-success')}} btn-sm"
-                                            wire:click="{{ $editMode ? 'updateScenarios(' . $position_id . ', ' . $item['id'] . ')' : ($viewMode ? 'viewScenarios(' . $position_id . ', ' . $item['id'] . ')' : 'addScenarios(' . $position_id . ', ' . $item['id'] . ')') }}">
-                                            <i class="bi {{ $editMode ? 'bi-pencil-fill' : ($viewMode ? 'bi-eye' : 'bi-plus-circle') }} me-1"></i>
-                                            {{ $editMode ? 'Update' : ($viewMode ? 'View' : 'Add') }}
-                                        </button>
+                                        <a
+                                        href="{{ $editMode 
+                                            ? route('test.practical.updatescenarios', ['position_id' => $position_id, 'skill_id' => $item['id']])
+                                            : ($viewMode 
+                                                ? route('test.practical.viewscenarios', ['position_id' => $position_id, 'skill_id' => $item['id']])
+                                                : route('test.practical.addscenarios', ['position_id' => $position_id, 'skill_id' => $item['id']])
+                                            )
+                                        }}"
+                                        target="_blank"
+                                        class="btn {{ $editMode ? 'btn-primary' : ($viewMode ? 'btn-info' : 'btn-success') }} btn-sm"
+                                    >
+                                        <i class="bi {{ $editMode ? 'bi-pencil-fill' : ($viewMode ? 'bi-eye' : 'bi-plus-circle') }} me-1"></i>
+                                        {{ $editMode ? 'Update' : ($viewMode ? 'View' : 'Add') }}
+                                    </a>
+
                                     </td>                                    
                                 </tr>
                             @empty
@@ -201,36 +210,6 @@
     $wire.on('show-practicalscenarioModal', () => {
         $('#practicalScenarioModal').modal('show');
     });
-
-        Livewire.on('open-new-tab', (data = {}) => {
-            const { position_id, skill_id } = data;
-
-            if (position_id && skill_id) {
-                const newTab = window.open(`/test/practical/addscenarios?position_id=${position_id}&skill_id=${skill_id}`, '_blank');
-            } else {
-                console.log('Invalid data received.');
-            }
-        });  
-
-        Livewire.on('open-new-update-tab', (data = {}) => {
-            const { position_id, skill_id } = data;
-
-            if (position_id && skill_id) {
-                const newTab = window.open(`/test/practical/updatescenarios?position_id=${position_id}&skill_id=${skill_id}`, '_blank');
-            } else {
-                console.log('Invalid data received.');
-            }
-        });      
-
-        Livewire.on('open-new-view-tab', (data = {}) => {
-            const { position_id, skill_id } = data;
-
-            if (position_id && skill_id) {
-                const newTab = window.open(`/test/practical/viewscenarios?position_id=${position_id}&skill_id=${skill_id}`, '_blank');
-            } else {
-                console.log('Invalid data received.');
-            }
-        }); 
 </script>
 @endscript
 

@@ -129,18 +129,8 @@ class Practicallist extends Component
                 $practicalScore->save();
 
                 $candidate = Candidate::findOrFail($this->selectedcandidate['id']);
-                $position = Position::find($candidate->position_id);
 
-                if ($position && in_array($position->item, [8, 10])) {
-                    Log::info('Candidate\'s position item is 8 or 10', [
-                        'candidate_id' => $candidate->id,
-                        'position_id' => $position->id,
-                        'item' => $position->item,
-                    ]);
-                }
-
-                //emailing
-                if (isset($assignedpractical) && isset($candidate)) {
+                if ($assignedpractical->draft_status === 'published' && isset($candidate)) {
                     SendPracticalCodeEmailJob::dispatch($assignedpractical, $candidate);
                 }
             });
@@ -272,13 +262,18 @@ class Practicallist extends Component
     {
         DB::transaction(function () {  
             $assignedpractical = AssignedPractical::findOrFail($this->assignedpracticalId);
-            
+            $this->updatecandidate_id = $assignedpractical->candidate_id;
             $assignedpractical->venue_id = $this->venue_id;
             $assignedpractical->assigned_date = $this->assigned_date;
             $assignedpractical->assigned_time = $this->assigned_time;
             $assignedpractical->draft_status = $this->draft_status;
             $assignedpractical->save();
 
+            $candidate = Candidate::findOrFail($this->selectedcandidate['id']);
+
+            if ($assignedpractical->draft_status === 'published' && isset($candidate)) {
+                SendPracticalCodeEmailJob::dispatch($assignedpractical, $candidate);
+            }
         });
 
         $this->clear();

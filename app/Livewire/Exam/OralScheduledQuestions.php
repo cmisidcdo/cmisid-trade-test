@@ -188,38 +188,41 @@ class OralScheduledQuestions extends Component
             try {
                 Log::info('Starting transaction for multiple question update.');
 
-    
+                $totalDuration = 0;
+
                 foreach ($this->questions as $index => $questionData) {
                     Log::info("Processing question #{$index}");
-    
-                    $totalSeconds = (
+
+                    $seconds = (
                         ($questionData['hours'] ?? $this->hours) * 3600 +
                         ($questionData['minutes'] ?? $this->minutes) * 60 +
                         ($questionData['seconds'] ?? $this->seconds)
                     );
-    
+
+                    $totalDuration += $seconds; 
+
                     $positionSkill = PositionSkill::where('position_id', $this->position_id)
-                                                  ->where('skill_id', $questionData['skill_id'])
-                                                  ->first();
-    
+                                                ->where('skill_id', $questionData['skill_id'])
+                                                ->first();
+
                     if (!$positionSkill) {
                         Log::warning("No PositionSkill found for position_id={$this->position_id}, skill_id={$questionData['skill_id']}");
                         continue;
                     }
-                    
+
                     $oralScoreSkill = OralScoreSkill::firstOrCreate([
                         'position_skill_id' => $positionSkill->id,
                         'oral_score_id' => $this->oral_score_id,
                     ]);
-    
+
                     if (isset($questionData['id'])) {
                         $oralquestion = OralQuestion::find($questionData['id']);
                         if ($oralquestion) {
                             $oralquestion->question = $questionData['question'];
                             $oralquestion->description = $questionData['description'];
-                            $oralquestion->duration = $totalSeconds;
+                            $oralquestion->duration = $seconds;
                             $oralquestion->position_skill_id = $positionSkill->id;
-    
+
                             if (isset($questionData['file'])) {
                                 if ($oralquestion->file_path) {
                                     Storage::delete($oralquestion->file_path);
@@ -227,7 +230,7 @@ class OralScheduledQuestions extends Component
                                 }
                                 $oralquestion->file_path = $questionData['file']->store('questions', 'public');
                             }
-    
+
                             $oralquestion->save();
                             Log::info("question #{$index} updated successfully.");
                         }
@@ -235,34 +238,39 @@ class OralScheduledQuestions extends Component
                         $oralquestion = new OralQuestion();
                         $oralquestion->question = $questionData['question'];
                         $oralquestion->description = $questionData['description'];
-                        $oralquestion->duration = $totalSeconds;
+                        $oralquestion->duration = $seconds;
                         $oralquestion->position_skill_id = $positionSkill->id;
-    
+
                         if (isset($questionData['file'])) {
                             $oralquestion->file_path = $questionData['file']->store('questions', 'public');
                         }
-    
+
                         $oralquestion->save();
                         Log::info("New question created with ID {$oralquestion->id}");
                     }
-    
+
                     OralScoreSkillQuestion::firstOrCreate([
                         'oral_score_skill_id' => $oralScoreSkill->id,
                         'oral_question_id' => $oralquestion->id,
                     ]);
                 }
-    
-                Log::info('All questions updated successfully.');
+
+                $oralScore = OralScore::find($this->oral_score_id);
+                if ($oralScore) {
+                    $oralScore->total_duration = $totalDuration;
+                    $oralScore->save();
+                    Log::info("Total duration updated to {$totalDuration} seconds in OralScore ID: {$oralScore->id}");
+                }
+
             } catch (\Exception $e) {
                 Log::error('Error while updating assessment questions.', ['error' => $e->getMessage()]);
                 throw $e;
             }
         });
 
-        $this->dispatch('success', 'questions Updated Successfully');
+        $this->dispatch('success', 'Questions Updated Successfully');
         return redirect()->route('exam.interviewlist');
     }
-    
 
 
     public function toggleArchive()

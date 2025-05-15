@@ -35,7 +35,7 @@ class Assessmentlist extends Component
     public $assigned_date, $assigned_time, $venue_id, $candidate_id, $candidate_name, $access_code, $draft_status = 'draft';
 
     public $venues = [];
-    public $selectedcandidate, $assigned_assessment_id;
+    public $selectedcandidate, $assigned_assessment_id, $updatecandidate_id;
     public $selected_candidate_name;
 
     public function render()
@@ -125,61 +125,14 @@ class Assessmentlist extends Component
                 $assignedassessment->access_code = $this->access_code;
                 $assignedassessment->save();
 
-                $assessmentScore = new AssessmentScore();
-                $assessmentScore->assigned_assessment_id = $assignedassessment->id;
-                $assessmentScore->save();
-
-                $candidate = Candidate::findOrFail($this->selectedcandidate['id']);
-                $position = Position::find( $candidate->position_id);
-
-                if ($position && in_array($position->item, [8, 10])) {
-                    Log::info('Candidate\'s position item is 8 or 10', [
-                        'candidate_id' => $candidate->id,
-                        'position_id' => $position->id,
-                        'item' => $position->item,
-                    ]);
+                if ($assignedassessment->draft_status !== 'draft') {
+                    $this->createAssessmentScores($assignedassessment);
                 }
-
-                $positionSkills = PositionSkill::where('position_id', $candidate->position_id)->get();
-
-                $totalDuration = 0;
-
-                foreach ($positionSkills as $skill) {
-                    $assessmentScoreSkill = AssessmentScoreSkill::create([
-                        'assessment_scores_id' => $assessmentScore->id,
-                        'position_skill_id' => $skill->id,
-                    ]);
-
-                    $distribution = match ($skill->competency_level) {
-                        'basic' => ['basic' => 5, 'intermediate' => 2, 'advanced' => 1],
-                        'intermediate' => ['basic' => 2, 'intermediate' => 4, 'advanced' => 2],
-                        'advanced' => ['basic' => 1, 'intermediate' => 2, 'advanced' => 5],
-                        default => ['basic' => 0, 'intermediate' => 0, 'advanced' => 0],
-                    };
-
-                    foreach ($distribution as $level => $count) {
-                        $questions = AssessmentQuestion::where('position_skill_id', $skill->id)
-                            ->where('competency_level', $level)
-                            ->inRandomOrder()
-                            ->limit($count)
-                            ->get();
-
-                        foreach ($questions as $question) {
-                            AssessmentScoreSkillQuestion::create([
-                                'assessment_score_skill_id' => $assessmentScoreSkill->id,
-                                'assessmentquestion_id' => $question->id,
-                            ]);
-
-                            $totalDuration += $question->duration;
-                        }
-                    }
-                }
-
-                $assessmentScore->total_duration = $totalDuration;
-                $assessmentScore->save();
 
                 //emailing
-                if (isset($assignedassessment) && isset($candidate)) {
+                $candidate = Candidate::findOrFail($this->selectedcandidate['id']);
+
+                if ($assignedassessment->draft_status === 'published' && isset($candidate)) {
                     SendAssessmentCodeEmailJob::dispatch($assignedassessment, $candidate);
                 }
             });
@@ -205,6 +158,63 @@ class Assessmentlist extends Component
             $this->dispatch('error', 'An error occurred while creating the schedule.');
         }
     }
+
+    private function createAssessmentScores(AssignedAssessment $assignedassessment)
+    {
+        $assessmentScore = new AssessmentScore();
+        $assessmentScore->assigned_assessment_id = $assignedassessment->id;
+        $assessmentScore->save();
+
+        $candidate = Candidate::findOrFail($this->updatecandidate_id);
+
+        $position = Position::find($candidate->position_id);
+
+        if ($position && in_array($position->item, [8, 10])) {
+            Log::info("Candidate's position item is 8 or 10", [
+                'candidate_id' => $candidate->id,
+                'position_id' => $position->id,
+                'item' => $position->item,
+            ]);
+        }
+
+        $positionSkills = PositionSkill::where('position_id', $candidate->position_id)->get();
+        $totalDuration = 0;
+
+        foreach ($positionSkills as $skill) {
+            $assessmentScoreSkill = AssessmentScoreSkill::create([
+                'assessment_scores_id' => $assessmentScore->id,
+                'position_skill_id' => $skill->id,
+            ]);
+
+            $distribution = match ($skill->competency_level) {
+                'basic' => ['basic' => 5, 'intermediate' => 2, 'advanced' => 1],
+                'intermediate' => ['basic' => 2, 'intermediate' => 4, 'advanced' => 2],
+                'advanced' => ['basic' => 1, 'intermediate' => 2, 'advanced' => 5],
+                default => ['basic' => 0, 'intermediate' => 0, 'advanced' => 0],
+            };
+
+            foreach ($distribution as $level => $count) {
+                $questions = AssessmentQuestion::where('position_skill_id', $skill->id)
+                    ->where('competency_level', $level)
+                    ->inRandomOrder()
+                    ->limit($count)
+                    ->get();
+
+                foreach ($questions as $question) {
+                    AssessmentScoreSkillQuestion::create([
+                        'assessment_score_skill_id' => $assessmentScoreSkill->id,
+                        'assessmentquestion_id' => $question->id,
+                    ]);
+
+                    $totalDuration += $question->duration;
+                }
+            }
+        }
+
+        $assessmentScore->total_duration = $totalDuration;
+        $assessmentScore->save();
+    }
+
 
     private function loadDropdownData()
     {
@@ -308,14 +318,21 @@ class Assessmentlist extends Component
     public function updateAssignedAssessment()
     {
         DB::transaction(function () {  
-            $assignedassessment = AssignedAssessment::findOrFail($this->assigned_assessment_id);
-            
+            $assignedassessment = AssignedAssessment::where('id', $this->assigned_assessment_id)->firstOrFail(); 
+            $this->updatecandidate_id = $assignedassessment->candidate_id;
             $assignedassessment->venue_id = $this->venue_id;
             $assignedassessment->assigned_date = $this->assigned_date;
             $assignedassessment->assigned_time = $this->assigned_time;
             $assignedassessment->draft_status = $this->draft_status;
             $assignedassessment->save();
 
+            $candidate = Candidate::findOrFail($this->updatecandidate_id);
+
+            if ($assignedassessment->draft_status === 'published' && isset($candidate)) {
+                $this->createAssessmentScores($assignedassessment);
+                SendAssessmentCodeEmailJob::dispatch($assignedassessment, $candidate);
+            }
+            
         });
 
         $this->clear();

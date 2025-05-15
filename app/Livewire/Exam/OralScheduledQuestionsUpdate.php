@@ -218,6 +218,7 @@ class OralScheduledQuestionsUpdate extends Component
 
                 $updatedQuestionIds = [];
                 $oralScoreSkill = null;
+                $totalDuration = 0;
 
                 foreach ($this->questions as $index => $questionData) {
                     Log::info("Processing question #{$index}");
@@ -227,6 +228,8 @@ class OralScheduledQuestionsUpdate extends Component
                         ($questionData['minutes'] ?? $this->minutes) * 60 +
                         ($questionData['seconds'] ?? $this->seconds)
                     );
+
+                    $totalDuration += $totalSeconds;
 
                     $positionSkill = PositionSkill::where('position_id', $this->position_id)
                                                 ->where('skill_id', $questionData['skill_id'])
@@ -278,7 +281,7 @@ class OralScheduledQuestionsUpdate extends Component
                         Log::info("New question created with ID {$oralquestion->id}");
                     }
 
-                    $updatedquestionIds[] = $oralquestion->id;
+                    $updatedQuestionIds[] = $oralquestion->id;
 
                     $exists = OralScoreSkillQuestion::where('oral_score_skill_id', $oralScoreSkill->id)
                         ->where('oral_question_id', $oralquestion->id)
@@ -289,36 +292,37 @@ class OralScheduledQuestionsUpdate extends Component
                             'oral_score_skill_id' => $oralScoreSkill->id,
                             'oral_question_id' => $oralquestion->id,
                         ]);
-
                         Log::info("Link created for question ID {$oralquestion->id} and score skill ID {$oralScoreSkill->id}");
                     } else {
                         Log::info("Link already exists for question ID {$oralquestion->id} and score skill ID {$oralScoreSkill->id}");
                     }
                 }
 
-                if ($oralScoreSkill) {
+                $oralScore = OralScore::where('assigned_oral_id', $this->assigned_oral_id)->first();
+                if ($oralScore) {
+                    $oralScore->total_duration = $totalDuration;
+                    $oralScore->save();
+                    Log::info("Total duration updated to {$totalDuration} seconds in OralScore ID: {$oralScore->id}");
+                } else {
+                    Log::error('No OralScore found for assigned_oral_id ' . $this->assigned_oral_id);
+                }
 
+                if ($oralScoreSkill) {
                     Log::info('Unlinked Questions:', ['unlinkedQuestions' => $this->unlinkedQuestions]);
 
-                    $oralScore = OralScore::where('assigned_oral_id', $this->assigned_oral_id)->first();
+                    $oralScoreSkills = OralScoreSkill::where('oral_score_id', $oralScore->id)->get();
 
-                    if ($oralScore) {
-                        $oralScoreSkills = OralScoreSkill::where('oral_score_id', $oralScore->id)->get();
+                    foreach ($oralScoreSkills as $oralScoreSkill) {
+                        $linkedQuestions = OralScoreSkillQuestion::where('oral_score_skill_id', $oralScoreSkill->id)->get();
 
-                        foreach ($oralScoreSkills as $oralScoreSkill) {
-                            $linkedQuestions = OralScoreSkillQuestion::where('oral_score_skill_id', $oralScoreSkill->id)->get();
+                        foreach ($linkedQuestions as $linkedQuestion) {
+                            if (in_array($linkedQuestion->oral_question_id, array_column($this->unlinkedQuestions, 'id'))) {
+                                Log::info("Unlinking question ID {$linkedQuestion->oral_question_id} from score skill ID {$oralScoreSkill->id}");
 
-                            foreach ($linkedQuestions as $linkedQuestion) {
-                                if (in_array($linkedQuestion->oral_question_id, array_column($this->unlinkedQuestions, 'id'))) {
-                                    Log::info("Unlinking question ID {$linkedQuestion->oral_question_id} from score skill ID {$oralScoreSkill->id}");
-
-                                    $linkedQuestion->delete();
-                                    Log::info("question ID {$linkedQuestion->oral_question_id} unlinked successfully.");
-                                }
+                                $linkedQuestion->delete();
+                                Log::info("question ID {$linkedQuestion->oral_question_id} unlinked successfully.");
                             }
                         }
-                    } else {
-                        Log::error('No OralScore found for assigned_oral_id ' . $this->assigned_oral_id);
                     }
                 } else {
                     Log::error('No OralScoreSkill found to unlink questions.');
@@ -334,6 +338,7 @@ class OralScheduledQuestionsUpdate extends Component
         $this->clear();
         $this->dispatch('success', 'questions Updated Successfully');
     }
+
 
     public function toggleArchive()
     {

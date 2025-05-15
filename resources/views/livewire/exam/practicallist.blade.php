@@ -132,13 +132,15 @@
                 </div>
                 
 
-                        <div class="modal fade" id="assignedPracticalModal" tabindex="-1" aria-labelledby="assignedPracticalModalLabel" aria-hidden="true"  wire:ignore.self>
+                        <div class="modal fade" id="assignedPracticalModal" tabindex="-1" aria-labelledby="assignedPracticalModalLabel" aria-hidden="true" wire:ignore.self>
                             <div class="modal-dialog modal-dialog-centered modal-lg">
                                 <div class="modal-content" style="border-radius: 12px;">
                                     <div class="modal-body p-4">
-                                        <h5 class="text-center mb-4 fw-bold text-dark">{{$editMode ? 'Update Practical Exam Schedule' : 'Add Schedule for Practical Test'}}</h5>
-                                        <form wire:submit.prevent="{{$editMode ? 'updateAssignedPractical' : 'createAssignedPractical'}}">
-                                             <div class="row g-3">
+                                        <h5 class="text-center mb-4 fw-bold text-dark">
+                                            {{$editMode ? 'Update Practical Exam Schedule' : 'Add Schedule for Practical Test'}}
+                                        </h5>
+                                        <form wire:submit.prevent="{{ $editMode ? 'updateAssignedPractical' : 'createAssignedPractical' }}">
+                                            <div class="row g-3">
 
                                                 <div class="col-md-6">
                                                     <div class="input-group">
@@ -146,7 +148,7 @@
                                                             type="text"
                                                             id="selectedCandidate"
                                                             class="form-control border-dark rounded-start-3"
-                                                            wire:model="{{  $editMode || $viewMode ? 'selected_candidate_name' : 'selectedcandidate.fullname' }}"
+                                                            wire:model="{{ $editMode || $viewMode ? 'selected_candidate_name' : 'selectedcandidate.fullname' }}"
                                                             placeholder="Candidate Name"
                                                             readonly
                                                         >
@@ -154,7 +156,7 @@
                                                             type="button"
                                                             class="btn btn-primary rounded-end-3 px-3"
                                                             wire:click='selectCandidates'
-                                                            @if($editMode || $viewMode) disabled @endif
+                                                            @disabled($editMode || $viewMode || $draft_status === 'published')
                                                         >
                                                             Select
                                                         </button>
@@ -166,9 +168,9 @@
                                                         class="form-select border-dark rounded-3"
                                                         wire:model="draft_status"
                                                         id="status"
-                                                        @if($viewMode) disabled @endif
+                                                        @disabled($viewMode || $draft_status === 'published')
                                                     >
-                                                        <option value="draft" selected>Draft</option>
+                                                        <option value="draft">Draft</option>
                                                         <option value="published">Publish</option>
                                                     </select>
                                                 </div>
@@ -179,7 +181,7 @@
                                                         class="form-control border-dark rounded-3"
                                                         wire:model="assigned_date"
                                                         id="selectDate"
-                                                        @if($viewMode) readonly @endif
+                                                        @readonly($viewMode || $draft_status === 'published')
                                                     >
                                                 </div>
 
@@ -189,7 +191,7 @@
                                                         class="form-control border-dark rounded-3"
                                                         wire:model="assigned_time"
                                                         id="selectTime"
-                                                        @if($viewMode) readonly @endif
+                                                        @readonly($viewMode || $draft_status === 'published')
                                                     >
                                                 </div>
 
@@ -200,7 +202,7 @@
                                                         id="venue_id"
                                                         wire:model="venue_id"
                                                         required
-                                                        @if($viewMode) disabled @endif
+                                                        @disabled($viewMode || $draft_status === 'published')
                                                     >
                                                         <option value="">Select Venue</option>
                                                         @foreach($venues as $venue)
@@ -221,11 +223,22 @@
                                                 >
                                                     <i class="bi bi-arrow-left me-2"></i> Back
                                                 </button>
-
+                                                
+                                                @if($editMode)
+                                                    <button
+                                                        type="button"
+                                                        class="btn btn-primary btn-sm d-flex align-items-center px-3"
+                                                        wire:click='updatePracticalScenario({{ $assignedpracticalId }})'
+                                                    >
+                                                        <i class="bi bi-check-circle me-2"></i> Update Scenarios
+                                                    </button>
+                                                @endif
+                                                
                                                 @if(!$viewMode)
                                                     <button
                                                         type="submit"
                                                         class="btn btn-primary btn-sm d-flex align-items-center px-3"
+                                                        @disabled($draft_status === 'published')
                                                     >
                                                         <i class="bi bi-check-circle me-2"></i>{{ $editMode ? 'Update Schedule' : 'Create Schedule' }}
                                                     </button>
@@ -236,6 +249,7 @@
                                 </div>
                             </div>
                         </div>
+
 
                     <div class="modal fade" id="candidatesModal" tabindex="-1" aria-labelledby="candidatesModalLabel" aria-hidden="true" wire:ignore.self>
                         <div class="modal-dialog modal-dialog-centered modal-lg">

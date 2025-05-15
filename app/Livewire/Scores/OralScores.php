@@ -32,7 +32,7 @@ class OralScores extends Component
 
     public function loadOralScores()
     {
-        return OralScore::with('candidate')
+        return OralScore::with(['candidate', 'assigned_oral'])
             ->when($this->search, function ($query) {
                 $query->whereHas('candidate', function ($q) {
                     $q->where('fullname', 'like', '%' . $this->search . '%');

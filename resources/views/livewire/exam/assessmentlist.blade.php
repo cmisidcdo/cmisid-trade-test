@@ -111,7 +111,12 @@
                                     <button class="btn btn-sm btn-info rounded-2" wire:click='viewAssignedAssessment({{$item->id}})' title="View">
                                         <i class="bi bi-eye-fill"></i>
                                     </button>
-                                    <button class="btn btn-sm btn-primary rounded-2" wire:click='readAssignedAssessment({{$item->id}})' title="Edit">
+                                    <button 
+                                        class="btn btn-sm {{ $item->draft_status === 'published' ? 'btn-secondary' : 'btn-primary' }} rounded-2" 
+                                        wire:click='readAssignedAssessment({{ $item->id }})' 
+                                        title="Edit"
+                                        {{ $item->draft_status === 'published' ? 'disabled' : '' }}
+                                    >
                                         <i class="bi bi-pencil-square"></i>
                                     </button>
                                 </td>

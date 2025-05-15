@@ -33,7 +33,7 @@ class Interviewlist extends Component
     public $assigned_date, $assigned_time, $venue_id, $candidate_id, $candidate_name, $access_code, $draft_status = 'draft';
 
     public $venues = [];
-    public $selectedcandidate, $assignedoralId;
+    public $selectedcandidate, $assignedoralId, $updatecandidate_id;
 
     public $selected_candidate_name;
 
@@ -122,18 +122,9 @@ class Interviewlist extends Component
 
                 $candidate = Candidate::findOrFail($this->selectedcandidate['id']);
                 $position = Position::find($candidate->position_id);
-
-                if ($position && in_array($position->item, [8, 10])) {
-                    Log::info('Candidate\'s position item is 8 or 10', [
-                        'candidate_id' => $candidate->id,
-                        'position_id' => $position->id,
-                        'item' => $position->item,
-                    ]);
-                }
-
                 
                 //emailing
-                if (isset($assignedoral) && isset($candidate)) {
+                if ($assignedoral->draft_status === 'published' && isset($candidate)) {
                     SendOralCodeEmailJob::dispatch($assignedoral, $candidate);
                 }
             });
@@ -260,15 +251,20 @@ class Interviewlist extends Component
     {
         DB::transaction(function () {  
             $assignedoral = AssignedOral::findOrFail($this->assignedoralId);
-            
+            $this->updatecandidate_id = $assignedoral->candidate_id;
             $assignedoral->venue_id = $this->venue_id;
             $assignedoral->assigned_date = $this->assigned_date;
             $assignedoral->assigned_time = $this->assigned_time;
             $assignedoral->draft_status = $this->draft_status;
             $assignedoral->save();
+            
+            $candidate = Candidate::findOrFail($this->updatecandidate_id);
 
+            if ($assignedoral->draft_status === 'published' && isset($candidate)) {
+                SendOralCodeEmailJob::dispatch($assignedoral, $candidate);
+            }
         });
-
+        
         $this->clear();
         $this->dispatch('hide-assignedOralModal');
         $this->dispatch('success', 'assigned oral updated successfully.');

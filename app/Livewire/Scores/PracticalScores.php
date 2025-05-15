@@ -33,7 +33,7 @@ class PracticalScores extends Component
 
     public function loadPracticalScores()
     {
-        return PracticalScore::with('candidate')
+        return PracticalScore::with(['candidate', 'assigned_practical'])
             ->when($this->search, function ($query) {
                 $query->whereHas('candidate', function ($q) {
                     $q->where('fullname', 'like', '%' . $this->search . '%');

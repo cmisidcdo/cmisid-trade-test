@@ -22,11 +22,12 @@ use App\Models\PositionSkill;
 class Interviewlist extends Component
 {
     use WithPagination;
-    public $editMode;
+    public $editMode, $viewMode;
 
     public $archive = false;
 
-    public $search;
+    public $candidateSearchMain = '';
+    public $candidateSearchModal = '';
     public $filterStatus = 'all'; 
     public $title, $skill_id, $status;
     public $assigned_date, $assigned_time, $venue_id, $candidate_id, $candidate_name, $access_code, $draft_status = 'draft';
@@ -64,11 +65,14 @@ class Interviewlist extends Component
         $this->resetPage(); 
     }
 
-    
-
-    public function updatedSearch()
+    public function updatedCandidateSearchMain()
     {
-        $this->resetPage();
+        $this->resetPage('assignedoralsPage');
+    }
+
+    public function updatedCandidateSearchModal()
+    {
+        $this->resetPage('candidateModalPage');
     }
 
     public function rules()
@@ -82,9 +86,9 @@ class Interviewlist extends Component
         return AssignedOral::with(['candidate', 'venue'])
             ->selectRaw('assigned_orals.*, 
                         DATEDIFF(CURRENT_DATE, CONCAT(assigned_orals.assigned_date, " ", assigned_orals.assigned_time)) AS aging_days')
-            ->when($this->search, function ($query) {
+            ->when($this->candidateSearchMain, function ($query) {
                 $query->whereHas('candidate', function ($q) {
-                    $q->where('fullname', 'like', '%' . $this->search . '%');
+                    $q->where('fullname', 'like', '%' . $this->candidateSearchMain . '%');
                 });
             })
             ->when($this->filterStatus !== 'all', function ($query) {
@@ -157,8 +161,6 @@ class Interviewlist extends Component
         return redirect()->route('exam.oralscheduledquestionsupdate', $assignedInterviewId);
     }
 
-
-
     private function loadDropdownData()
     {
         $this->venues = Venue::all();
@@ -173,8 +175,6 @@ class Interviewlist extends Component
         return $code;
     }
 
-
-
     public function clear()
     {
         $this->reset();
@@ -182,7 +182,7 @@ class Interviewlist extends Component
         $this->loadDropdownData();
     }
 
-    public function readAssignedOral($assignedOralId)
+    private function loadAssignedOralData($assignedOralId, $mode = 'edit')
     {
         $this->loadDropdownData();
 
@@ -195,16 +195,32 @@ class Interviewlist extends Component
             'assigned_date' => $assigned_oral->assigned_date,
             'assigned_time' => $assigned_oral->assigned_time,
             'venue_id' => $assigned_oral->venue_id,
-            'assignedoralId' =>$assigned_oral->id,
+            'assignedoralId' => $assigned_oral->id,
         ]);
 
         $this->assigned_oral_id = $assigned_oral->id;
-        $this->editMode = true;
+
+        $this->editMode = false;
+        $this->viewMode = false;
+
+        if ($mode === 'edit') {
+            $this->editMode = true;
+        } elseif ($mode === 'view') {
+            $this->viewMode = true;
+        }
 
         $this->dispatch('show-assignedOralModal');
     }
 
+    public function readAssignedOral($assignedOralId)
+    {
+        $this->loadAssignedOralData($assignedOralId, 'edit');
+    }
 
+    public function viewAssignedOral($assignedOralId)
+    {
+        $this->loadAssignedOralData($assignedOralId, 'view');
+    }
 
     public function selectCandidates()
     {
@@ -232,11 +248,12 @@ class Interviewlist extends Component
 
     public function getCandidates()
     {
-        $query = Candidate::query();
-    
-        return $query->paginate(5, ['*'], 'candidatesPage');
+        return Candidate::query()
+            ->when($this->candidateSearchModal, function ($query) {
+                $query->where('fullname', 'like', '%' . $this->candidateSearchModal . '%');
+            })
+            ->paginate(5, ['*'], 'candidateModalPage');
     }
-    
 
 
     public function updateAssignedOral()

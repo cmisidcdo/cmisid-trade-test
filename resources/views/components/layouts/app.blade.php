@@ -147,85 +147,80 @@
 
     @can('read candidate')
     <li class="nav-item">
-      <a class="nav-link {{ Request::routeIs('candidate.list') || Request::routeIs('references.*') ? '' : 'collapsed' }}" data-bs-target="#candidate-nav" data-bs-toggle="collapse" href="#">
-        <i class="bi bi-layout-text-window-reverse fs-5"></i><span>Manage Candidate</span><i class="bi bi-chevron-down ms-auto"></i>
-      </a>
-      <ul id="candidate-nav" class="nav-content collapse {{ Request::routeIs('candidate.list') || Request::routeIs('references.*') ? 'show' : '' }}" data-bs-parent="#sidebar-nav">
-        <li>
-          <a class="{{ Request::routeIs('candidate.list') ? 'active' : '' }}" href="{{ route('candidate.list') }}">
-            <i class="bi bi-person-check-fill fs-5"></i>
-            <span>Add Candidate</span>
-          </a>
-        </li>
-
-        <li>
-          <a class="nav-link {{ Request::routeIs('references.*') ? '' : 'collapsed' }}" data-bs-target="#references-nav" data-bs-toggle="collapse" href="#">
-            <i class="bi bi-layout-text-window-reverse fs-5"></i><span>References</span><i class="bi bi-chevron-down ms-auto fs-6"></i>
-          </a>
-          <ul id="references-nav" class="nav-content collapse {{ Request::routeIs('references.*') ? 'show' : '' }}" data-bs-parent="#candidate-nav" style="padding-left: 10px;">
-            <li>
-              <a class="{{ Request::routeIs('references.skills') ? 'active' : '' }}" href="{{ route('references.skills') }}">
-                <i class="bi bi-lightbulb-fill fs-5"></i><span>Skills</span>
-              </a>
-            </li>
-            <li>
-              <a class="{{ Request::routeIs('references.positions') ? 'active' : '' }}" href="{{ route('references.positions') }}">
-                <i class="bi bi-arrows-move fs-5"></i><span>Positions</span>
-              </a>
-            </li>
-            <li>
-              <a class="{{ Request::routeIs('references.offices') ? 'active' : '' }}" href="{{ route('references.offices') }}">
-                <i class="bi bi-building-fill fs-5"></i><span>Offices</span>
-              </a>
-            </li>
-            <li>
-              <a class="{{ Request::routeIs('references.prioritygroups') ? 'active' : '' }}" href="{{ route('references.prioritygroups') }}">
-                <i class="bi bi-people-fill fs-5"></i><span>Priority Groups</span>
-              </a>
-            </li>
-            <li>
-              <a class="{{ Request::routeIs('references.venues') ? 'active' : '' }}" href="{{ route('references.venues') }}">
-                <i class="bi bi-geo-alt-fill fs-5"></i><span>Venues</span>
-              </a>
-            </li>
-            <li>
-              <a class="nav-link {{ Request::routeIs('references.criterias.*') ? '' : 'collapsed' }}" data-bs-target="#criteria-nav" data-bs-toggle="collapse" href="#">
-                <i class="bi bi-card-checklist fs-5"></i><span>Evaluation Criteria</span><i class="bi bi-chevron-down ms-auto fs-6"></i>
-              </a>
-              <ul id="criteria-nav" class="nav-content collapse {{ Request::routeIs('references.criterias.*') ? 'show' : '' }}" data-bs-parent="#references-nav" style="padding-left: 10px;">
-                <li>
-                  <a class="{{ Request::routeIs('references.criterias.practical') ? 'active' : '' }}" href="{{ route('references.criterias.practical') }}">
-                    <i class="bi bi-tools fs-5"></i><span>Practical Criteria</span>
-                  </a>
-                </li>
-                <li>
-                  <a class="{{ Request::routeIs('references.criterias.oral') ? 'active' : '' }}" href="{{ route('references.criterias.oral') }}">
-                    <i class="bi bi-mic-fill fs-5"></i><span>Oral Criteria</span>
-                  </a>
-                </li>
-              </ul>
-            </li>
-            <li>
-              <a class="nav-link {{ Request::routeIs('references.scoresheets.*') ? '' : 'collapsed' }}" data-bs-target="#scoresheet-nav" data-bs-toggle="collapse" href="#">
-                <i class="bi bi-list-check fs-5"></i><span>Score Sheets</span><i class="bi bi-chevron-down ms-auto fs-6"></i>
-              </a>
-              <ul id="scoresheet-nav" class="nav-content collapse {{ Request::routeIs('references.scoresheets.*') ? 'show' : '' }}" data-bs-parent="#references-nav" style="padding-left: 10px;">
-                <li>
-                  <a class="{{ Request::routeIs('references.scoresheets.practical') ? 'active' : '' }}" href="{{ route('references.scoresheets.practical') }}">
-                    <i class="bi bi-tools fs-5"></i><span>Practical Exam Scoring</span>
-                  </a>
-                </li>
-                <li>
-                  <a class="{{ Request::routeIs('references.scoresheets.oral') ? 'active' : '' }}" href="{{ route('references.scoresheets.oral') }}">
-                    <i class="bi bi-mic-fill fs-5"></i><span>Oral Interview Scoring</span>
-                  </a>
-                </li>
-              </ul>
-            </li>
-          </ul>
-        </li>
-      </ul>
+        <a class="nav-link {{ Request::routeIs('candidate.list') ? '' : 'collapsed' }}" href="{{ route('candidate.list') }}">
+        <i class="bi bi-person-check-fill fs-5"></i>
+        <span>Candidate List</span>
+        </a>
     </li>
+    @endcan
+
+     @can('read reference')
+      <li class="nav-item">
+        <a class="nav-link {{ Request::routeIs('references.*') ? '' : 'collapsed' }}" data-bs-target="#references-nav" data-bs-toggle="collapse" href="#">
+          <i class="bi bi-layout-text-window-reverse fs-5"></i><span>References</span><i class="bi bi-chevron-down ms-auto"></i>
+        </a>
+        <ul id="references-nav" class="nav-content collapse {{ Request::routeIs('references.*') ? 'show' : '' }}" data-bs-parent="#sidebar-nav">
+          <li>
+            <a class="{{ Request::routeIs('references.skills') ? 'active' : '' }}" href="{{ route('references.skills') }}">
+              <i class="bi bi-lightbulb-fill fs-5"></i><span>Skills</span>
+            </a>
+          </li>
+          <li>
+            <a class="{{ Request::routeIs('references.positions') ? 'active' : '' }}" href="{{ route('references.positions') }}">
+              <i class="bi bi-arrows-move fs-5"></i><span>Positions</span>
+            </a>
+          </li>
+          <li>
+            <a class="{{ Request::routeIs('references.offices') ? 'active' : '' }}" href="{{ route('references.offices') }}">
+              <i class="bi bi-building-fill fs-5"></i><span>Offices</span>
+            </a>
+          </li>
+          <li>
+            <a class="{{ Request::routeIs('references.prioritygroups') ? 'active' : '' }}" href="{{ route('references.prioritygroups') }}">
+              <i class="bi bi-people-fill fs-5"></i><span>Priority Groups</span>
+            </a>
+          </li>
+          <li>
+            <a class="{{ Request::routeIs('references.venues') ? 'active' : '' }}" href="{{ route('references.venues') }}">
+              <i class="bi bi-geo-alt-fill fs-5"></i><span>Venues</span>
+            </a>
+          </li>
+          <li>
+            <a class="nav-link {{ Request::routeIs('references.criterias.*') ? '' : 'collapsed' }}" data-bs-target="#criteria-nav" data-bs-toggle="collapse" href="#">
+              <i class="bi bi-card-checklist fs-5"></i><span>Evaluation Criteria</span><i class="bi bi-chevron-down ms-auto fs-6"></i>
+            </a>
+            <ul id="criteria-nav" class="nav-content collapse {{ Request::routeIs('references.criterias.*') ? 'show' : '' }}" data-bs-parent="#references-nav" style="padding-left: 10px;">
+              <li>
+                <a class="{{ Request::routeIs('references.criterias.practical') ? 'active' : '' }}" href="{{ route('references.criterias.practical') }}">
+                  <i class="bi bi-tools fs-5"></i><span>Practical Criteria</span>
+                </a>
+              </li>
+              <li>
+                <a class="{{ Request::routeIs('references.criterias.oral') ? 'active' : '' }}" href="{{ route('references.criterias.oral') }}">
+                  <i class="bi bi-mic-fill fs-5"></i><span>Oral Criteria</span>
+                </a>
+              </li>
+            </ul>
+          </li>
+          <li>
+            <a class="nav-link {{ Request::routeIs('references.scoresheets.*') ? '' : 'collapsed' }}" data-bs-target="#scoresheet-nav" data-bs-toggle="collapse" href="#">
+              <i class="bi bi-list-check fs-5"></i><span>Score Sheets</span><i class="bi bi-chevron-down ms-auto fs-6"></i>
+            </a>
+            <ul id="scoresheet-nav" class="nav-content collapse {{ Request::routeIs('references.scoresheets.*') ? 'show' : '' }}" data-bs-parent="#references-nav" style="padding-left: 10px;">
+              <li>
+                <a class="{{ Request::routeIs('references.scoresheets.practical') ? 'active' : '' }}" href="{{ route('references.scoresheets.practical') }}">
+                  <i class="bi bi-tools fs-5"></i><span>Practical Exam Scoring</span>
+                </a>
+              </li>
+              <li>
+                <a class="{{ Request::routeIs('references.scoresheets.oral') ? 'active' : '' }}" href="{{ route('references.scoresheets.oral') }}">
+                  <i class="bi bi-mic-fill fs-5"></i><span>Oral  Interview Scoring</span>
+                </a>
+              </li>
+            </ul>
+          </li>
+        </ul>
+      </li><!-- End Tables Nav -->
     @endcan
 
     @can('assessor permission')

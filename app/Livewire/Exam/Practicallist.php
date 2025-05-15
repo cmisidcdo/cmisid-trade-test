@@ -23,11 +23,12 @@ use App\Models\PositionSkill;
 class Practicallist extends Component
 {
     use WithPagination;
-    public $editMode;
+    public $editMode, $viewMode;
 
     public $archive = false;
 
-    public $search;
+    public $candidateSearchMain = '';
+    public $candidateSearchModal = '';
     public $filterStatus = 'all'; 
     public $title, $skill_id, $status;
     public $assigned_date, $assigned_time, $venue_id, $candidate_id, $candidate_name, $access_code, $draft_status = 'draft';
@@ -72,6 +73,16 @@ class Practicallist extends Component
         $this->resetPage();
     }
 
+    public function updatedCandidateSearchMain()
+    {
+        $this->resetPage('assignedpracticalsPage');
+    }
+
+    public function updatedCandidateSearchModal()
+    {
+        $this->resetPage('candidateModalPage');
+    }
+
     public function rules()
     {
 
@@ -83,9 +94,9 @@ class Practicallist extends Component
         return AssignedPractical::with(['candidate', 'venue'])
             ->selectRaw('assigned_practicals.*, 
                         DATEDIFF(CURRENT_DATE, CONCAT(assigned_practicals.assigned_date, " ", assigned_practicals.assigned_time)) AS aging_days')
-            ->when($this->search, function ($query) {
+            ->when($this->candidateSearchMain, function ($query) {
                 $query->whereHas('candidate', function ($q) {
-                    $q->where('fullname', 'like', '%' . $this->search . '%');
+                    $q->where('fullname', 'like', '%' . $this->candidateSearchMain . '%');
                 });
             })
             ->when($this->filterStatus !== 'all', function ($query) {
@@ -182,7 +193,7 @@ class Practicallist extends Component
         $this->loadDropdownData();
     }
 
-    public function readAssignedPractical($assignedPracticalId)
+    private function loadAssignedPracticalData($assignedPracticalId, $mode = 'edit')
     {
         $this->loadDropdownData();
 
@@ -195,13 +206,31 @@ class Practicallist extends Component
             'assigned_date' => $assigned_practical->assigned_date,
             'assigned_time' => $assigned_practical->assigned_time,
             'venue_id' => $assigned_practical->venue_id,
-            'assignedpracticalId' =>$assigned_practical->id,
+            'assignedpracticalId' => $assigned_practical->id,
         ]);
 
         $this->assigned_practical_id = $assigned_practical->id;
-        $this->editMode = true;
+
+        $this->editMode = false;
+        $this->viewMode = false;
+
+        if ($mode === 'edit') {
+            $this->editMode = true;
+        } elseif ($mode === 'view') {
+            $this->viewMode = true;
+        }
 
         $this->dispatch('show-assignedPracticalModal');
+    }
+
+    public function readAssignedPractical($assignedPracticalId)
+    {
+        $this->loadAssignedPracticalData($assignedPracticalId, 'edit');
+    }
+
+    public function viewAssignedPractical($assignedPracticalId)
+    {
+        $this->loadAssignedPracticalData($assignedPracticalId, 'view');
     }
 
     public function selectCandidates()
@@ -230,9 +259,11 @@ class Practicallist extends Component
 
     public function getCandidates()
     {
-        $query = Candidate::query();
-    
-        return $query->paginate(5, ['*'], 'candidatesPage');
+        return Candidate::query()
+            ->when($this->candidateSearchModal, function ($query) {
+                $query->where('fullname', 'like', '%' . $this->candidateSearchModal . '%');
+            })
+            ->paginate(5, ['*'], 'candidateModalPage');
     }
     
 

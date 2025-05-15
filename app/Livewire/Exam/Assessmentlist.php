@@ -24,11 +24,12 @@ class Assessmentlist extends Component
 {
 
     use WithPagination;
-    public $editMode;
+    public $editMode, $viewMode;
 
     public $archive = false;
 
-    public $search;
+    public $candidateSearchMain = '';
+    public $candidateSearchModal = '';
     public $filterStatus = 'all'; 
     public $title, $skill_id, $status;
     public $assigned_date, $assigned_time, $venue_id, $candidate_id, $candidate_name, $access_code, $draft_status = 'draft';
@@ -39,7 +40,6 @@ class Assessmentlist extends Component
 
     public function render()
     {
-
         return view('livewire.exam.assessmentlist', [
             'assignedassessments' => $this->loadAssignedAssessments(),
             'candidates' => $this->getCandidates(),
@@ -72,6 +72,16 @@ class Assessmentlist extends Component
         $this->resetPage();
     }
 
+    public function updatedCandidateSearchMain()
+    {
+        $this->resetPage('assignedassessmentsPage');
+    }
+
+    public function updatedCandidateSearchModal()
+    {
+        $this->resetPage('candidateModalPage');
+    }
+
     public function rules()
     {
 
@@ -82,33 +92,15 @@ class Assessmentlist extends Component
         $this->archive = !$this->archive;
     }
 
-    public function getAssignedAssessments()
-    {
-        $query = AssignedAssessment::query();
-
-        if ($this->archive) {
-            $query->onlyTrashed(); 
-        }
-
-        return $query
-            ->when($this->search, function ($query) {
-                $query->where('title', 'like', '%' . $this->search . '%');
-            })
-            ->orderByDesc('created_at')
-            ->paginate(10);
-    }
-
-
-
     public function loadAssignedAssessments()
     {
         
         return AssignedAssessment::with(['candidate', 'venue'])
             ->selectRaw('assigned_assessments.*, 
                         DATEDIFF(CURRENT_DATE, CONCAT(assigned_assessments.assigned_date, " ", assigned_assessments.assigned_time)) AS aging_days')
-            ->when($this->search, function ($query) {
+            ->when($this->candidateSearchMain, function ($query) {
                 $query->whereHas('candidate', function ($q) {
-                    $q->where('fullname', 'like', '%' . $this->search . '%');
+                    $q->where('fullname', 'like', '%' . $this->candidateSearchMain . '%');
                 });
             })
             ->when($this->filterStatus !== 'all', function ($query) {
@@ -228,8 +220,6 @@ class Assessmentlist extends Component
         return $code;
     }
 
-
-
     public function clear()
     {
         $this->reset();
@@ -237,7 +227,7 @@ class Assessmentlist extends Component
         $this->loadDropdownData();
     }
 
-    public function readAssignedAssessment($assignedAssessmentId)
+    private function loadAssignedAssessmentData($assignedAssessmentId, $mode = 'edit')
     {
         $this->loadDropdownData();
 
@@ -250,14 +240,33 @@ class Assessmentlist extends Component
             'assigned_date' => $assigned_assessment->assigned_date,
             'assigned_time' => $assigned_assessment->assigned_time,
             'venue_id' => $assigned_assessment->venue_id,
-            'assignedoralId' =>$assigned_assessment->id,
+            'assignedoralId' => $assigned_assessment->id,
         ]);
 
         $this->assigned_assessment_id = $assigned_assessment->id;
-        $this->editMode = true;
+
+        $this->editMode = false;
+        $this->viewMode = false;
+
+        if ($mode === 'edit') {
+            $this->editMode = true;
+        } elseif ($mode === 'view') {
+            $this->viewMode = true;
+        }
 
         $this->dispatch('show-assignedAssessmentModal');
     }
+
+    public function readAssignedAssessment($assignedAssessmentId)
+    {
+        $this->loadAssignedAssessmentData($assignedAssessmentId, 'edit');
+    }
+
+    public function viewAssignedAssessment($assignedAssessmentId)
+    {
+        $this->loadAssignedAssessmentData($assignedAssessmentId, 'view');
+    }
+
 
     public function selectCandidates()
     {
@@ -283,12 +292,16 @@ class Assessmentlist extends Component
         $this->dispatch('hide-candidatesModal');
     }
 
-    public function getCandidates()
+   public function getCandidates()
     {
-        $query = Candidate::query();
-    
-        return $query->paginate(5, ['*'], 'candidatesPage');
+        return Candidate::query()
+            ->when($this->candidateSearchModal, function ($query) {
+                $query->where('fullname', 'like', '%' . $this->candidateSearchModal . '%');
+            })
+            ->paginate(5, ['*'], 'candidateModalPage');
     }
+
+
     
 
 

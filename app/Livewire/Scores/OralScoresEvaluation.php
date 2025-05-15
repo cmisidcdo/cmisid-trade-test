@@ -19,11 +19,7 @@ class OralScoresEvaluation extends Component
 
     public $totalDuration = 0;
     public $startTime = null;
-    public $pausedAt = null;
-
     public $interviewStarted = false;
-    public $interviewPaused = false;
-
 
     public $venues = [], $evaluation = [], $oralscoreskills = [], $oralscoreskill;
     public $selectedcandidate;
@@ -35,13 +31,30 @@ class OralScoresEvaluation extends Component
         $this->oralscoreId = $oralscoreId;
         
         $this->loadOralScoreData($oralscoreId);
+
+        if($this->oralscore->started_at)
+        {
+            $this->dispatch('startCountdown');
+        }
     }
 
 
     public function loadOralScoreData($oralscoreId)
     {
         $oralscore = OralScore::with(['candidate', 'user'])->findOrFail($oralscoreId);
+        $this->oralscore = $oralscore;
+        $totalDuration = $oralscore->total_duration;
+
         $this->totalDuration = $oralscore->total_duration;
+
+         $startedAt = Carbon::parse($oralscore->started_at);
+
+        $elapsedSeconds = $startedAt->diffInSeconds(now(), false);
+
+        $remainingTime = $totalDuration - $elapsedSeconds;
+
+        $this->remainingTime = max($remainingTime, 0);
+
         $this->fill([
             'candidateName' => $oralscore->candidate?->fullname ?? 'N/A',
             'assessorName' => $oralscore->user?->name ?? 'N/A',
@@ -57,37 +70,34 @@ class OralScoresEvaluation extends Component
         return view('livewire.scores.oral-scores-evaluation');
     }
 
-    public function readNote($oralscoreId)
-    {
-        $oralscore = OralScore::with('oralScoreSkills.position_skill.skill')
-                                        ->find($oralscoreId);
-
-        if (!$oralscore) {
-            session()->flash('error', 'oral Score not found!');
-            return redirect()->route('some.route');
-        }
-
-        $this->oralscore = $oralscore;
-
-        $this->dispatch('show-noteModal');
-    }
-
     public function startInterview()
     {
         $this->interviewStarted = true;
-        $this->interviewPaused = false;
-    }
-
-    public function pauseInterview()
-    {
-        $this->interviewPaused = true;
+        if ($this->oralscore) {
+            $this->oralscore->update([
+                'started_at' => now(),
+                'status' => 'ongoing',
+            ]);
+        }
+        $this->status = $this->oralscore->status;
+        $this->dispatch('startCountdown');
     }
 
     public function completeInterview()
     {
+        $now = now();
         $this->interviewStarted = false;
         $this->interviewCompleted = true;
-        $this->status = 'Completed';
+        if ($this->oralscore) {
+            $this->oralscore->update([
+                'status' => 'done',
+                'date_finished' => $now->toDateString(), 
+                'time_finished' => $now->toTimeString(),
+            ]);
+        }
+        $this->status = $this->oralscore->status;
+        $this->dateFinished = $this->oralscore->date_finished;
+        $this->timeFinished = $this->oralscore->time_finished;
     }
 
 

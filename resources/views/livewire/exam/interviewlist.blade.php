@@ -19,14 +19,14 @@
                                 </span>
                                 <input type="text" class="form-control border-start-0 ps-0"
                                     placeholder="Search candidates..."
-                                    wire:model.live.debounce.300ms="search"
+                                    wire:model.live.debounce.300ms="candidateSearchMain"
                                     aria-label="Search candidates">
                                 <button class="btn btn-outline-secondary border-start-0 bg-light" type="button"
-                                    wire:loading.class="d-none" wire:target="search"
-                                    wire:click="$set('search', '')">
+                                    wire:loading.class="d-none" wire:target="candidateSearchMain"
+                                    wire:click="$set('candidateSearchMain', '')">
                                     <i class="bi bi-x"></i>
                                 </button>
-                                <span wire:loading wire:target="search" class="input-group-text bg-light border-start-0">
+                                <span wire:loading wire:target="candidateSearchMain" class="input-group-text bg-light border-start-0">
                                     <div class="spinner-border spinner-border-sm text-primary" role="status">
                                         <span class="visually-hidden">Searching...</span>
                                     </div>
@@ -108,10 +108,10 @@
                                 </td>
                                 <td>{{ $item->aging_days ?? 'N/A' }}</td>
                                 <td>
-                                    <button class="btn btn-sm btn-info rounded-2" data-bs-toggle="modal" data-bs-target="#viewModal" data-bs-placement="top" title="View">
+                                    <button class="btn btn-sm btn-info rounded-2" wire:click='viewAssignedOral({{$item->id}})' title="View">
                                         <i class="bi bi-eye-fill"></i>
                                     </button>
-                                    <button class="btn btn-sm btn-primary" wire:click='readAssignedOral({{$item->id}})' title="Edit">
+                                    <button class="btn btn-sm btn-primary rounded-2" wire:click='readAssignedOral({{$item->id}})' title="Edit">
                                         <i class="bi bi-pencil-square"></i>
                                     </button>
                                 </td>
@@ -138,61 +138,98 @@
                                     <div class="modal-body p-4">
                                         <h5 class="text-center mb-4 fw-bold text-dark">{{$editMode ? 'Update Oral Exam Schedule' : 'Add Schedule for Oral Test'}}</h5>
                                         <form wire:submit.prevent="{{$editMode ? 'updateAssignedOral' : 'createAssignedOral'}}">
-                                            <div class="row g-3">
-                        
+                                             <div class="row g-3">
+
                                                 <div class="col-md-6">
                                                     <div class="input-group">
-                                                        <input type="text" id="selectedCandidate" class="form-control border-dark rounded-start-3" wire:model="{{$editMode ? 'selected_candidate_name' : 'selectedcandidate.fullname'}}" placeholder="Candidate Name" readonly>
-                                                        <button type="button" class="btn btn-primary rounded-end-3 px-3" wire:click='selectCandidates' @if($editMode) disabled @endif>
+                                                        <input
+                                                            type="text"
+                                                            id="selectedCandidate"
+                                                            class="form-control border-dark rounded-start-3"
+                                                            wire:model="{{  $editMode || $viewMode ? 'selected_candidate_name' : 'selectedcandidate.fullname' }}"
+                                                            placeholder="Candidate Name"
+                                                            readonly
+                                                        >
+                                                        <button
+                                                            type="button"
+                                                            class="btn btn-primary rounded-end-3 px-3"
+                                                            wire:click='selectCandidates'
+                                                            @if($editMode || $viewMode) disabled @endif
+                                                        >
                                                             Select
                                                         </button>
                                                     </div>
                                                 </div>
 
                                                 <div class="col-md-6">
-                                                    <select class="form-select border-dark rounded-3" wire:model="draft_status" id="status">
+                                                    <select
+                                                        class="form-select border-dark rounded-3"
+                                                        wire:model="draft_status"
+                                                        id="status"
+                                                        @if($viewMode) disabled @endif
+                                                    >
                                                         <option value="draft" selected>Draft</option>
                                                         <option value="published">Publish</option>
                                                     </select>
                                                 </div>
-                        
+
                                                 <div class="col-md-6">
-                                                    <input type="date" class="form-control border-dark rounded-3" wire:model="assigned_date" id="selectDate">
+                                                    <input
+                                                        type="date"
+                                                        class="form-control border-dark rounded-3"
+                                                        wire:model="assigned_date"
+                                                        id="selectDate"
+                                                        @if($viewMode) readonly @endif
+                                                    >
                                                 </div>
-                        
+
                                                 <div class="col-md-6">
-                                                    <input type="time" class="form-control border-dark rounded-3" wire:model="assigned_time" id="selectTime">
+                                                    <input
+                                                        type="time"
+                                                        class="form-control border-dark rounded-3"
+                                                        wire:model="assigned_time"
+                                                        id="selectTime"
+                                                        @if($viewMode) readonly @endif
+                                                    >
                                                 </div>
-                                                
+
                                                 <div class="col-md-12">
                                                     <label for="venue_id" class="form-label small">Venue</label>
-                                                    <select class="form-select border-dark rounded-3" id="venue_id" wire:model="venue_id" required>
+                                                    <select
+                                                        class="form-select border-dark rounded-3"
+                                                        id="venue_id"
+                                                        wire:model="venue_id"
+                                                        required
+                                                        @if($viewMode) disabled @endif
+                                                    >
                                                         <option value="">Select Venue</option>
                                                         @foreach($venues as $venue)
-                                                        <option value="{{ $venue->id }}">{{ $venue->name }}, {{ $venue->location }}</option>
+                                                            <option value="{{ $venue->id }}">{{ $venue->name }}, {{ $venue->location }}</option>
                                                         @endforeach
                                                     </select>
                                                     @error('venue_id') <span class="text-danger small">{{ $message }}</span> @enderror
                                                 </div>
                                             </div>
-                        
+
                                             <hr class="my-4 border-dark">
 
                                             <div class="d-flex justify-content-between">
-
-                                                <button type="button" class="btn btn-secondary btn-sm d-flex align-items-center px-3" data-bs-dismiss="modal">
+                                                <button
+                                                    type="button"
+                                                    class="btn btn-secondary btn-sm d-flex align-items-center px-3"
+                                                    data-bs-dismiss="modal"
+                                                >
                                                     <i class="bi bi-arrow-left me-2"></i> Back
                                                 </button>
 
-                                                @if($editMode)
-                                                <button type="button" class="btn btn-primary btn-sm d-flex align-items-center px-3" wire:click='updateOralQuestion({{$assignedoralId}})'>
-                                                    <i class="bi bi-check-circle me-2"></i> Update Questions
-                                                </button>
+                                                @if(!$viewMode)
+                                                    <button
+                                                        type="submit"
+                                                        class="btn btn-primary btn-sm d-flex align-items-center px-3"
+                                                    >
+                                                        <i class="bi bi-check-circle me-2"></i>{{ $editMode ? 'Update Schedule' : 'Create Schedule' }}
+                                                    </button>
                                                 @endif
-
-                                                <button type="submit" class="btn btn-primary btn-sm d-flex align-items-center px-3">
-                                                    <i class="bi bi-check-circle me-2"></i> {{$editMode ? 'Save Changes' : 'Create and Proceed to Questions'}}
-                                                </button>
                                             </div>
                                         </form>
                                     </div>
@@ -219,9 +256,9 @@
                                                 type="text"
                                                 class="form-control"
                                                 placeholder="Search candidates..."
-                                                wire:model.live="candidateSearch"
+                                                wire:model.live.debounce.500ms="candidateSearchModal"
                                                 aria-label="Search candidates">
-                                            <span wire:loading wire:target="candidateSearch" class="input-group-text bg-light border">
+                                            <span wire:loading wire:target="candidateSearchModal" class="input-group-text bg-light border">
                                                 <div class="spinner-border spinner-border-sm text-primary" role="status">
                                                     <span class="visually-hidden">Searching...</span>
                                                 </div>

@@ -167,19 +167,19 @@
                                     </td>
                                     <td style="width:15%">
                                         <a
-                                        href="{{ $editMode 
-                                            ? route('test.assessment.updatequestions', ['position_id' => $position_id, 'skill_id' => $item['id']])
-                                            : ($viewMode 
-                                                ? route('test.assessment.viewquestions', ['position_id' => $position_id, 'skill_id' => $item['id']])
-                                                : route('test.assessment.addquestions', ['position_id' => $position_id, 'skill_id' => $item['id']])
-                                            )
-                                        }}"
-                                        target="_blank"
-                                        class="btn {{ $editMode ? 'btn-primary' : ($viewMode ? 'btn-info' : 'btn-success') }} btn-sm"
-                                    >
-                                        <i class="bi {{ $editMode ? 'bi-pencil-fill' : ($viewMode ? 'bi-eye' : 'bi-plus-circle') }} me-1"></i>
-                                        {{ $editMode ? 'Update' : ($viewMode ? 'View' : 'Add') }}
-                                    </a>
+                                            href="{{ $editMode 
+                                                ? route('test.assessment.updatequestions', ['position_id' => $position_id, 'skill_id' => $item['id']])
+                                                : ($viewMode 
+                                                    ? route('test.assessment.viewquestions', ['position_id' => $position_id, 'skill_id' => $item['id']])
+                                                    : route('test.assessment.addquestions', ['position_id' => $position_id, 'skill_id' => $item['id']])
+                                                )
+                                            }}"
+                                            target="_blank"
+                                            class="btn {{ $editMode ? 'btn-primary' : ($viewMode ? 'btn-info' : 'btn-success') }} btn-sm"
+                                        >
+                                            <i class="bi {{ $editMode ? 'bi-pencil-fill' : ($viewMode ? 'bi-eye' : 'bi-plus-circle') }} me-1"></i>
+                                            {{ $editMode ? 'Update' : ($viewMode ? 'View' : 'Add') }}
+                                        </a>
 
                                     </td>                                    
                                 </tr>

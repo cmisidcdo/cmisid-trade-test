@@ -60,5 +60,13 @@ class Candidate extends Model
         return $this->hasMany(AssignedOral::class);
     }
 
+    public function getFullnameAttribute()
+    {
+        return $this->first_name . ' ' .
+            ($this->middle_initial ? $this->middle_initial . '. ' : '') .
+            $this->family_name .
+            ($this->extension ? ' ' . $this->extension : '');
+    }
+
 
 }   

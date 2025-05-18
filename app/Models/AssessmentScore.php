@@ -32,5 +32,9 @@ class AssessmentScore extends Model
         return $this->hasMany(AssessmentScoreSkill::class, 'assessment_scores_id');
     }
 
+    public function user()
+    {
+        return $this->belongsTo(User::class, 'user_id');
+    }
 
 }

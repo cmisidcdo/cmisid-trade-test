@@ -2,6 +2,7 @@
 
 namespace App\Livewire\Candidate;
 
+use App\Models\OralScore;
 use Livewire\Component;
 use App\Models\AssignedAssessment;
 use App\Models\AssignedPractical;
@@ -18,6 +19,8 @@ class Home extends Component
 {
     public $assessmentCompleted = false;
     public $practicalCompleted = false;
+
+    public $oral_completed = false;
 
     public $practical_code, $interview_code;
     public function mount()
@@ -44,15 +47,28 @@ class Home extends Component
                     $this->practicalCompleted = true;
                 }
             }
+
+            $assignedOral = AssignedOral::where('candidate_id', $candidateId)->first();
+
+            if ($assignedOral) {
+                $oralScore = OralScore::where('assigned_oral_id', $assignedOral->id)->first();
+
+                if ($oralScore && $oralScore->status === 'done') {
+                    $this->oral_completed = true;
+                }
+            }
         }
     }
+
 
     public function render()
     {
         return view('livewire.candidate.home', [
             'assessment_completed' => $this->assessmentCompleted,
             'practical_completed' => $this->practicalCompleted,
+            'oral_completed' => $this->oral_completed, 
         ])->layout('components.layouts.candidate-app');
+
     }
 
     public function proceedToTest()

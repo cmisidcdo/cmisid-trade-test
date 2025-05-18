@@ -47,19 +47,6 @@ class Practicallist extends Component
             'selectedcandidate' => $this->selectedcandidate,            
         ]);
     }
-
-    protected $listeners = ['deleteSkill'];
-
-    public function mount()
-    {
-        $user = auth()->user();
-
-        if(!$user->can('read reference')){
-            abort(403);
-        }
-
-        $this->venues = Venue::all();
-    }
     
     public function updatingFilterStatus()
     {
@@ -96,7 +83,8 @@ class Practicallist extends Component
                         DATEDIFF(CURRENT_DATE, CONCAT(assigned_practicals.assigned_date, " ", assigned_practicals.assigned_time)) AS aging_days')
             ->when($this->candidateSearchMain, function ($query) {
                 $query->whereHas('candidate', function ($q) {
-                    $q->where('fullname', 'like', '%' . $this->candidateSearchMain . '%');
+                    $q->where('first_name', 'like', '%' . $this->candidateSearchMain . '%')
+                    ->orWhere('family_name', 'like', '%' . $this->candidateSearchMain . '%');
                 });
             })
             ->when($this->filterStatus !== 'all', function ($query) {
@@ -251,10 +239,14 @@ class Practicallist extends Component
     {
         return Candidate::query()
             ->when($this->candidateSearchModal, function ($query) {
-                $query->where('fullname', 'like', '%' . $this->candidateSearchModal . '%');
+                $query->where(function ($q) {
+                    $q->where('first_name', 'like', '%' . $this->candidateSearchModal . '%')
+                    ->orWhere('family_name', 'like', '%' . $this->candidateSearchModal . '%');
+                });
             })
             ->paginate(5, ['*'], 'candidateModalPage');
     }
+
     
 
 

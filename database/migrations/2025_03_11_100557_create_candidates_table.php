@@ -13,9 +13,13 @@ return new class extends Migration
     {
         Schema::create('candidates', function (Blueprint $table) {
             $table->id();
-            $table->string('fullname');
+            $table->string('first_name');
+            $table->string('middle_initial')->nullable();
+            $table->string('family_name');
+            $table->string('extension')->nullable();
             $table->string('email')->unique();
             $table->string('contactno')->unique();
+            $table->text('attachments')->nullable();
             $table->string('remarks')->nullable();
             $table->foreignId('position_id')->constrained('positions')->onDelete('cascade');
             $table->foreignId('office_id')->constrained('offices')->onDelete('cascade');

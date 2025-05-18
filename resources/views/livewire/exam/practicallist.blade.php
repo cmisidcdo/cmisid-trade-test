@@ -111,9 +111,11 @@
                                     <button class="btn btn-sm btn-info rounded-2" wire:click='viewAssignedPractical({{$item->id}})' title="View">
                                         <i class="bi bi-eye-fill"></i>
                                     </button>
+                                    @canany(['assessor permission', 'update exam'])
                                     <button class="btn btn-sm btn-primary" wire:click='readAssignedPractical({{$item->id}})' title="Edit">
                                         <i class="bi bi-pencil-square"></i>
                                     </button>
+                                    @endcanany
                                 </td>
                             </tr>
                             @empty

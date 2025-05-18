@@ -23,4 +23,10 @@ class AssessmentScoreSkill extends Model
     {
         return $this->position_skill?->skill;
     }
+
+    public function skillQuestions()
+    {
+        return $this->hasMany(AssessmentScoreSkillQuestion::class);
+    }
+
 }

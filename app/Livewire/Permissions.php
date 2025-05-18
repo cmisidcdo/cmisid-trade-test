@@ -37,4 +37,14 @@ class Permissions extends Component
     {
         $this->permissions = Permission::all();   
     }
+
+    public function mount()
+    {
+        $user = auth()->user();
+        
+        if (!$user || $user->type !== 'superadmin') {
+            abort(403, 'Unauthorized');
+        }
+    }
+
 }

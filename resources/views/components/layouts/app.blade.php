@@ -55,19 +55,13 @@
           </a><!-- End Profile Iamge Icon -->
 
           <ul class="dropdown-menu dropdown-menu-end dropdown-menu-arrow profile">
-            <li class="dropdown-header">
-              <h6>{{Auth::user()->name}}</h6>
-              <span>Web Designer</span>
-            </li>
-            <li>
-              <hr class="dropdown-divider">
+           <li class="dropdown-header">
+                <h6>{{ Auth::user()->name }}</h6>
+                <span>{{ ucfirst(Auth::user()->type) }}</span>
             </li>
 
             <li>
-              <a class="dropdown-item d-flex align-items-center" href="users-profile.html">
-                <i class="bi bi-person"></i>
-                <span>My Profile</span>
-              </a>
+              <hr class="dropdown-divider">
             </li>
             <li>
               <hr class="dropdown-divider">
@@ -127,14 +121,7 @@
           <i class="bi bi-grid-fill fs-5"></i>
           <span>Dashboard</span>
         </a>
-      </li><!-- End Dashboard Nav -->
-
-      {{-- <li class="nav-item">
-        <a class="nav-link {{ Request::routeIs('permissions') ? '' : 'collapsed' }}" href="{{ route('permissions') }}">
-            <i class="bi bi-key-fill fs-5"></i>
-            <span>Permissions</span>
-        </a>
-    </li> --}}
+      </li>
 
     @can('read user')
     <li class="nav-item">
@@ -223,14 +210,13 @@
       </li><!-- End Tables Nav -->
     @endcan
 
-    @can('assessor permission')
+    @canany(['assessor permission', 'read exam'])
     <li class="nav-item">
       <a class="nav-link {{ Request::routeIs('test.*') || Request::routeIs('exam.*') || Request::routeIs('scores.*') ? '' : 'collapsed' }}" data-bs-target="#tests-nav" data-bs-toggle="collapse" href="#">
         <i class="bi bi-clipboard-check-fill fs-5"></i><span>Tests</span><i class="bi bi-chevron-down ms-auto"></i>
       </a>
       <ul id="tests-nav" class="nav-content collapse {{ Request::routeIs('test.*') || Request::routeIs('exam.*') || Request::routeIs('scores.*') ? 'show' : '' }}" data-bs-parent="#sidebar-nav">
         
-        <!-- Questions/Scenarios Dropdown -->
         <li>
           <a class="nav-link {{ Request::routeIs('test.*') ? '' : 'collapsed' }}" data-bs-target="#questions-nav" data-bs-toggle="collapse" href="#">
             <i class="bi bi-journal-text fs-6"></i><span>Questions / Scenarios</span><i class="bi bi-chevron-down ms-auto fs-6"></i>
@@ -254,7 +240,6 @@
           </ul>
         </li>
     
-        <!-- Assigning Dropdown -->
         <li>
           <a class="nav-link {{ Request::routeIs('exam.*') ? '' : 'collapsed' }}" data-bs-target="#assigning-nav" data-bs-toggle="collapse" href="#">
             <i class="bi bi-journal-code fs-6"></i><span>Assigning</span><i class="bi bi-chevron-down ms-auto fs-6"></i>
@@ -278,7 +263,6 @@
           </ul>
         </li>
     
-        <!-- Scoring Dropdown -->
         <li>
           <a class="nav-link {{ Request::routeIs('scores.*') ? '' : 'collapsed' }}" data-bs-target="#scoring-nav" data-bs-toggle="collapse" href="#">
             <i class="bi bi-journal-check fs-6"></i><span>Scoring</span><i class="bi bi-chevron-down ms-auto fs-6"></i>
@@ -308,35 +292,7 @@
         </li>
       </ul>
     </li>
-    @endcan
-    
-    
-
-
-      {{-- <li class="nav-item">
-        <a class="nav-link {{ Request::routeIs('reports.*') ? '' : 'collapsed' }}" data-bs-target="#reports-nav" data-bs-toggle="collapse" href="#">
-          <i class="bi bi-file-bar-graph-fill fs-5"></i></i><span>Reports</span><i class="bi bi-chevron-down ms-auto"></i>
-        </a>
-        <ul id="reports-nav" class="nav-content collapse {{ Request::routeIs('reports.*') ? 'show' : '' }}" data-bs-parent="#sidebar-nav">
-          <li>
-            <a class="{{ Request::routeIs('reports.adminreports') ? 'active' : '' }}" href="{{ route('reports.adminreports') }}">
-              <i class="bi bi-clipboard-data-fill fs-5"></i><span>Admin reports</span>
-            </a>
-          </li>
-          <li>
-            <a class="{{ Request::routeIs('reports.candidatereports') ? 'active' : '' }}" href="{{ route('reports.candidatereports') }}">
-              <i class="bi bi-person-fill-gear fs-5"></i><span>Candidate reports</span>
-            </a>
-          </li>
-        </ul>
-      </li> --}}
-
-      {{-- <li class="nav-item">
-        <a class="nav-link {{ Request::routeIs('logs') ? '' : 'collapsed' }}" href="{{ route('logs') }}">
-          <i class="bi bi-file-earmark-text-fill fs-5"></i>
-          <span>Logs</span>
-        </a>
-      </li><!-- End Logs Page Nav --> --}}
+    @endcanany
 
     </ul>
 

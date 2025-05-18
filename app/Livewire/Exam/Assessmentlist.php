@@ -46,19 +46,6 @@ class Assessmentlist extends Component
             'selectedcandidate' => $this->selectedcandidate,            
         ]);
     }
-
-    protected $listeners = ['deleteSkill'];
-
-    public function mount()
-    {
-        $user = auth()->user();
-
-        if(!$user->can('read reference')){
-            abort(403);
-        }
-
-        $this->venues = Venue::all();
-    }
     
     public function updatingFilterStatus()
     {
@@ -92,15 +79,15 @@ class Assessmentlist extends Component
         $this->archive = !$this->archive;
     }
 
-    public function loadAssignedAssessments()
+   public function loadAssignedAssessments()
     {
-        
         return AssignedAssessment::with(['candidate', 'venue'])
             ->selectRaw('assigned_assessments.*, 
                         DATEDIFF(CURRENT_DATE, CONCAT(assigned_assessments.assigned_date, " ", assigned_assessments.assigned_time)) AS aging_days')
             ->when($this->candidateSearchMain, function ($query) {
                 $query->whereHas('candidate', function ($q) {
-                    $q->where('fullname', 'like', '%' . $this->candidateSearchMain . '%');
+                    $q->where('first_name', 'like', '%' . $this->candidateSearchMain . '%')
+                    ->orWhere('family_name', 'like', '%' . $this->candidateSearchMain . '%');
                 });
             })
             ->when($this->filterStatus !== 'all', function ($query) {
@@ -109,6 +96,7 @@ class Assessmentlist extends Component
             ->orderByDesc('created_at')
             ->paginate(10, ['*'], 'assignedassessmentsPage');
     }
+
 
     public function createAssignedAssessment()
     {
@@ -302,11 +290,14 @@ class Assessmentlist extends Component
         $this->dispatch('hide-candidatesModal');
     }
 
-   public function getCandidates()
+    public function getCandidates()
     {
         return Candidate::query()
             ->when($this->candidateSearchModal, function ($query) {
-                $query->where('fullname', 'like', '%' . $this->candidateSearchModal . '%');
+                $query->where(function ($q) {
+                    $q->where('first_name', 'like', '%' . $this->candidateSearchModal . '%')
+                    ->orWhere('family_name', 'like', '%' . $this->candidateSearchModal . '%');
+                });
             })
             ->paginate(5, ['*'], 'candidateModalPage');
     }

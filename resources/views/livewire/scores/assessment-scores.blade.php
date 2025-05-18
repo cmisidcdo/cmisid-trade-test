@@ -173,15 +173,17 @@
                                                 <td >{{ $item->skill->title ?? 'N/A' }}</td>
                                                 <td >{{ $item->position_skill->competency_level ?? 'N/A' }}</td>
                                                 <td >  
-                                                    <button class="btn btn-sm btn-dark me-1" data-bs-toggle="modal" data-bs-target="#viewModal" data-bs-placement="top" title="View">
+                                                    <button class="btn btn-sm btn-dark me-1" wire:click='readSkillQuestions({{$item->id}})' title="View">
                                                         <i class="bi bi-eye-fill"></i>
                                                     </button></td>
                                                 <td >{{ $item->skill_score ?? 'N/A' }}</td>
                                                 <td >{{ $item->assessmentscore->total_score ?? 'N/A' }}</td>
                                                 <td >
-                                                    <button class="btn btn-sm btn-primary me-1" data-bs-toggle="modal" data-bs-target="#assessmentScoreModal" title="Edit">
+                                                    @canany(['assessor permission', 'update exam'])
+                                                    <button class="btn btn-sm btn-primary me-1" wire:click='readSkillScore({{$item->id}})'title="Edit">
                                                         <i class="bi bi-pencil-square"></i>
                                                     </button>
+                                                    @endcanany
                                                 </td>
                                             </tr>
                                         @empty
@@ -199,8 +201,78 @@
                     </div>
                 </div>
                 
-                
-                
+                <div class="modal fade" id="assessmentSkillScoreModal" tabindex="-1" aria-labelledby="assessmentSkillScoreModalLabel" aria-hidden="true" wire:ignore.self>
+                    <div class="modal-dialog modal-dialog-centered modal-l"> 
+                        <div class="modal-content" style="border-radius: 12px;">
+                            <div class="modal-body p-4">
+                                <h5 class="text-center mb-4 fw-bold text-dark">(Edit) Assessment Skill Score</h5>
+
+                                <div class="mb-3">
+                                    <label class="form-label fw-semibold text-dark">Skill Name</label>
+                                    <input type="text" class="form-control" value="{{ $skill_name }}" readonly>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label class="form-label fw-semibold text-dark">Skill Score</label>
+                                    <input type="number" min="0" max="100" class="form-control" wire:model.defer="skill_score" placeholder="Enter score">
+                                </div>
+
+                                <div class="text-end mt-4">
+                                    <button type="button" class="btn btn-primary" wire:click="saveSkillScore">Save</button>
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+               <div class="modal fade" id="assessmentSkillQuestionsModal" tabindex="-1" aria-labelledby="assessmentSkillQuestionsModalLabel" aria-hidden="true" wire:ignore.self>
+                    <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable modal-lg"> 
+                        <div class="modal-content" style="border-radius: 12px;">
+                            <div class="modal-body p-4" style="max-height: 70vh; overflow-y: auto;">
+                                <h5 class="text-center mb-4 fw-bold text-dark">(View) Candidate Assessment Skill Questions</h5>
+
+                                @forelse($selectedSkillQuestions as $questionItem)
+                                    @php
+                                        $selectedAnswerId = $questionItem->answer;
+                                        $isCorrect = $questionItem->is_correct;
+                                        $question = $questionItem->assessmentQuestion;
+                                    @endphp
+
+                                    <div class="mb-4 p-3 border rounded" style="background-color: #f9f9f9;">
+                                        <div class="d-flex justify-content-between align-items-center mb-2">
+                                            <strong>Question:</strong>
+                                            <span class="badge {{ $isCorrect ? 'bg-success' : 'bg-danger' }}">
+                                                {{ $isCorrect ? 'Correct' : 'Incorrect' }}
+                                            </span>
+                                        </div>
+                                        <p class="mb-3">{{ $question->question ?? 'N/A' }}</p>
+
+                                        <ul class="list-group">
+                                            @foreach($question->choices as $choice)
+                                                <li class="list-group-item d-flex justify-content-between align-items-center 
+                                                    @if($choice->id == $selectedAnswerId) list-group-item-info @endif">
+                                                    <span>
+                                                        {{ $choice->choice_text }}
+                                                        @if($choice->is_answer)
+                                                            <span class="badge bg-success ms-2">Correct Answer</span>
+                                                        @endif
+                                                        @if($choice->id == $selectedAnswerId)
+                                                            <span class="badge bg-primary ms-2">Selected</span>
+                                                        @endif
+                                                    </span>
+                                                </li>
+                                            @endforeach
+                                        </ul>
+                                    </div>
+                                @empty
+                                    <p class="text-muted text-center">No skill questions found for this skill.</p>
+                                @endforelse
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </section>
@@ -230,6 +302,14 @@
 
     $wire.on('show-assessmentScoreModal', () => {
         $('#assessmentScoreModal').modal('show');
+    });
+
+    $wire.on('show-assessmentSkillScoreModal', () => {
+        $('#assessmentSkillScoreModal').modal('show');
+    });
+
+    $wire.on('show-assessmentSkillQuestionsModal', () => {
+        $('#assessmentSkillQuestionsModal').modal('show');
     });
 
 </script>

@@ -114,12 +114,14 @@
                                 </td>
                                 <td>{{ $item->total_score ?? 'N/A' }}</td>
                                 <td>
+                                    @canany(['assessor permission', 'update exam'])
                                     <button 
                                         class="btn btn-sm me-1 {{ optional($item->assigned_practical)->draft_status === 'draft' ? 'btn-secondary' : 'btn-primary' }}"
                                         wire:click='readPracticalScore({{$item->id}})' title="Edit"
                                         @if(optional($item->assigned_practical)->draft_status === 'draft') disabled @endif>
                                         <i class="bi bi-pencil-square"></i>
                                     </button>
+                                    @endcanany
                                 </td>
                             </tr>
                             @empty

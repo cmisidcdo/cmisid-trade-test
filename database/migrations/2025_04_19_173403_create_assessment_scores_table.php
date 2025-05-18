@@ -20,6 +20,7 @@ return new class extends Migration
             $table->integer('total_duration')->nullable();
             $table->enum('status', ['pending', 'ongoing', 'done'])->default('pending');
             $table->timestamp('started_at')->nullable();
+            $table->foreignId('user_id')->nullable()->constrained()->onDelete('cascade');
             $table->timestamps();
         });
     }

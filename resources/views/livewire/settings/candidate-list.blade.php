@@ -89,7 +89,7 @@
                             @forelse($candidates as $item)
                             <tr>
                                 <td scope="row" class="text-center">{{$loop->iteration}}</td>
-                                <td>{{$item->fullname}}</td>
+                                <td>{{ $item->first_name }} {{ $item->middle_initial ? $item->middle_initial . '.' : '' }} {{ $item->family_name }} {{ $item->extension }}</td>
                                 <td>{{$item->office->title}}</td>
                                 <td>{{$item->position->title}}</td>
                                 <td>{{$item->prioritygroup->title}}</td>
@@ -114,7 +114,7 @@
                                             <button class="btn btn-icon me-1 {{ $isUsed ? 'btn-secondary' : 'btn-primary' }}"
                                                 wire:click='readCandidate({{$item->id}})'
                                                 data-bs-toggle="tooltip"
-                                                data-bs-title="{{ $isUsed ? 'Editing disabled due to assignment' : 'Edit' }}"
+                                                data-bs-title="Edit"
                                                 @if($isUsed) disabled @endif>
                                                 <i class="bi bi-pencil"></i>
                                             </button>
@@ -134,7 +134,7 @@
                     </table>
                 </div>
 
-                <div class="d-flex justify-content-center mt-4">
+                <div>
                     {{$candidates->links(data: ['scrollTo' => false])}}
                 </div>
 
@@ -204,6 +204,34 @@
                                 <th>Remarks:</th>
                                 <td>{{ $candidate?->remarks }}</td>
                             </tr>
+
+                            <tr>
+                                <th>Attachments:</th>
+                                <td>
+                                    @if (!empty($attachments))
+                                        <ul class="mt-1 small">
+                                            @foreach ($attachments as $filePath)
+                                                <li>
+                                                    <a href="{{ asset('storage/' . $filePath) }}" target="_blank" download title="{{ basename($filePath) }}">
+                                                        <span class="truncate-filename">{{ basename($filePath) }}</span>
+                                                    </a>
+                                                </li>
+                                            @endforeach
+                                        </ul>
+                                    @endif
+                                </td>
+                            </tr>
+
+                            <style>
+                                .truncate-filename {
+                                    max-width: 150px;
+                                    white-space: nowrap;
+                                    overflow: hidden;
+                                    text-overflow: ellipsis;
+                                    display: inline-block;
+                                    vertical-align: bottom;
+                                    }
+                            </style>
                         </table>
                     </div>
 
@@ -224,15 +252,34 @@
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" wire:click='clear'></button>
                     </div>
                     <div class="modal-body p-3">
-                        <form class="needs-validation" wire:submit="{{$editMode ? 'updateCandidate' : 'createCandidate'}}">
+                        <form class="needs-validation" wire:submit.prevent="{{$editMode ? 'updateCandidate' : 'createCandidate'}}">
                             <div class="row g-2">
                                 <div class="col-md-6">
-                                    <label for="fullname" class="form-label small">Full Name</label>
-                                    <input type="text" class="form-control form-control-sm" id="fullname" wire:model="fullname" required>
-                                    @error('fullname') <span class="text-danger small">{{ $message }}</span> @enderror
+                                    <label for="first_name" class="form-label small">First Name</label>
+                                    <input type="text" class="form-control form-control-sm" id="first_name" wire:model="first_name" required>
+                                    @error('first_name') <span class="text-danger small">{{ $message }}</span> @enderror
                                 </div>
+
+                                <div class="col-md-3">
+                                    <label for="middle_initial" class="form-label small">M.I.</label>
+                                    <input type="text" class="form-control form-control-sm" id="middle_initial" wire:model="middle_initial" maxlength="1">
+                                    @error('middle_initial') <span class="text-danger small">{{ $message }}</span> @enderror
+                                </div>
+
+                                <div class="col-md-3">
+                                    <label for="extension" class="form-label small">Extension</label>
+                                    <input type="text" class="form-control form-control-sm" id="extension" wire:model="extension">
+                                    @error('extension') <span class="text-danger small">{{ $message }}</span> @enderror
+                                </div>
+
                                 <div class="col-md-6">
-                                    <label for="email" class="form-label small">Email</label>
+                                    <label for="family_name" class="form-label small mt-2">Family Name</label>
+                                    <input type="text" class="form-control form-control-sm" id="family_name" wire:model="family_name" required>
+                                    @error('family_name') <span class="text-danger small">{{ $message }}</span> @enderror
+                                </div>
+
+                                <div class="col-md-6 mt-2">
+                                    <label for="email" class="form-label small mt-2">Email</label>
                                     <input type="email" class="form-control form-control-sm" id="email" wire:model="email" required>
                                     @error('email') <span class="text-danger small">{{ $message }}</span> @enderror
                                 </div>
@@ -249,7 +296,7 @@
                                     <select class="form-select form-select-sm" id="position_id" wire:model="position_id" required>
                                         <option value="">Select Position</option>
                                         @foreach($positions as $position)
-                                        <option value="{{ $position->id }}">{{ $position->title }}</option>
+                                            <option value="{{ $position->id }}">{{ $position->title }}</option>
                                         @endforeach
                                     </select>
                                     @error('position_id') <span class="text-danger small">{{ $message }}</span> @enderror
@@ -262,7 +309,7 @@
                                     <select class="form-select form-select-sm" id="office_id" wire:model="office_id" required>
                                         <option value="">Select Office</option>
                                         @foreach($offices as $office)
-                                        <option value="{{ $office->id }}">{{ $office->title }}</option>
+                                            <option value="{{ $office->id }}">{{ $office->title }}</option>
                                         @endforeach
                                     </select>
                                     @error('office_id') <span class="text-danger small">{{ $message }}</span> @enderror
@@ -272,7 +319,7 @@
                                     <select class="form-select form-select-sm" id="priority_group_id" wire:model="priority_group_id" required>
                                         <option value="">Select Priority Group</option>
                                         @foreach($priorityGroups as $priorityGroup)
-                                        <option value="{{ $priorityGroup->id }}">{{ $priorityGroup->title }}</option>
+                                            <option value="{{ $priorityGroup->id }}">{{ $priorityGroup->title }}</option>
                                         @endforeach
                                     </select>
                                     @error('priority_group_id') <span class="text-danger small">{{ $message }}</span> @enderror
@@ -309,6 +356,48 @@
                                 </div>
                             </div>
 
+                            <div class="row g-2 mt-2">
+                                <div class="col-md-12">
+                                    <label for="attachments" class="form-label small">Attachments (PDF, JPG, PNG; max 5 files)</label>
+                                    <input type="file" class="form-control form-control-sm" id="attachments" wire:model="attachments" multiple>
+                                    @error('attachments') <span class="text-danger small">{{ $message }}</span> @enderror
+                                    @error('attachments.*') <span class="text-danger small">{{ $message }}</span> @enderror
+
+                                    @if($editMode)
+                                        @if (!empty($attachments) && count($attachments) > 0)
+                                            <p class="text-muted mt-2">
+                                                <strong>{{ count($attachments) }}</strong> file(s) attached.
+                                            </p>
+                                            <ul class="list-unstyled small">
+                                                @foreach ($attachments as $index => $filePath)
+                                                    <li class="mb-1">
+                                                        {{ basename($filePath) }} ({{ strtoupper(pathinfo($filePath, PATHINFO_EXTENSION)) }})
+                                                        <div class="btn-group btn-group-sm ms-2" role="group">
+                                                            <a href="{{ asset('storage/' . $filePath) }}" target="_blank" class="btn btn-outline-primary" title="View File">
+                                                                <i class="bi bi-eye"></i>
+                                                            </a>
+                                                            <a href="{{ asset('storage/' . $filePath) }}" download class="btn btn-outline-secondary" title="Download File">
+                                                                <i class="bi bi-download"></i>
+                                                            </a>
+                                                            <button type="button" class="btn btn-outline-danger" wire:click="removeFile({{ $index }})" title="Remove File">
+                                                                <i class="bi bi-trash3"></i>
+                                                            </button>
+                                                        </div>
+
+                                                        @if(!empty($replaceFileVisibility[$index]) && $replaceFileVisibility[$index])
+                                                            <input type="file" 
+                                                                class="form-control form-control-sm mt-1" 
+                                                                wire:model="replacementFiles.{{ $index }}" 
+                                                                accept=".pdf,.png,.jpg,.jpeg">
+                                                        @endif
+                                                    </li>
+                                                @endforeach
+                                            </ul>
+                                        @endif
+                                    @endif
+                                </div>
+                            </div>
+
                             <div class="mt-3 text-end">
                                 <button type="button" class="btn btn-sm btn-secondary" data-bs-dismiss="modal" wire:click='clear'>Cancel</button>
                                 <button type="submit" class="btn btn-sm btn-primary px-3">
@@ -326,6 +415,7 @@
                 </div>
             </div>
         </div>
+
     </section>
 </div>
 

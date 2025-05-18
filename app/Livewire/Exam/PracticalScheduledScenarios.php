@@ -188,30 +188,33 @@ class PracticalScheduledScenarios extends Component
             try {
                 Log::info('Starting transaction for multiple scenario update.');
 
-    
+                $totalDuration = 0;
+
                 foreach ($this->scenarios as $index => $scenarioData) {
                     Log::info("Processing scenario #{$index}");
-    
+
                     $totalSeconds = (
                         ($scenarioData['hours'] ?? $this->hours) * 3600 +
                         ($scenarioData['minutes'] ?? $this->minutes) * 60 +
                         ($scenarioData['seconds'] ?? $this->seconds)
                     );
-    
+
+                    $totalDuration += $totalSeconds;
+
                     $positionSkill = PositionSkill::where('position_id', $this->position_id)
-                                                  ->where('skill_id', $scenarioData['skill_id'])
-                                                  ->first();
-    
+                                                ->where('skill_id', $scenarioData['skill_id'])
+                                                ->first();
+
                     if (!$positionSkill) {
                         Log::warning("No PositionSkill found for position_id={$this->position_id}, skill_id={$scenarioData['skill_id']}");
                         continue;
                     }
-                    
+
                     $practicalScoreSkill = PracticalScoreSkill::firstOrCreate([
                         'position_skill_id' => $positionSkill->id,
                         'practical_score_id' => $this->practical_score_id,
                     ]);
-    
+
                     if (isset($scenarioData['id'])) {
                         $practicalscenario = PracticalScenario::find($scenarioData['id']);
                         if ($practicalscenario) {
@@ -219,7 +222,7 @@ class PracticalScheduledScenarios extends Component
                             $practicalscenario->description = $scenarioData['description'];
                             $practicalscenario->duration = $totalSeconds;
                             $practicalscenario->position_skill_id = $positionSkill->id;
-    
+
                             if (isset($scenarioData['file'])) {
                                 if ($practicalscenario->file_path) {
                                     Storage::delete($practicalscenario->file_path);
@@ -227,7 +230,7 @@ class PracticalScheduledScenarios extends Component
                                 }
                                 $practicalscenario->file_path = $scenarioData['file']->store('scenarios', 'public');
                             }
-    
+
                             $practicalscenario->save();
                             Log::info("Scenario #{$index} updated successfully.");
                         }
@@ -237,21 +240,28 @@ class PracticalScheduledScenarios extends Component
                         $practicalscenario->description = $scenarioData['description'];
                         $practicalscenario->duration = $totalSeconds;
                         $practicalscenario->position_skill_id = $positionSkill->id;
-    
+
                         if (isset($scenarioData['file'])) {
                             $practicalscenario->file_path = $scenarioData['file']->store('scenarios', 'public');
                         }
-    
+
                         $practicalscenario->save();
                         Log::info("New scenario created with ID {$practicalscenario->id}");
                     }
-    
+
                     PracticalScoreSkillScenario::firstOrCreate([
                         'practical_score_skill_id' => $practicalScoreSkill->id,
                         'practical_scenario_id' => $practicalscenario->id,
                     ]);
                 }
-    
+
+                $practicalScore = PracticalScore::find($this->practical_score_id);
+                if ($practicalScore) {
+                    $practicalScore->total_duration = $totalDuration;
+                    $practicalScore->save();
+                    Log::info("Total duration updated to {$totalDuration} seconds in PracticalScore ID: {$practicalScore->id}");
+                }
+
                 Log::info('All scenarios updated successfully.');
             } catch (\Exception $e) {
                 Log::error('Error while updating assessment scenarios.', ['error' => $e->getMessage()]);
@@ -262,6 +272,7 @@ class PracticalScheduledScenarios extends Component
         $this->dispatch('success', 'Scenarios Updated Successfully');
         return redirect()->route('exam.practicallist');
     }
+
     
 
 

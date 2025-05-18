@@ -24,22 +24,22 @@ class Assessmentlist extends Component
 {
 
     use WithPagination;
-    public $editMode;
+    public $editMode, $viewMode;
 
     public $archive = false;
 
-    public $search;
+    public $candidateSearchMain = '';
+    public $candidateSearchModal = '';
     public $filterStatus = 'all'; 
     public $title, $skill_id, $status;
     public $assigned_date, $assigned_time, $venue_id, $candidate_id, $candidate_name, $access_code, $draft_status = 'draft';
 
     public $venues = [];
-    public $selectedcandidate, $assigned_assessment_id;
+    public $selectedcandidate, $assigned_assessment_id, $updatecandidate_id;
     public $selected_candidate_name;
 
     public function render()
     {
-
         return view('livewire.exam.assessmentlist', [
             'assignedassessments' => $this->loadAssignedAssessments(),
             'candidates' => $this->getCandidates(),
@@ -72,6 +72,16 @@ class Assessmentlist extends Component
         $this->resetPage();
     }
 
+    public function updatedCandidateSearchMain()
+    {
+        $this->resetPage('assignedassessmentsPage');
+    }
+
+    public function updatedCandidateSearchModal()
+    {
+        $this->resetPage('candidateModalPage');
+    }
+
     public function rules()
     {
 
@@ -82,33 +92,15 @@ class Assessmentlist extends Component
         $this->archive = !$this->archive;
     }
 
-    public function getAssignedAssessments()
-    {
-        $query = AssignedAssessment::query();
-
-        if ($this->archive) {
-            $query->onlyTrashed(); 
-        }
-
-        return $query
-            ->when($this->search, function ($query) {
-                $query->where('title', 'like', '%' . $this->search . '%');
-            })
-            ->orderByDesc('created_at')
-            ->paginate(10);
-    }
-
-
-
     public function loadAssignedAssessments()
     {
         
         return AssignedAssessment::with(['candidate', 'venue'])
             ->selectRaw('assigned_assessments.*, 
                         DATEDIFF(CURRENT_DATE, CONCAT(assigned_assessments.assigned_date, " ", assigned_assessments.assigned_time)) AS aging_days')
-            ->when($this->search, function ($query) {
+            ->when($this->candidateSearchMain, function ($query) {
                 $query->whereHas('candidate', function ($q) {
-                    $q->where('fullname', 'like', '%' . $this->search . '%');
+                    $q->where('fullname', 'like', '%' . $this->candidateSearchMain . '%');
                 });
             })
             ->when($this->filterStatus !== 'all', function ($query) {
@@ -133,61 +125,14 @@ class Assessmentlist extends Component
                 $assignedassessment->access_code = $this->access_code;
                 $assignedassessment->save();
 
-                $assessmentScore = new AssessmentScore();
-                $assessmentScore->assigned_assessment_id = $assignedassessment->id;
-                $assessmentScore->save();
-
-                $candidate = Candidate::findOrFail($this->selectedcandidate['id']);
-                $position = Position::find( $candidate->position_id);
-
-                if ($position && in_array($position->item, [8, 10])) {
-                    Log::info('Candidate\'s position item is 8 or 10', [
-                        'candidate_id' => $candidate->id,
-                        'position_id' => $position->id,
-                        'item' => $position->item,
-                    ]);
+                if ($assignedassessment->draft_status !== 'draft') {
+                    $this->createAssessmentScores($assignedassessment);
                 }
-
-                $positionSkills = PositionSkill::where('position_id', $candidate->position_id)->get();
-
-                $totalDuration = 0;
-
-                foreach ($positionSkills as $skill) {
-                    $assessmentScoreSkill = AssessmentScoreSkill::create([
-                        'assessment_scores_id' => $assessmentScore->id,
-                        'position_skill_id' => $skill->id,
-                    ]);
-
-                    $distribution = match ($skill->competency_level) {
-                        'basic' => ['basic' => 5, 'intermediate' => 2, 'advanced' => 1],
-                        'intermediate' => ['basic' => 2, 'intermediate' => 4, 'advanced' => 2],
-                        'advanced' => ['basic' => 1, 'intermediate' => 2, 'advanced' => 5],
-                        default => ['basic' => 0, 'intermediate' => 0, 'advanced' => 0],
-                    };
-
-                    foreach ($distribution as $level => $count) {
-                        $questions = AssessmentQuestion::where('position_skill_id', $skill->id)
-                            ->where('competency_level', $level)
-                            ->inRandomOrder()
-                            ->limit($count)
-                            ->get();
-
-                        foreach ($questions as $question) {
-                            AssessmentScoreSkillQuestion::create([
-                                'assessment_score_skill_id' => $assessmentScoreSkill->id,
-                                'assessmentquestion_id' => $question->id,
-                            ]);
-
-                            $totalDuration += $question->duration;
-                        }
-                    }
-                }
-
-                $assessmentScore->total_duration = $totalDuration;
-                $assessmentScore->save();
 
                 //emailing
-                if (isset($assignedassessment) && isset($candidate)) {
+                $candidate = Candidate::findOrFail($this->selectedcandidate['id']);
+
+                if ($assignedassessment->draft_status === 'published' && isset($candidate)) {
                     SendAssessmentCodeEmailJob::dispatch($assignedassessment, $candidate);
                 }
             });
@@ -214,6 +159,63 @@ class Assessmentlist extends Component
         }
     }
 
+    private function createAssessmentScores(AssignedAssessment $assignedassessment)
+    {
+        $assessmentScore = new AssessmentScore();
+        $assessmentScore->assigned_assessment_id = $assignedassessment->id;
+        $assessmentScore->save();
+
+        $candidate = Candidate::findOrFail($this->updatecandidate_id);
+
+        $position = Position::find($candidate->position_id);
+
+        if ($position && in_array($position->item, [8, 10])) {
+            Log::info("Candidate's position item is 8 or 10", [
+                'candidate_id' => $candidate->id,
+                'position_id' => $position->id,
+                'item' => $position->item,
+            ]);
+        }
+
+        $positionSkills = PositionSkill::where('position_id', $candidate->position_id)->get();
+        $totalDuration = 0;
+
+        foreach ($positionSkills as $skill) {
+            $assessmentScoreSkill = AssessmentScoreSkill::create([
+                'assessment_scores_id' => $assessmentScore->id,
+                'position_skill_id' => $skill->id,
+            ]);
+
+            $distribution = match ($skill->competency_level) {
+                'basic' => ['basic' => 5, 'intermediate' => 2, 'advanced' => 1],
+                'intermediate' => ['basic' => 2, 'intermediate' => 4, 'advanced' => 2],
+                'advanced' => ['basic' => 1, 'intermediate' => 2, 'advanced' => 5],
+                default => ['basic' => 0, 'intermediate' => 0, 'advanced' => 0],
+            };
+
+            foreach ($distribution as $level => $count) {
+                $questions = AssessmentQuestion::where('position_skill_id', $skill->id)
+                    ->where('competency_level', $level)
+                    ->inRandomOrder()
+                    ->limit($count)
+                    ->get();
+
+                foreach ($questions as $question) {
+                    AssessmentScoreSkillQuestion::create([
+                        'assessment_score_skill_id' => $assessmentScoreSkill->id,
+                        'assessmentquestion_id' => $question->id,
+                    ]);
+
+                    $totalDuration += $question->duration;
+                }
+            }
+        }
+
+        $assessmentScore->total_duration = $totalDuration;
+        $assessmentScore->save();
+    }
+
+
     private function loadDropdownData()
     {
         $this->venues = Venue::all();
@@ -228,8 +230,6 @@ class Assessmentlist extends Component
         return $code;
     }
 
-
-
     public function clear()
     {
         $this->reset();
@@ -237,7 +237,7 @@ class Assessmentlist extends Component
         $this->loadDropdownData();
     }
 
-    public function readAssignedAssessment($assignedAssessmentId)
+    private function loadAssignedAssessmentData($assignedAssessmentId, $mode = 'edit')
     {
         $this->loadDropdownData();
 
@@ -250,14 +250,33 @@ class Assessmentlist extends Component
             'assigned_date' => $assigned_assessment->assigned_date,
             'assigned_time' => $assigned_assessment->assigned_time,
             'venue_id' => $assigned_assessment->venue_id,
-            'assignedoralId' =>$assigned_assessment->id,
+            'assignedoralId' => $assigned_assessment->id,
         ]);
 
         $this->assigned_assessment_id = $assigned_assessment->id;
-        $this->editMode = true;
+
+        $this->editMode = false;
+        $this->viewMode = false;
+
+        if ($mode === 'edit') {
+            $this->editMode = true;
+        } elseif ($mode === 'view') {
+            $this->viewMode = true;
+        }
 
         $this->dispatch('show-assignedAssessmentModal');
     }
+
+    public function readAssignedAssessment($assignedAssessmentId)
+    {
+        $this->loadAssignedAssessmentData($assignedAssessmentId, 'edit');
+    }
+
+    public function viewAssignedAssessment($assignedAssessmentId)
+    {
+        $this->loadAssignedAssessmentData($assignedAssessmentId, 'view');
+    }
+
 
     public function selectCandidates()
     {
@@ -283,26 +302,37 @@ class Assessmentlist extends Component
         $this->dispatch('hide-candidatesModal');
     }
 
-    public function getCandidates()
+   public function getCandidates()
     {
-        $query = Candidate::query();
-    
-        return $query->paginate(5, ['*'], 'candidatesPage');
+        return Candidate::query()
+            ->when($this->candidateSearchModal, function ($query) {
+                $query->where('fullname', 'like', '%' . $this->candidateSearchModal . '%');
+            })
+            ->paginate(5, ['*'], 'candidateModalPage');
     }
+
+
     
 
 
     public function updateAssignedAssessment()
     {
         DB::transaction(function () {  
-            $assignedassessment = AssignedAssessment::findOrFail($this->assigned_assessment_id);
-            
+            $assignedassessment = AssignedAssessment::where('id', $this->assigned_assessment_id)->firstOrFail(); 
+            $this->updatecandidate_id = $assignedassessment->candidate_id;
             $assignedassessment->venue_id = $this->venue_id;
             $assignedassessment->assigned_date = $this->assigned_date;
             $assignedassessment->assigned_time = $this->assigned_time;
             $assignedassessment->draft_status = $this->draft_status;
             $assignedassessment->save();
 
+            $candidate = Candidate::findOrFail($this->updatecandidate_id);
+
+            if ($assignedassessment->draft_status === 'published' && isset($candidate)) {
+                $this->createAssessmentScores($assignedassessment);
+                SendAssessmentCodeEmailJob::dispatch($assignedassessment, $candidate);
+            }
+            
         });
 
         $this->clear();

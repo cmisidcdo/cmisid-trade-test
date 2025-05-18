@@ -210,7 +210,7 @@ class PracticalScheduledScenariosUpdate extends Component
     }
 
 
-    public function updatePracticalScenarios()
+   public function updatePracticalScenarios()
     {
         DB::transaction(function () {
             try {
@@ -218,6 +218,7 @@ class PracticalScheduledScenariosUpdate extends Component
 
                 $updatedScenarioIds = [];
                 $practicalScoreSkill = null;
+                $totalAccumulatedDuration = 0;
 
                 foreach ($this->scenarios as $index => $scenarioData) {
                     Log::info("Processing scenario #{$index}");
@@ -227,6 +228,8 @@ class PracticalScheduledScenariosUpdate extends Component
                         ($scenarioData['minutes'] ?? $this->minutes) * 60 +
                         ($scenarioData['seconds'] ?? $this->seconds)
                     );
+
+                    $totalAccumulatedDuration += $totalSeconds; 
 
                     $positionSkill = PositionSkill::where('position_id', $this->position_id)
                                                 ->where('skill_id', $scenarioData['skill_id'])
@@ -296,21 +299,25 @@ class PracticalScheduledScenariosUpdate extends Component
                     }
                 }
 
+                $practicalScore = PracticalScore::where('assigned_practical_id', $this->assigned_practical_id)->first();
+                if ($practicalScore) {
+                    $practicalScore->total_duration = $totalAccumulatedDuration;
+                    $practicalScore->save();
+                    Log::info("PracticalScore total_duration updated to {$totalAccumulatedDuration} seconds.");
+                }
+
                 if ($practicalScoreSkill) {
-
                     Log::info('Unlinked Scenarios:', ['unlinkedScenarios' => $this->unlinkedScenarios]);
-
-                    $practicalScore = PracticalScore::where('assigned_practical_id', $this->assigned_practical_id)->first();
 
                     if ($practicalScore) {
                         $practicalScoreSkills = PracticalScoreSkill::where('practical_score_id', $practicalScore->id)->get();
 
-                        foreach ($practicalScoreSkills as $practicalScoreSkill) {
-                            $linkedScenarios = PracticalScoreSkillScenario::where('practical_score_skill_id', $practicalScoreSkill->id)->get();
+                        foreach ($practicalScoreSkills as $scoreSkill) {
+                            $linkedScenarios = PracticalScoreSkillScenario::where('practical_score_skill_id', $scoreSkill->id)->get();
 
                             foreach ($linkedScenarios as $linkedScenario) {
                                 if (in_array($linkedScenario->practical_scenario_id, array_column($this->unlinkedScenarios, 'id'))) {
-                                    Log::info("Unlinking scenario ID {$linkedScenario->practical_scenario_id} from score skill ID {$practicalScoreSkill->id}");
+                                    Log::info("Unlinking scenario ID {$linkedScenario->practical_scenario_id} from score skill ID {$scoreSkill->id}");
 
                                     $linkedScenario->delete();
                                     Log::info("Scenario ID {$linkedScenario->practical_scenario_id} unlinked successfully.");
@@ -334,6 +341,7 @@ class PracticalScheduledScenariosUpdate extends Component
         $this->clear();
         $this->dispatch('success', 'Scenarios Updated Successfully');
     }
+
 
     public function toggleArchive()
     {

@@ -31,4 +31,9 @@ class PracticalScore extends Model
     {
         return $this->hasMany(PracticalScoreSkill::class, 'practical_score_id');
     }
+
+    public function user()
+    {
+        return $this->belongsTo(User::class, 'user_id');
+    }
 }

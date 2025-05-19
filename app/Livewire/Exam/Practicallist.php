@@ -261,7 +261,7 @@ class Practicallist extends Component
             $assignedpractical->draft_status = $this->draft_status;
             $assignedpractical->save();
 
-            $candidate = Candidate::findOrFail($this->selectedcandidate['id']);
+            $candidate = Candidate::findOrFail($this->updatecandidate_id);
 
             if ($assignedpractical->draft_status === 'published' && isset($candidate)) {
                 SendPracticalCodeEmailJob::dispatch($assignedpractical, $candidate);

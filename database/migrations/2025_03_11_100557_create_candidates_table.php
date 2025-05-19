@@ -17,7 +17,7 @@ return new class extends Migration
             $table->string('middle_initial')->nullable();
             $table->string('family_name');
             $table->string('extension')->nullable();
-            $table->string('email')->unique();
+            $table->string('email');
             $table->string('contactno')->unique();
             $table->text('attachments')->nullable();
             $table->string('remarks')->nullable();
